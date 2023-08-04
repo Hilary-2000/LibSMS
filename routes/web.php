@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Acquisitions;
 use App\Http\Controllers\login;
 use Illuminate\Support\Facades\Route;
 
@@ -22,6 +23,11 @@ Route::get("/",[login::class,"getSchools"]);
 
 Route::post("/process_login",[login::class,"loginLibrary"]);
 Route::get("/Dashboard",[login::class,"dashboard"]);
+
+// Acquisitions
+Route::get("/Acquisitions",[Acquisitions::class,"Acquisitions"]);
+Route::post("/Acquisitions/add-book",[Acquisitions::class,"addBook"]);
+Route::get("/Acquisitions/getBookDetails",[Acquisitions::class,"getBookDetails"]);
 
 // LOGOUT
 Route::get("/Logout",[login::class,"Logout"]);

@@ -78,6 +78,22 @@ class login extends Controller
                 return redirect("/");
             }
 
+            // get the school details and store it in a session
+            $school_details = DB::select("SELECT * FROM `school_information` WHERE `school_code` = ?",[$school_code]);
+
+            // add the school information
+            if (count($school_details) > 0) {
+                session()->put("school_details",$school_details[0]);
+            }else {
+                session()->flash("error","An error occured, please contact your administrator.");
+
+                // destroy all the cookies
+                Cookie::queue(Cookie::forget("school_code"));
+                Cookie::queue(Cookie::forget("username"));
+                Cookie::queue(Cookie::forget("user_password"));
+                return redirect("/");
+            }
+
             return redirect("/Dashboard");
         }else{
             session()->flash("error","Incorrect credentials, check your school code, username or password for errors.");
@@ -152,6 +168,22 @@ class login extends Controller
                     Cookie::queue(Cookie::forget("user_password"));
 
                     // return to homepage
+                    return redirect("/");
+                }
+
+                // get the school details and store it in a session
+                $school_details = DB::select("SELECT * FROM `school_information` WHERE `school_code` = ?",[$school_code]);
+
+                // add the school information
+                if (count($school_details) > 0) {
+                    session()->put("school_details",$school_details[0]);
+                }else {
+                    session()->flash("error","An error occured, please contact your administrator.");
+    
+                    // destroy all the cookies
+                    Cookie::queue(Cookie::forget("school_code"));
+                    Cookie::queue(Cookie::forget("username"));
+                    Cookie::queue(Cookie::forget("user_password"));
                     return redirect("/");
                 }
 
