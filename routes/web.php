@@ -27,7 +27,10 @@ Route::get("/Dashboard",[login::class,"dashboard"]);
 // Acquisitions
 Route::get("/Acquisitions",[Acquisitions::class,"Acquisitions"]);
 Route::post("/Acquisitions/add-book",[Acquisitions::class,"addBook"]);
+Route::post("/Acquisitions/update-book",[Acquisitions::class,"updateBooks"]);
 Route::get("/Acquisitions/getBookDetails",[Acquisitions::class,"getBookDetails"]);
+Route::get("/Acquisitions/Book-details/{book_id}",[Acquisitions::class,"viewBookData"]);
+Route::get("/Acquisitions/Delete-book/{book_id}",[Acquisitions::class,"deleteBook"]);
 
 // LOGOUT
 Route::get("/Logout",[login::class,"Logout"]);

@@ -550,13 +550,13 @@
                                                 <th class="d-none">ISBN-10</th>
                                                 <th>Date Acquired</th>
                                                 <th>Call No.</th>
-                                                <th>Location</th>
                                                 <th>Actions</th>
                                             </tr>
                                             </thead>
                                             <tbody>
                                                 @for ($i = 0; $i < count($book_list); $i++)
                                                     <tr>
+                                                        <input type="hidden" value="{{json_encode($book_list[$i])}}" id="book_name_{{$book_list[$i]->book_id}}">
                                                         <td>{{$i+1}}</td>
                                                         <td>{{$book_list[$i]->book_title}}</td>
                                                         <td>{{$book_list[$i]->book_author}}</td>
@@ -564,18 +564,14 @@
                                                         <td class="d-none" >{{$book_list[$i]->isbn_10}}</td>
                                                         <td>{{date("M dS, Y",strtotime($book_list[$i]->date_recorded))}}</td>
                                                         <td>{{$book_list[$i]->call_no}}</td>
-                                                        <td>{{$book_list[$i]->shelf_no_location}}</td>
                                                         <td>
                                                             <ul class="list-unstyled hstack gap-1 mb-0">
                                                                 <li data-bs-toggle="tooltip" data-bs-placement="top" title="View">
-                                                                    <a href="job-details.html" class="btn btn-sm btn-soft-primary"><i class="mdi mdi-eye-outline"></i></a>
+                                                                    <a href="/Acquisitions/Book-details/{{$book_list[$i]->book_id}}" class="btn btn-sm btn-soft-primary"><i class="mdi mdi-eye-outline"></i> View</a>
                                                                 </li>
-                                                                <li data-bs-toggle="tooltip" data-bs-placement="top" title="Edit">
-                                                                    <a href="#" class="btn btn-sm btn-soft-info"><i class="mdi mdi-pencil-outline"></i></a>
-                                                                </li>
-                                                                <li data-bs-toggle="tooltip" data-bs-placement="top" title="Delete">
-                                                                    <a href="#jobDelete" data-bs-toggle="modal" class="btn btn-sm btn-soft-danger"><i class="mdi mdi-delete-outline"></i></a>
-                                                                </li>
+                                                                {{-- <li data-bs-toggle="tooltip" data-bs-placement="top" title="Delete">
+                                                                    <button class="btn btn-soft-danger btn-sm delete_data" id="delete_data{{$book_list[$i]->book_id}}"><i class="mdi mdi-delete-outline"></i></button>
+                                                                </li> --}}
                                                             </ul>
                                                         </td>
                                                     </tr>

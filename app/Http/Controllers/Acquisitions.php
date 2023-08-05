@@ -313,6 +313,87 @@ class Acquisitions extends Controller
         return $return_book_details;
     }
 
+    // get the book data
+    function viewBookData($book_id){
+        // check if the isbn number is present in the database and return book details
+        $database_name = session("school_details")->database_name;
+        // SET THE DATABASE NAME AS PER THE STUDENT ADMISSION NO
+        config(['database.connections.mysql2.database' => $database_name]);
+        
+        // connect to mysql 2
+        DB::setDefaultConnection("mysql2");
+
+        // get the book data
+        $book_details = DB::select("SELECT * FROM `library_details` WHERE `book_id` = ?",[$book_id]);
+        
+        // if books are present then we proceed to get more details
+        if (count($book_details) > 0) {
+            // get the subjects present in school
+        // get the list of subjects taught in school
+        $subjects = DB::select("SELECT * FROM `table_subject`");
+        $subject_name = [];
+        for ($index=0; $index < count($subjects); $index++) { 
+            array_push($subject_name,$subjects[$index]->display_name);
+        }
+            // get the book details
+            return view("book_details",["book_details" => $book_details[0], "subject_name" => $subject_name]);
+        }else {
+            session()->flash("error","Book details not found, try another books!");
+            return redirect("/Acquisitions");
+        }
+    }
+
+    function updateBooks(Request $request){
+        // check if the isbn number is present in the database and return book details
+        $database_name = session("school_details")->database_name;
+        // SET THE DATABASE NAME AS PER THE STUDENT ADMISSION NO
+        config(['database.connections.mysql2.database' => $database_name]);
+        
+        // connect to mysql 2
+        DB::setDefaultConnection("mysql2");
+        // return $request;
+        $book_ids = $request->input("book_ids");
+        $book_title = $request->input("book_title");
+        $book_author = $request->input("book_author");
+        $isbn_10 = $request->input("isbn_10");
+        $isbn_13 = $request->input("isbn_13");
+        $no_of_pages = $request->input("no_of_pages");
+        $book_category = $request->input("book_category");
+        $book_publishers = $request->input("book_publishers");
+        $date_published = $request->input("date_published");
+        $book_call_no = $request->input("book_call_no");
+        $book_location = $request->input("book_location");
+        $book_description = $request->input("book_description");
+        $book_cover_url = $request->input("book_cover_url");
+        $book_dimensions = $request->input("book_dimensions");
+        $book_language = $request->input("book_language");
+        $no_of_revisions = $request->input("no_of_revisions");
+
+        // UPDATE THE DATA IN THE DATABASE
+        $update_data = DB::update("UPDATE `library_details` SET `book_title` = ?, `book_author` = ?, `book_publishers` = ?, `published_date` = ?, `thumbnail_location` = ?, `book_category` = ?, `isbn_13` = ?, `isbn_10` = ?, `physical_dimensions` = ?, `no_of_revisions` = ?, `call_no` = ?, `language` = ?, `description` = ?, `shelf_no_location` = ?, `no_of_pages` = ? WHERE `book_id` = ?",[$book_title,$book_author,$book_publishers,$date_published,$book_cover_url,$book_category,$isbn_13,$isbn_10,$book_dimensions,$no_of_revisions,$book_call_no,$book_language,$book_description,$book_location,$no_of_pages,$book_ids]);
+
+        // update the data
+        session()->flash("success","\"".$book_title."\" details have been updated successfully!");
+        return redirect("/Acquisitions/Book-details/".$book_ids);
+    }
+
+    function deleteBook($book_id){
+        // check if the isbn number is present in the database and return book details
+        $database_name = session("school_details")->database_name;
+        // SET THE DATABASE NAME AS PER THE STUDENT ADMISSION NO
+        config(['database.connections.mysql2.database' => $database_name]);
+        
+        // connect to mysql 2
+        DB::setDefaultConnection("mysql2");
+
+        //delete book
+        $delete_book = DB::delete("DELETE FROM `library_details` WHERE `book_id` = ?",[$book_id]);
+        
+        // success message
+        session()->flash("success","Book has been deleted successfully!");
+        return redirect("/Acquisitions");
+    }
+
     // CHECKS IF JSON IS EMPTY
     function isJsonDataPresent($jsonString) {
         // CHECK IF ITS VALID JSON
