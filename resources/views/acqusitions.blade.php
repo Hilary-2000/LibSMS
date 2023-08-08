@@ -284,30 +284,10 @@
                                         @endif
                                         <input type="hidden" id="main_keylogger_listener">
                                         {{-- add the option for scanning --}}
-                                        <div class="container p-0">
-                                            <h5>Scan Options</h5>
-                                            <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
-                                                <input type="radio" class="btn-check w-xs" name="btnradio" id="btnradio4" autocomplete="off" checked="">
-                                                <label class="btn btn-outline-secondary" for="btnradio4">Search Books</label>
-                                              
-                                                <input type="radio" class="btn-check" name="btnradio" id="btnradio5" autocomplete="off">
-                                                <label class="btn btn-outline-secondary" for="btnradio5">Add Books</label>
-                                            </div>
-                                        </div>
                                         <div class="d-flex align-items-center">
                                             <h5 class="mb-0 card-title flex-grow-1">Book List</h5>
                                             <div class="flex-shrink-0">
-                                                <button type="button" class="btn btn-primary waves-effect waves-light" data-bs-toggle="modal" data-bs-target="#exampleModalScrollable">Add a Book</button>
-                                                <a href="." class="btn btn-light"><i class="mdi mdi-refresh"></i></a>
-                                                <div class="dropdown d-inline-block">
-
-                                                    <button type="menu" class="btn btn-success" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false"><i class="mdi mdi-dots-vertical"></i></button>
-                                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                                                        <li><a class="dropdown-item" href="#">Action</a></li>
-                                                        <li><a class="dropdown-item" href="#">Another action</a></li>
-                                                        <li><a class="dropdown-item" href="#">Something else here</a></li>
-                                                    </ul>
-                                                </div>
+                                                <button type="button" id="show_windows" class="btn btn-primary waves-effect waves-light" data-bs-toggle="modal" data-bs-target="#exampleModalScrollable"><i class="bx bx-plus"></i> Add a Book</button>
                                             </div>
                                         </div>
                                     </div>
@@ -470,7 +450,7 @@
                                                                             </div>
                                                                             <div class="col-md-12">
                                                                                 <div class="mb-3">
-                                                                                    <label for="book_call_no" class="form-label">Book Call No</label>
+                                                                                    <label for="book_call_no" class="form-label">Book Call No | <span class="text-success" id="prev_call_no">Call No : N/A</span></label>
                                                                                     <input type="text" name="book_call_no" value="{{session("book_call_no") ? session("book_call_no") : ""}}" class="form-control" id="book_call_no"
                                                                                         placeholder="Book Call No." required>
                                                                                         <div class="valid-feedback">
@@ -540,6 +520,21 @@
                                         </div><!-- /.modal-dialog -->
                                     </div><!-- /.modal -->
                                     <div class="card-body">
+                                        @php
+                                            function elongateData($larger_length,$data){
+                                                // get the length of the string
+                                                $length = strlen($data);
+
+                                                // get the remaining length if string to make it match the longest one
+                                                $larger_length -= $length;
+
+                                                // loop to add the string string to match the longest.
+                                                for ($index=0; $index < $larger_length; $index++) { 
+                                                    $data.= ($index+1 == $larger_length ? "   " : "   ");
+                                                }
+                                                return $data;
+                                            }
+                                        @endphp
                                         <table id="datatable" class="table table-bordered dt-responsive  nowrap w-100">
                                             <thead>
                                             <tr>
@@ -548,6 +543,7 @@
                                                 <th>Author</th>
                                                 <th>ISBN</th>
                                                 <th class="d-none">ISBN-10</th>
+                                                <th class="d-none">Keywords</th>
                                                 <th>Date Acquired</th>
                                                 <th>Call No.</th>
                                                 <th>Actions</th>
@@ -556,14 +552,20 @@
                                             <tbody>
                                                 @for ($i = 0; $i < count($book_list); $i++)
                                                     <tr>
-                                                        <input type="hidden" value="{{json_encode($book_list[$i])}}" id="book_name_{{$book_list[$i]->book_id}}">
                                                         <td>{{$i+1}}</td>
-                                                        <td>{{$book_list[$i]->book_title}}</td>
-                                                        <td>{{$book_list[$i]->book_author}}</td>
-                                                        <td>{{$book_list[$i]->isbn_13}}</td>
+                                                        <td>{{elongateData($larger_length,$book_list[$i]->book_title)}}
+                                                            @if ($book_list[$i]->availability_status == 1)
+                                                                <span data-bs-toggle="tooltip" data-bs-placement="top" title="Available" class="badge bg-success">in</span> 
+                                                            @else
+                                                                <span data-bs-toggle="tooltip" data-bs-placement="top" title="Borrowed" class="badge bg-danger">Out</span> 
+                                                            @endif
+                                                        </td>
+                                                        <td>{{elongateData($larger_length,$book_list[$i]->book_author)}}</td>
+                                                        <td>{{elongateData($larger_length,$book_list[$i]->isbn_13)}}</td>
                                                         <td class="d-none" >{{$book_list[$i]->isbn_10}}</td>
-                                                        <td>{{date("M dS, Y",strtotime($book_list[$i]->date_recorded))}}</td>
-                                                        <td>{{$book_list[$i]->call_no}}</td>
+                                                        <td class="d-none" >{{$book_list[$i]->keywords}}</td>
+                                                        <td>{{elongateData($larger_length,date("M dS, Y",strtotime($book_list[$i]->date_recorded)))}}</td>
+                                                        <td>{{elongateData($larger_length,$book_list[$i]->call_no)}}</td>
                                                         <td>
                                                             <ul class="list-unstyled hstack gap-1 mb-0">
                                                                 <li data-bs-toggle="tooltip" data-bs-placement="top" title="View">
@@ -760,43 +762,44 @@
 
         
         <!-- JAVASCRIPT -->
-        <script src="assets/libs/jquery/jquery.min.js"></script>
-        <script src="assets/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
-        <script src="assets/libs/metismenu/metisMenu.min.js"></script>
-        <script src="assets/libs/simplebar/simplebar.min.js"></script>
-        <script src="assets/libs/node-waves/waves.min.js"></script>
+        <script src="/assets/libs/jquery/jquery.min.js"></script>
+        <script src="/assets/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
+        <script src="/assets/libs/metismenu/metisMenu.min.js"></script>
+        <script src="/assets/libs/simplebar/simplebar.min.js"></script>
+        <script src="/assets/libs/node-waves/waves.min.js"></script>
 
         <!-- Required datatable js -->
-        <script src="assets/libs/datatables.net/js/jquery.dataTables.min.js"></script>
-        <script src="assets/libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js"></script>
+        <script src="/assets/libs/datatables.net/js/jquery.dataTables.min.js"></script>
+        <script src="/assets/libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js"></script>
+
         <!-- Buttons examples -->
-        <script src="assets/libs/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
-        <script src="assets/libs/datatables.net-buttons-bs4/js/buttons.bootstrap4.min.js"></script>
-        <script src="assets/libs/jszip/jszip.min.js"></script>
-        <script src="assets/libs/pdfmake/build/pdfmake.min.js"></script>
-        <script src="assets/libs/pdfmake/build/vfs_fonts.js"></script>
-        <script src="assets/libs/datatables.net-buttons/js/buttons.html5.min.js"></script>
-        <script src="assets/libs/datatables.net-buttons/js/buttons.print.min.js"></script>
-        <script src="assets/libs/datatables.net-buttons/js/buttons.colVis.min.js"></script>
+        <script src="/assets/libs/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
+        <script src="/assets/libs/datatables.net-buttons-bs4/js/buttons.bootstrap4.min.js"></script>
+        <script src="/assets/libs/jszip/jszip.min.js"></script>
+        <script src="/assets/libs/pdfmake/build/pdfmake.min.js"></script>
+        <script src="/assets/libs/pdfmake/build/vfs_fonts.js"></script>
+        <script src="/assets/libs/datatables.net-buttons/js/buttons.html5.min.js"></script>
+        <script src="/assets/libs/datatables.net-buttons/js/buttons.print.min.js"></script>
+        <script src="/assets/libs/datatables.net-buttons/js/buttons.colVis.min.js"></script>
         
         <!-- Responsive examples -->
-        <script src="assets/libs/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
-        <script src="assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js"></script>
+        <script src="/assets/libs/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+        <script src="/assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js"></script>
         
 
         {{-- validation --}}
-        <script src="assets/js/pages/form-validation.init.js"></script>
-        <script src="assets/libs/parsleyjs/parsley.min.js"></script>
+        <script src="/assets/js/pages/form-validation.init.js"></script>
+        <script src="/assets/libs/parsleyjs/parsley.min.js"></script>
 
         <!-- Datatable init js -->
-        <script src="assets/js/pages/datatables.init.js"></script>
+        <script src="assets/js/pages/datatables.init.js"></script>  
 
         {{-- Acqusition --}}
-        <script src="assets/js/acquisition.js"></script>
+        <script src="/assets/js/acquisition.js"></script>
 
         <!-- Alerts Live Demo js -->
-        <script src="assets/js/pages/alerts.init.js"></script>
+        <script src="/assets/js/pages/alerts.init.js"></script>
 
-        <script src="assets/js/app.js"></script>
+        <script src="/assets/js/app.js"></script>
     </body>
 </html>

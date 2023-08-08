@@ -42,8 +42,10 @@ function hasJsonStructure(str) {
     }
 }
 
+var searched = 0;
 cObj("search_book_using_isbn").addEventListener("click",sendAjaxRequest);
 function sendAjaxRequest() {
+    searched = 1;
     var err = 0;
     err += checkBlank("hold_book_isbn_value");
 
@@ -54,6 +56,7 @@ function sendAjaxRequest() {
     
         // initialize the loader
         cObj("book_isbn_loader").classList.remove("d-none");
+        cObj("search_book_using_isbn").disabled = true;
     
         // Configure the request
         xhr.open("GET", "/Acquisitions/getBookDetails?isbn_number="+valObj("hold_book_isbn_value"), true);
@@ -64,6 +67,9 @@ function sendAjaxRequest() {
                 // Request was successful (status code 200)
                 const responseData = JSON.parse(xhr.responseText);
                 // console.log("Data returned:", responseData);
+
+                // disable search button
+                cObj("search_book_using_isbn").disabled = false;
 
                 // You can add actions based on the response data here
                 cObj("book_title").value = responseData.book_title;
@@ -80,6 +86,7 @@ function sendAjaxRequest() {
                 cObj("book_dimensions").value = responseData.physical_dimensions;
                 cObj("book_language").value = responseData.language;
                 cObj("no_of_revisions").value = responseData.revisions;
+                cObj("prev_call_no").innerText = "Last Call No : {"+responseData.last_call_no+"}";
 
                 // set the book image thumbnail
                 var image_url = responseData.cover_url.length > 0 ? responseData.cover_url.substr(0,responseData.cover_url.length-5)+"L.jpg" : "";
@@ -123,9 +130,61 @@ function sendAjaxRequest() {
 }
 
 cObj("hold_book_isbn_value").onkeydown = function (event) {
+    if (searched == 1) {
+        this.value = "";
+        searched = 0;
+    }
     // Check if the pressed key is the "Enter" key (key code 13)
     if (event.keyCode === 13) {
         // Execute your code here
         sendAjaxRequest();
       }
+}
+
+cObj("show_windows").onclick = function () {
+    var inputElement = document.getElementById("hold_book_isbn_value");
+    if (inputElement) {
+        setTimeout(() => {
+            inputElement.focus();
+        }, 500);
+    }
+}
+
+var check_13 = false;
+var tenth_id = null;
+// Add a keydown event listener to the document to capture scanned data
+document.addEventListener('keyup', function (event) {
+    if (event.key === "Control" || event.key === "Ctrl") {
+        event.preventDefault();
+        return 0;
+      }
+      if (event.altKey) {
+        return 0
+      }
+    
+      if (event.shiftKey) {
+        return 0
+      }
+    // Check if the focus is on the book scanner input
+    if (document.activeElement === cObj("hold_book_isbn_value")) {
+        if (valObj("hold_book_isbn_value").trim().length == 10) {
+            var runAjax = setTimeout(() => {
+                sendAjaxRequest();
+                // console.log("10th");
+            }, 1000);
+            tenth_id = runAjax;
+        }
+        if (valObj("hold_book_isbn_value").trim().length == 13) {
+            sendAjaxRequest();
+            // console.log("13th");
+        }
+        // check if more text is typed
+        checkMoreText(tenth_id);
+    }
+});
+
+function checkMoreText(timeout_id) {
+    if (valObj("hold_book_isbn_value").trim().length > 10) {
+        clearTimeout(timeout_id);
+    }
 }

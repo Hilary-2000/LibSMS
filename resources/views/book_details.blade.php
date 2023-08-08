@@ -410,6 +410,29 @@
                                                             <p>{{(isset($book_details->isbn_13) && strlen($book_details->isbn_13) > 0)? $book_details->isbn_13 : "N/A"}}</p>
                                                         </div>
                                                     </div>
+                                                    <div class="col-md-4">
+                                                        <div class="mb-3">
+                                                            <label class="form-label"><b>Date Recorded</b></label>
+                                                            <p>{{(isset($book_details->date_recorded) && strlen($book_details->date_recorded) > 0)? date("D dS M Y",strtotime($book_details->date_recorded)) : "N/A"}}</p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <div class="mb-3">
+                                                            <label class="form-label"><b>Location</b></label>
+                                                            <p>
+                                                                @if($book_details->availability_status == 0)
+                                                                    Borrowed
+                                                                @else
+                                                                    Available at:
+                                                                    @if(isset($book_details->shelf_no_location) && strlen($book_details->shelf_no_location) > 0)
+                                                                        <b>{!! $book_details->shelf_no_location !!}</b>
+                                                                    @else
+                                                                        <b>Location Not Set!</b>
+                                                                    @endif
+                                                                @endif
+                                                            </p>
+                                                        </div>
+                                                    </div>
                                                     <div class="col-md-12">
                                                         <div class="mb-3">
                                                             <label class="form-label"><b>Book Description</b></label>
@@ -652,7 +675,18 @@
                                             </div>
                                             <div class="tab-pane" id="availability_status" role="tabpanel">
                                                 <p class="mb-0">
-                                                    Show the book availability status
+                                                    @if($book_details->availability_status == 0)
+                                                        <p>Borrowed</p>
+                                                    @else
+                                                        <p>
+                                                            Available at:
+                                                            @if(isset($book_details->shelf_no_location) && strlen($book_details->shelf_no_location) > 0)
+                                                                <b>{!! $book_details->shelf_no_location !!}</b>
+                                                            @else
+                                                                <b>Location Not Set!</b>
+                                                            @endif
+                                                        </p>
+                                                    @endif
                                                 </p>
                                             </div>
                                             <div class="tab-pane" id="circulation_log" role="tabpanel">

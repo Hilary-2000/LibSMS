@@ -20,13 +20,28 @@ class Acquisitions extends Controller
         // get the list of books recorded
         $select = DB::select("SELECT * FROM `library_details` ORDER BY `book_id` DESC");
 
+        $larger_length = 0;
+        for ($index=0; $index < count($select); $index++) {
+            $title = strlen($select[$index]->book_title);
+            $larger_length = $title >= $larger_length ? $title : $larger_length;
+            $book_author = strlen($select[$index]->book_author);
+            $larger_length = $book_author >= $larger_length ? $book_author : $larger_length;
+            $isbn_13 = strlen($select[$index]->isbn_13);
+            $larger_length = $isbn_13 >= $larger_length ? $isbn_13 : $larger_length;
+            $date_recorded = strlen($select[$index]->date_recorded);
+            $larger_length = $date_recorded >= $larger_length ? $date_recorded : $larger_length;
+            $call_no = strlen($select[$index]->call_no);
+            $larger_length = $call_no >= $larger_length ? $call_no : $larger_length;
+        }
+
         // get the list of subjects taught in school
         $subjects = DB::select("SELECT * FROM `table_subject`");
         $subject_name = [];
         for ($index=0; $index < count($subjects); $index++) { 
             array_push($subject_name,$subjects[$index]->display_name);
         }
-        return view("acqusitions",["book_list" => $select,"subject_name" => $subject_name]);
+        // return $larger_length;
+        return view("acqusitions",["book_list" => $select,"subject_name" => $subject_name, "larger_length" => $larger_length]);
     }
 
     function addBook(Request $request){
@@ -124,7 +139,7 @@ class Acquisitions extends Controller
         DB::setDefaultConnection("mysql2");
 
         // get the subject details
-        $book_details = DB::select("SELECT * FROM `library_details` WHERE `isbn_13` = ? OR `isbn_10` = ? LIMIT 1",[$isbn_number,$isbn_number]);
+        $book_details = DB::select("SELECT * FROM `library_details` WHERE `isbn_13` = ? OR `isbn_10` = ? ORDER BY `book_id` DESC LIMIT 1",[$isbn_number,$isbn_number]);
 
         // get the book details
         $return_book_details = new stdClass();
@@ -146,6 +161,7 @@ class Acquisitions extends Controller
             $return_book_details->revisions = $book_details[0]->no_of_revisions;
             $return_book_details->present = true;
             $return_book_details->found = true;
+            $return_book_details->last_call_no = $book_details[0]->call_no;
         }else{
             // do a curl request getting the book details from the cloud
             // API endpoint URL
@@ -269,6 +285,7 @@ class Acquisitions extends Controller
                     $return_book_details->revisions = isset($data['details']['revision']) ? $data['details']['revision'] : 0;
                     $return_book_details->present = false;
                     $return_book_details->found = true;
+                    $return_book_details->last_call_no = "N/A";
                 }else {
                     $return_book_details->book_title = "";
                     $return_book_details->book_author = "";
@@ -287,6 +304,7 @@ class Acquisitions extends Controller
                     $return_book_details->revisions = "";
                     $return_book_details->present = false;
                     $return_book_details->found = false;
+                    $return_book_details->last_call_no = "N/A";
                 }
             } else {
                 $return_book_details->book_title = "";
@@ -306,6 +324,7 @@ class Acquisitions extends Controller
                 $return_book_details->revisions = "";
                 $return_book_details->present = false;
                 $return_book_details->found = false;
+                $return_book_details->last_call_no = "N/A";
             }
         }
 
