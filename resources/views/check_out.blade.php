@@ -4,7 +4,7 @@
     <head>
         
         <meta charset="utf-8" />
-        <title>Cataloguing | {{ucwords(strtolower(session("fullname")))}} </title>
+        <title>Check Out | {{ucwords(strtolower(session("fullname")))}} </title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta content="Ladybird Lbrary Management System" name="description" />
         <meta content="Ladybird Softech Co." name="author" />
@@ -12,25 +12,25 @@
         <!-- App favicon -->
         <link rel="shortcut icon" href="/images/ladybird_dark.png">
 
-        <link href="assets/libs/bootstrap-datepicker/css/bootstrap-datepicker.min.css" rel="stylesheet" type="text/css">
+        <link href="/assets/libs/bootstrap-datepicker/css/bootstrap-datepicker.min.css" rel="stylesheet" type="text/css">
 
-        <link href="assets/libs/select2/css/select2.min.css" rel="stylesheet" type="text/css" />
+        <link href="/assets/libs/select2/css/select2.min.css" rel="stylesheet" type="text/css" />
 
         <!-- Bootstrap Css -->
-        <link href="assets/css/bootstrap.min.css" id="bootstrap-style" rel="stylesheet" type="text/css" />
+        <link href="/assets/css/bootstrap.min.css" id="bootstrap-style" rel="stylesheet" type="text/css" />
         <!-- Icons Css -->
-        <link href="assets/css/icons.min.css" rel="stylesheet" type="text/css" />
+        <link href="/assets/css/icons.min.css" rel="stylesheet" type="text/css" />
         <!-- App Css-->
-        <link href="assets/css/app.min.css" id="app-style" rel="stylesheet" type="text/css" />
+        <link href="/assets/css/app.min.css" id="app-style" rel="stylesheet" type="text/css" />
         <!-- App js -->
-        <script src="assets/js/plugin.js"></script>
+        <script src="/assets/js/plugin.js"></script>
 
         <!-- DataTables -->
-        <link href="assets/libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
-        <link href="assets/libs/datatables.net-buttons-bs4/css/buttons.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+        <link href="/assets/libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+        <link href="/assets/libs/datatables.net-buttons-bs4/css/buttons.bootstrap4.min.css" rel="stylesheet" type="text/css" />
 
         <!-- Responsive datatable examples -->
-        <link href="assets/libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+        <link href="/assets/libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css" rel="stylesheet" type="text/css" />
 
     </head>
 
@@ -60,19 +60,19 @@
                         <div class="navbar-brand-box">
                             <a href="." class="logo logo-dark">
                                 <span class="logo-sm">
-                                    <img src="assets/images/logo.svg" alt="" height="22">
+                                    <img src="/assets/images/logo.svg" alt="" height="22">
                                 </span>
                                 <span class="logo-lg">
-                                    <img src="assets/images/logo-dark.png" alt="" height="17">
+                                    <img src="/assets/images/logo-dark.png" alt="" height="17">
                                 </span>
                             </a>
 
                             <a href="." class="logo logo-light">
                                 <span class="logo-sm">
-                                    <img src="images/ladybird_dark-removebg.png" alt="" height="40">
+                                    <img src="/images/ladybird_dark-removebg.png" alt="" height="40">
                                 </span>
                                 <span class="logo-lg">
-                                    <img src="images/ladybird_dark-removebg.png" alt="" height="100">
+                                    <img src="/images/ladybird_dark-removebg.png" alt="" height="100">
                                 </span>
                             </a>
                         </div>
@@ -158,7 +158,7 @@
                         <div class="dropdown d-inline-block">
                             <button type="button" class="btn header-item waves-effect" id="page-header-user-dropdown"
                             data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <img class="rounded-circle header-profile-user" src="assets/images/users/avatar-1.jpg"
+                                <img class="rounded-circle header-profile-user" src="/assets/images/users/avatar-1.jpg"
                                     alt="Header Avatar">
                                 <span class="d-none d-xl-inline-block ms-1" key="t-henry">{{session("gender") == "M" ? "Mr." : "Ms."}} {{explode(" ",ucwords(strtolower(session("fullname"))))[0]}}</span>
                                 <i class="mdi mdi-chevron-down d-none d-xl-inline-block"></i>
@@ -185,9 +185,7 @@
 
             <!-- ========== Left Sidebar Start ========== -->
             <div class="vertical-menu">
-
                 <div data-simplebar class="h-100">
-
                     <!--- Sidemenu -->
                     <div id="sidebar-menu">
                         <!-- Left Menu Start -->
@@ -212,7 +210,7 @@
                                     <span key="t-file-manager">Cataloging</span>
                                 </a>
                             </li>
-                            <li>
+                            <li class="mm-active">
                                 <a href="/Circulation" class="waves-effect">
                                     <i class="bx bx-rotate-left"></i>
                                     <span key="t-file-manager">Circulation</span>
@@ -230,114 +228,109 @@
                                     <span key="t-file-manager">Settings</span>
                                 </a>
                             </li>
+                        </ul>
                     </div>
                     <!-- Sidebar -->
                 </div>
             </div>
             <!-- Left Sidebar End -->
-
             
-
             <!-- ============================================================== -->
             <!-- Start right Content here -->
             <!-- ============================================================== -->
             <div class="main-content">
-
                 <div class="page-content">
                     <div class="container-fluid">
-
-                        <!-- start page title -->
+                        <a href="/Circulation" class="btn btn-soft-primary btn-sm my-3"><i class="bx bx-left-arrow-alt"></i> Back</a>
                         <div class="row">
                             <div class="col-12">
                                 <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                                    <h4 class="mb-sm-0 font-size-18">Book Cataloguing</h4>
-
+                                    <h4 class="mb-sm-0 font-size-18">Check Out Books</h4>
                                     <div class="page-title-right">
                                         <ol class="breadcrumb m-0">
-                                            <li class="breadcrumb-item active">Book Cataloguing</li>
+                                            <li class="breadcrumb-item">Book Circulation</li>
+                                            <li class="breadcrumb-item active">Check Out Book</li>
                                         </ol>
                                     </div>
-
                                 </div>
                             </div>
                         </div>
-                        <!-- end page title -->
-                        
-
                         <div class="row">
-                            <div class="col-lg-12">
-                                <div class="card">
-                                    <div class="card-body border-bottom">
-                                        @if (session("success"))
-                                            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                                                <i class="mdi mdi-check-all me-2"></i>
-                                                {{session("success")}}
-                                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                            </div>
-                                        @endif
-                                        @if (session("error"))
-                                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                                <i class="mdi mdi-check-all me-2"></i>
-                                                {{session("error")}}
-                                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                            </div>
-                                        @endif
-                                        <input type="hidden" id="main_keylogger_listener">
-                                        <h5 class="mb-0 card-title flex-grow-1">Book List</h5>
-                                        {{-- add the option for scanning --}}
-                                        <div class="d-flex align-items-center">
-                                            <div class="flex-shrink-0">
-                                                {{-- <button type="button" id="show_windows" class="btn btn-primary waves-effect waves-light" data-bs-toggle="modal" data-bs-target="#exampleModalScrollable"><i class="bx bx-plus"></i> Add a Book</button> --}}
-                                            </div>
+                            <div class="card">
+                                <div class="card-body border-bottom">
+                                    {{-- <a href="/Circulation/check-in" class="btn btn-secondary"><i class="bx bxs-log-in-circle"></i> Check In</a> --}}
+                                    @if (session("success"))
+                                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                            <i class="mdi mdi-check-all me-2"></i>
+                                            {{session("success")}}
+                                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                                         </div>
-                                    </div>
-
-                                    <div class="card-body">
-                                        <p class="card-desc">This table shows all the different books you have in your library!</p>
-                                        <div class="table-responsive">
-                                            <table id="datatable" class="table table-bordered dt-responsive  nowrap w-100">
-                                                <thead>
-                                                <tr>
-                                                    <th>No.</th>
-                                                    <th>Title</th>
-                                                    <th>Author</th>
-                                                    <th>ISBN</th>
-                                                    <th class="d-none">ISBN-10</th>
-                                                    <th>Quantity</th>
-                                                    <th>Actions</th>
-                                                </tr>
-                                                </thead>
-                                                <tbody>
-                                                    @for ($i = 0; $i < count($book_list); $i++)
-                                                        <tr>
-                                                            <td>{{$i+1}}</td>
-                                                            <td>{{$book_list[$i]['book_title']}}</td>
-                                                            <td>{{$book_list[$i]['book_author']}}</td>
-                                                            <td>{{$book_list[$i]['isbn_13']}}</td>
-                                                            <td class="d-none" >{{$book_list[$i]['isbn_10']}}</td>
-                                                            <td>{{$book_list[$i]['Total']." Book(s)"}}</td>
-                                                            <td>
+                                    @endif
+                                    @if (session("error"))
+                                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                            <i class="mdi mdi-check-all me-2"></i>
+                                            {{session("error")}}
+                                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                        </div>
+                                    @endif
+                                    <p class="card-title-desc">This table below shows the books to be checked out.</p>
+                                    <div class="table-responsive">
+                                        <table id="datatable" class="table table-bordered dt-responsive  nowrap w-100">
+                                            <thead>
+                                            <tr>
+                                                <th>No.</th>
+                                                <th>Title</th>
+                                                <th>Author</th>
+                                                <th>ISBN</th>
+                                                <th class="d-none">ISBN-10</th>
+                                                <th class="d-none">Keywords</th>
+                                                <th>Date Acquired</th>
+                                                <th>Call No.</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                                @for ($i = 0; $i < count($book_list); $i++)
+                                                    <tr>
+                                                        <td>{{$i+1}}</td>
+                                                        <td>{{$book_list[$i]->book_title}}
+                                                            @if ($book_list[$i]->availability_status == 1)
+                                                                <span data-bs-toggle="tooltip" data-bs-placement="top" title="Available" class="badge bg-success">in</span> 
+                                                            @else
+                                                                <span data-bs-toggle="tooltip" data-bs-placement="top" title="Borrowed" class="badge bg-danger">Out</span> 
+                                                            @endif
+                                                        </td>
+                                                        <td>{{$book_list[$i]->book_author}}</td>
+                                                        <td>{{$book_list[$i]->isbn_13}}</td>
+                                                        <td class="d-none" >{{$book_list[$i]->isbn_10}}</td>
+                                                        <td class="d-none" >{{$book_list[$i]->keywords}}</td>
+                                                        <td>{{date("M dS, Y",strtotime($book_list[$i]->date_recorded))}}</td>
+                                                        <td>{{$book_list[$i]->call_no}}</td>
+                                                        <td>
+                                                            @if ($book_list[$i]->availability_status == 1)
                                                                 <ul class="list-unstyled hstack gap-1 mb-0">
-                                                                    <li data-bs-toggle="tooltip" data-bs-placement="top" title="View">
-                                                                        <a href="/Cataloging/Edit/{{$book_list[$i]['isbn_13']}}" class="btn btn-sm btn-soft-primary"><i class="mdi mdi-eye-outline"></i> View</a>
+                                                                    <li data-bs-toggle="tooltip" data-bs-placement="top" title="Check-out">
+                                                                        <a href="/Circulation/check-out/{{$book_list[$i]->book_id}}" class="btn btn-sm btn-soft-primary"><i class="bx bx-log-out-circle"></i> Check-Out</a>
                                                                     </li>
-                                                                    {{-- <li data-bs-toggle="tooltip" data-bs-placement="top" title="Delete">
-                                                                        <button class="btn btn-soft-danger btn-sm delete_data" id="delete_data{{$book_list[$i]->book_id}}"><i class="mdi mdi-delete-outline"></i></button>
-                                                                    </li> --}}
                                                                 </ul>
-                                                            </td>
-                                                        </tr>
-                                                    @endfor
-                                                </tbody>
-                                            </table>
-                                        </div>
+                                                            @else
+                                                                <ul class="list-unstyled hstack gap-1 mb-0">
+                                                                    <li data-bs-toggle="tooltip" data-bs-placement="top" title="View borrower details">
+                                                                        <a href="/Circulation/View/check-out/{{$book_list[$i]->book_id}}/{{$book_list[$i]->circulation_id}}" class="btn btn-sm btn-soft-success"><i class="mdi mdi-eye-outline"></i> View</a>
+                                                                    </li>
+                                                                </ul>
+                                                            @endif
+                                                        </td>
+                                                    </tr>
+                                                @endfor
+                                            </tbody>
+                                        </table>
                                     </div>
-                                </div><!--end card-->
-                            </div><!--end col-->
-                        </div><!--end row-->
-                    </div> <!-- container-fluid -->
-                </div><!-- End Page-content -->
-                <!-- End Page-content -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
                 <footer class="footer">
                     <div class="container-fluid">
@@ -377,7 +370,7 @@
 
                 <div class="p-4">
                     <div class="mb-2">
-                        <img src="assets/images/layouts/layout-1.jpg" class="img-thumbnail" alt="layout images">
+                        <img src="/assets/images/layouts/layout-1.jpg" class="img-thumbnail" alt="layout images">
                     </div>
 
                     <div class="form-check form-switch mb-3">
@@ -386,7 +379,7 @@
                     </div>
     
                     <div class="mb-2">
-                        <img src="assets/images/layouts/layout-2.jpg" class="img-thumbnail" alt="layout images">
+                        <img src="/assets/images/layouts/layout-2.jpg" class="img-thumbnail" alt="layout images">
                     </div>
                     <div class="form-check form-switch mb-3">
                         <input class="form-check-input theme-choice" type="checkbox" id="dark-mode-switch">
@@ -419,13 +412,13 @@
         <script src="/assets/libs/datatables.net-buttons/js/buttons.print.min.js"></script>
         <script src="/assets/libs/datatables.net-buttons/js/buttons.colVis.min.js"></script>
         
+
         {{-- validation --}}
         <script src="/assets/js/pages/form-validation.init.js"></script>
         <script src="/assets/libs/parsleyjs/parsley.min.js"></script>
 
         <!-- Datatable init js -->
-        <script src="assets/js/pages/datatables.init.js"></script> 
-
+        <script src="/assets/js/pages/datatables.init.js"></script>
 
         <!-- Alerts Live Demo js -->
         <script src="/assets/js/pages/alerts.init.js"></script>

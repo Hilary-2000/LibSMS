@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Acquisitions;
 use App\Http\Controllers\Cataloguing;
+use App\Http\Controllers\Circulation;
 use App\Http\Controllers\login;
 use Illuminate\Support\Facades\Route;
 
@@ -34,9 +35,20 @@ Route::get("/Acquisitions/Book-details/{book_id}",[Acquisitions::class,"viewBook
 Route::get("/Acquisitions/Delete-book/{book_id}",[Acquisitions::class,"deleteBook"]);
 
 // Cataloguing
-Route::get("Cataloging",[Cataloguing::class,"Cataloging"]);
+Route::get("/Cataloging",[Cataloguing::class,"Cataloging"]);
 Route::get("/Cataloging/Edit/{book_isbn}",[Cataloguing::class,"editBookDets"]);
 Route::post("/Catalogue/EditBooks",[Cataloguing::class,"editBooks"]);
+
+// Circulation
+Route::get("/Circulation",[Circulation::class,"circulationDashboard"]);
+Route::get("/Circulation/check-out",[Circulation::class,"Circulation_Checkout"]);
+Route::get("/Circulation/check-out/{book_id}",[Circulation::class,"checkOut"]);
+Route::post("/Circulation/Confirm/check-out",[Circulation::class,"confirmCheckOut"]);
+Route::get("/Circulation/View/check-out/{book_id}/{circulation_id}",[Circulation::class,"viewCheckOut"]);
+Route::get("/Circulation/Cancel/check-out/{circulation_id}",[Circulation::class,"cancelCirculationRecord"]);
+Route::post("/Circulation/ExtendReturnDate",[Circulation::class,"extendReturnDate"]);
+Route::get("/Circulation/Confirm/check-in/{circulation_id}",[Circulation::class,"ConfirmCheckIn"]);
+Route::get("/Circulation/Cancel/check-in/{circulation_id}",[Circulation::class,"cancelCheckIn"]);
 
 // LOGOUT
 Route::get("/Logout",[login::class,"Logout"]);

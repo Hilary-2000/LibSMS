@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\DB;
 
+date_default_timezone_set('Africa/Nairobi');
 class login extends Controller
 {
     //this controller is used to manage accounts access

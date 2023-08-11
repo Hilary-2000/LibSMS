@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
+date_default_timezone_set('Africa/Nairobi');
 class Cataloguing extends Controller
 {
     //Manages Cataloguing
@@ -91,6 +92,10 @@ class Cataloguing extends Controller
             // set the session
             $call_number = DB::select("SELECT * FROM `library_details` WHERE `book_id` = ?",[$book_id]);
             if (count($call_number) > 0) {
+                // update the call no on the book circulation table
+                DB::update("UPDATE `book_circulation` SET `book_call_number` = ? WHERE `book_id` = ?",[$book_call_number,$book_id]);
+
+                // redirect back to the book page
                 session()->flash("success","Book data has been successfully updated!");
                 return redirect("/Cataloging/Edit/".$call_number[0]->isbn_13);
             }

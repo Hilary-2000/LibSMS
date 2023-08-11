@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use stdClass;
 
+date_default_timezone_set('Africa/Nairobi');
 class Acquisitions extends Controller
 {
     //handle Acquisitions
@@ -40,7 +41,7 @@ class Acquisitions extends Controller
         for ($index=0; $index < count($subjects); $index++) { 
             array_push($subject_name,$subjects[$index]->display_name);
         }
-        // return $larger_length;
+        // return $select;
         return view("acqusitions",["book_list" => $select,"subject_name" => $subject_name, "larger_length" => $larger_length]);
     }
 
