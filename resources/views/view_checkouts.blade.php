@@ -270,7 +270,8 @@
                                 <div class="card">
                                     <div class="card-body border-bottom text-center">
                                         <h5 class="text-center">Book Thumbnail</h5>
-                                        <img class="mx-auto" src="{{$book_details->thumbnail_location}}" alt="Book Thumbnail" width="200">
+                                        <input type="hidden" value="{{$book_details->thumbnail_location}}" name="" id="book_thumbnail_holder">
+                                        <img class="mx-auto" id="book_thumbnails" alt="Book Thumbnail" width="200">
                                     </div>
                                 </div>
                             </div>
@@ -317,7 +318,7 @@
                                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                     </div>
                                                     <div class="modal-body">
-                                                        <p>This action is irreversible? <br>Are you sure you want to cancel check-out for <b>{{$book_details->book_title}}</b> Call No: <b>{{$book_details->call_no}}</b> by <b>{{$book_borrow_data[0]->borrower_fullname}}</b>?</p>
+                                                        <p>This action is irreversible? <br>Are you sure you want to cancel check-out for <b>{{$book_details->book_title}}</b> Call No: <b>{{$book_details->call_no}}</b> borrowed by <b>{{$book_borrow_data[0]->borrower_fullname}}</b>?</p>
                                                         <p><b>Note:</b><br> When this action is performed the system will assume that the book was not checked out!</p>
                                                     </div>
                                                     <div class="modal-footer">
@@ -641,6 +642,12 @@
         <!-- form advanced init -->
         <script src="/assets/js/pages/form-advanced.init.js"></script>
         {{-- <script src="/assets/js/confirm_checkout.js"></script> --}}
+        <script>
+            var book_thumbnail = document.getElementById("book_thumbnail_holder");
+            window.onload = function () {
+                document.getElementById("book_thumbnails").src = book_thumbnail.value;
+            }
+        </script>
 
         <script src="/assets/js/app.js"></script>
     </body>

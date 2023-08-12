@@ -201,6 +201,7 @@ class Circulation extends Controller
         $student_borrower = $request->input("student_borrower");
         $staff_borrower = $request->input("staff_borrower");
         $expected_return_date = $request->input("expected_return_date");
+        $checkout_comment = $request->input("checkout_comment");
 
         // check if the staff or student is selected
         if ($book_borrower == "staff" && $staff_borrower == "Select an option") {
@@ -231,7 +232,7 @@ class Circulation extends Controller
         $user_id = session("user_id");
 
         // insert
-        $insert = DB::insert("INSERT INTO `book_circulation` (`book_id`,`book_isbn`,`book_call_number`,`user_checked_out`,`user_borrowing`,`date_checked_out`,`expected_return_date`,`checked_out_by`) VALUES (?,?,?,?,?,?,?,?)",[$book_ids,$book_isbn,$book_call_number,$user_checked_out,$book_borrower,$today,$return_date,$user_id]);
+        $insert = DB::insert("INSERT INTO `book_circulation` (`book_id`,`book_isbn`,`book_call_number`,`user_checked_out`,`user_borrowing`,`date_checked_out`,`expected_return_date`,`checked_out_by`,`comments`) VALUES (?,?,?,?,?,?,?,?,?)",[$book_ids,$book_isbn,$book_call_number,$user_checked_out,$book_borrower,$today,$return_date,$user_id,$checkout_comment]);
 
         // update data
         $update = DB::update("UPDATE `library_details` SET `availability_status` = '0' WHERE `book_id` = ?",[$book_ids]);

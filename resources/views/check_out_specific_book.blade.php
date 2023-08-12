@@ -270,7 +270,8 @@
                                 <div class="card">
                                     <div class="card-body border-bottom text-center">
                                         <h5 class="text-center">Book Thumbnail</h5>
-                                        <img class="mx-auto" src="{{$book_details->thumbnail_location}}" alt="Book Thumbnail" width="200">
+                                        <input type="hidden" value="{{$book_details->thumbnail_location}}" id="book_thumbnail_holder">
+                                        <img class="mx-auto" id="book_thumbnails" alt="Book Thumbnail" width="200">
                                     </div>
                                 </div>
                             </div>
@@ -364,6 +365,18 @@
                                                             <div class="mb-3">
                                                                 <label for="expected_return_date" class="form-label">Expected return date</label>
                                                                 <input min="{{date("Y-m-d")}}" type="date" value="{{date("Y-m-d")}}" name="expected_return_date" class="form-control" id="expected_return_date" required>
+                                                                <div class="valid-feedback">
+                                                                    Looks good!
+                                                                </div>
+                                                                <div class="invalid-feedback">
+                                                                    The book return date should be set.
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-12">
+                                                            <div class="mb-3">
+                                                                <label for="checkout_comment" class="form-label">Expected return date</label>
+                                                                <textarea name="checkout_comment" id="checkout_comment" cols="30" rows="5" class="form-control" placeholder="Write your comment here!"></textarea>
                                                                 <div class="valid-feedback">
                                                                     Looks good!
                                                                 </div>
@@ -561,6 +574,12 @@
         <!-- form advanced init -->
         <script src="/assets/js/pages/form-advanced.init.js"></script>
         <script src="/assets/js/confirm_checkout.js"></script>
+        <script>
+            var book_thumbnail = document.getElementById("book_thumbnail_holder");
+            window.onload = function () {
+                document.getElementById("book_thumbnails").src = book_thumbnail.value;
+            }
+        </script>
 
         <script src="/assets/js/app.js"></script>
     </body>

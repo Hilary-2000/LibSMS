@@ -246,7 +246,7 @@
                 <div class="page-content">
                     <div class="container-fluid">
                         <div class="container my-2">
-                            <a href="/Acquisitions" class="btn btn-primary"><i class="bx bx-left-arrow-alt"></i> Back</a>
+                            <a href="/Acquisitions" class="btn btn-soft-primary btn-sm"><i class="bx bx-left-arrow-alt"></i> Back</a>
                         </div>
 
                         <!-- start page title -->
@@ -273,7 +273,8 @@
                                 <div class="card">
                                     <div class="card-body border-bottom text-center">
                                         <h5 class="text-center">Book Thumbnail</h5>
-                                        <img class="mx-auto" src="{{$book_details->thumbnail_location}}" alt="Book Thumbnail" width="200">
+                                        <input type="hidden" value="{{$book_details->thumbnail_location}}" id="book_thumbnail_holder">
+                                        <img class="mx-auto" src="" alt="Book Thumbnail" id="book_thumbnails" width="200">
                                     </div>
                                 </div>
                             </div>
@@ -676,7 +677,7 @@
                                             <div class="tab-pane" id="availability_status" role="tabpanel">
                                                 <p class="mb-0">
                                                     @if($book_details->availability_status == 0)
-                                                        <p>Borrowed</p>
+                                                        <p class="text-soft-success">Book has been borrowed! <br>Check circulation log for more details!</p>
                                                     @else
                                                         <p>
                                                             Available at:
@@ -690,9 +691,109 @@
                                                 </p>
                                             </div>
                                             <div class="tab-pane" id="circulation_log" role="tabpanel">
-                                                <p class="mb-0">
-                                                    show logs of how the book has been borrowed!
-                                                </p>
+                                                <h4 class="card-title mb-5">Activity</h4>
+                                                <ul class="verti-timeline list-unstyled">
+                                                    @if (count($book_circulation_details) > 0)
+                                                        @for ($i = 0; $i < 20; $i++)
+                                                            @if (count($book_circulation_details) == $i)
+                                                                @break;
+                                                            @endif
+                                                            <li class="event-list">
+                                                                <div class="event-timeline-dot">
+                                                                    <i class="bx bx-right-arrow-circle font-size-18"></i>
+                                                                </div>
+                                                                <div class="d-flex">
+                                                                    <div class="flex-shrink-0 me-3">
+                                                                        <h5 class="font-size-10">{{date("D dS M Y @ H:i:s A",strtotime($book_circulation_details[$i]->date))}} <i class="bx bx-right-arrow-alt font-size-16 text-primary align-middle ms-2"></i></h5>
+                                                                    </div>
+                                                                    <div class="flex-grow-1">
+                                                                        <div>
+                                                                            {!!$book_circulation_details[$i]->description!!}
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </li>
+                                                        @endfor
+                                                    @else
+                                                        <li class="event-list">
+                                                            <div class="event-timeline-dot">
+                                                                <i class="bx bx-right-arrow-circle font-size-18"></i>
+                                                            </div>
+                                                            <div class="d-flex">
+                                                                <div class="flex-shrink-0 me-3">
+                                                                    <h5 class="font-size-10">Now <i class="bx bx-right-arrow-alt font-size-16 text-primary align-middle ms-2"></i></h5>
+                                                                </div>
+                                                                <div class="flex-grow-1">
+                                                                    <div>
+                                                                        This book has not been circulated yet!
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                    @endif
+                                                </ul>
+                                                {{-- <ul class="verti-timeline list-unstyled">
+                                                    <li class="event-list">
+                                                        <div class="event-timeline-dot">
+                                                            <i class="bx bx-right-arrow-circle font-size-18"></i>
+                                                        </div>
+                                                        <div class="d-flex">
+                                                            <div class="flex-shrink-0 me-3">
+                                                                <h5 class="font-size-14">22 Nov <i class="bx bx-right-arrow-alt font-size-16 text-primary align-middle ms-2"></i></h5>
+                                                            </div>
+                                                            <div class="flex-grow-1">
+                                                                <div>
+                                                                    Responded to need “Volunteer Activities
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </li>
+                                                    <li class="event-list">
+                                                        <div class="event-timeline-dot">
+                                                            <i class="bx bx-right-arrow-circle font-size-18"></i>
+                                                        </div>
+                                                        <div class="d-flex">
+                                                            <div class="flex-shrink-0 me-3">
+                                                                <h5 class="font-size-14">17 Nov <i class="bx bx-right-arrow-alt font-size-16 text-primary align-middle ms-2"></i></h5>
+                                                            </div>
+                                                            <div class="flex-grow-1">
+                                                                <div>
+                                                                    Everyone realizes why a new common language would be desirable... <a href="javascript: void(0);">Read more</a>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </li>
+                                                    <li class="event-list active">
+                                                        <div class="event-timeline-dot">
+                                                            <i class="bx bxs-right-arrow-circle font-size-18 bx-fade-right"></i>
+                                                        </div>
+                                                        <div class="d-flex">
+                                                            <div class="flex-shrink-0 me-3">
+                                                                <h5 class="font-size-14">15 Nov <i class="bx bx-right-arrow-alt font-size-16 text-primary align-middle ms-2"></i></h5>
+                                                            </div>
+                                                            <div class="flex-grow-1">
+                                                                <div>
+                                                                    Joined the group “Boardsmanship Forum”
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </li>
+                                                    <li class="event-list">
+                                                        <div class="event-timeline-dot">
+                                                            <i class="bx bx-right-arrow-circle font-size-18"></i>
+                                                        </div>
+                                                        <div class="d-flex">
+                                                            <div class="flex-shrink-0 me-3">
+                                                                <h5 class="font-size-14">12 Nov <i class="bx bx-right-arrow-alt font-size-16 text-primary align-middle ms-2"></i></h5>
+                                                            </div>
+                                                            <div class="flex-grow-1">
+                                                                <div>
+                                                                    Responded to need “In-Kind Opportunity”
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </li>
+                                                </ul> --}}
                                             </div>
                                         </div>
                                     </div>
@@ -785,5 +886,11 @@
 
         {{-- app --}}
         <script src="/assets/js/app.js"></script>
+        <script>
+            var book_thumbnail = document.getElementById("book_thumbnail_holder");
+            window.onload = function () {
+                document.getElementById("book_thumbnails").src = book_thumbnail.value;
+            }
+        </script>
     </body>
 </html>

@@ -679,7 +679,9 @@
         <script src="/assets/libs/parsleyjs/parsley.min.js"></script>
 
         <!-- Datatable init js -->
-        <script src="assets/js/pages/datatables.init.js"></script>  
+        <script src="assets/js/pages/datatables.init.js"></script> 
+        <!-- Alerts Live Demo js -->
+        <script src="assets/js/pages/alerts.init.js"></script> 
 
         {{-- Acqusition --}}
         <script src="/assets/js/acquisition.js"></script>

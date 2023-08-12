@@ -514,7 +514,7 @@
                                                                 </td>
                                                                 <td>{{date("D dS M Y",strtotime($checked_out[$i]->expected_return_date))}}
                                                                     @if ((date("Ymd")*1) > (date("Ymd",strtotime($checked_out[$i]->expected_return_date))*1))
-                                                                        <span data-bs-toggle="tooltip" data-bs-placement="top" class="badge badge-pill badge-soft-danger" data-bs-original-title="Overdue {{getDateDifference(date("Ymd"), date("Ymd",strtotime($checked_out[$i]->expected_return_date)), 'days')}} Day(s)">Overdue</span>
+                                                                        <span data-bs-toggle="tooltip" data-bs-placement="top" class="badge badge-pill badge-soft-danger" data-bs-original-title="Overdue by {{getDateDifference(date("Ymd"), date("Ymd",strtotime($checked_out[$i]->expected_return_date)), 'days')}} Day(s)">Overdue</span>
                                                                     @endif
                                                                     @if ((date("Ymd")*1) == (date("Ymd",strtotime($checked_out[$i]->expected_return_date))*1))
                                                                         <span data-bs-toggle="tooltip" data-bs-placement="top" class="badge badge-pill badge-soft-success" data-bs-original-title="Due Today">Due</span>

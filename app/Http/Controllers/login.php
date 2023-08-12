@@ -111,7 +111,63 @@ class login extends Controller
             session()->flash("error","Provide your credentials to Login!");
             return redirect("/");
         }
-        return view("librarian_dash");
+
+        // get the dashboard details
+        // GET THE BOOKS DETAILS BY GROUPING WITH THE ISBN NUMBER
+        $database_name = session("school_details")->database_name;
+        // SET THE DATABASE NAME AS PER THE STUDENT ADMISSION NO
+        config(['database.connections.mysql2.database' => $database_name]);
+        
+        // connect to mysql 2
+        DB::setDefaultConnection("mysql2");
+
+        // get total books in the library
+        $data = DB::select("SELECT COUNT(*) AS 'Total' FROM `library_details`");
+        $book_count = count($data) == 0 ? 0 : number_format($data[0]->Total);
+
+        // books checked out today
+        $today = date("Ymd");
+        $data = DB::select("SELECT COUNT(*) AS 'Total' FROM `book_circulation` WHERE `date_checked_out` LIKE '".$today."%'");
+        $checked_out_today = count($data) == 0 ? 0 : number_format($data[0]->Total);
+
+        // checked in today
+        $data = DB::select("SELECT COUNT(*) AS 'Total' FROM `book_circulation` WHERE `return_date` LIKE '".$today."%'");
+        $checked_in_today = count($data) == 0 ? 0 : number_format($data[0]->Total);
+
+        // books checked out by user
+        $user_id = session("user_id");
+        $data = DB::select("SELECT COUNT(*) AS 'Total' FROM `book_circulation` WHERE `checked_out_by` = '".$user_id."'");
+        $check_out_user = count($data) == 0 ? 0 : number_format($data[0]->Total);
+
+        // books checked in by user
+        $data = DB::select("SELECT COUNT(*) AS 'Total' FROM `book_circulation` WHERE `checked_in_by` = '".$user_id."'");
+        $check_in_user = count($data) == 0 ? 0 : number_format($data[0]->Total);
+
+        // books checked this month
+        $this_month = date("Ym");
+        $data = DB::select("SELECT COUNT(*) AS 'Total' FROM `book_circulation` WHERE `date_checked_out` LIKE '".$this_month."%'");
+        $borrowed_this_month = count($data) == 0 ? 0 : $data[0]->Total;
+
+        // last month
+        $last_month = date("Ym",strtotime("-1 Month"));
+        $data = DB::select("SELECT COUNT(*) AS 'Total' FROM `book_circulation` WHERE `date_checked_out` LIKE '".$last_month."%'");
+        $borrowed_last_month = count($data) == 0 ? 0 : $data[0]->Total;
+
+        // GET THE DATA FOR THE MOST BORROWED BOOK
+        $most_borrowed_books = DB::select("SELECT `book_isbn`, COUNT(*) AS 'Total' FROM `book_circulation` GROUP BY `book_isbn` ORDER BY `Total` DESC LIMIT 3;");
+        // loop through the data to get the books details
+        for ($index=0; $index < count($most_borrowed_books); $index++) { 
+            $book_data  = DB::select("SELECT * FROM `library_details` WHERE `isbn_13` = ? OR `isbn_10` = ? LIMIT 1",[$most_borrowed_books[$index]->book_isbn,$most_borrowed_books[$index]->book_isbn]);
+            $book_title = count($book_data) > 0 ? $book_data[0]->book_title : "N/A";
+
+            // book details
+            $most_borrowed_books[$index]->book_title = $book_title;
+        }
+        // return $most_borrowed_books;
+        // get the latest books
+        $book_data = DB::select("SELECT * FROM `library_details` ORDER BY `book_id` DESC LIMIT 15");
+
+        return view("librarian_dash",["book_data" => $book_data,"most_borrowed_books" => $most_borrowed_books, "borrowed_last_month" => $borrowed_last_month ,"borrowed_this_month" => $borrowed_this_month, "check_in_user" => $check_in_user ,"check_out_user" => $check_out_user,"book_count" => $book_count,"checked_out_today" => $checked_out_today,"checked_in_today" => $checked_in_today]);
     }
     function getSchools(){
         // get if cookies are still available so that we bypass the login process

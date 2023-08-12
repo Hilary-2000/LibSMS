@@ -288,7 +288,8 @@
                                 <div class="card">
                                     <div class="card-body text-center">
                                         <h4 class="card-title">Book Thumbnail</h4>
-                                        <img src="{{$book_data->thumbnail_location}}" alt="Book Thumbnail: " width="150" class="mt-2">
+                                        <input type="hidden" value="{{$book_data->thumbnail_location}}" id="book_thumbnail_holder">
+                                        <img id="book_thumbnails" src="{{$book_data->thumbnail_location}}" alt="Book Thumbnail: " width="150" class="mt-2">
                                     </div>
                                 </div><!--end card-->
                             </div><!--end col-->
@@ -324,6 +325,7 @@
                                                                 <ul class="list-unstyled hstack gap-1 mb-0">
                                                                     <li data-bs-toggle="tooltip" data-bs-placement="top" title="Edit">
                                                                         <button type="button" id="book_details_{{$book_data_all[$i]->book_id}}" class="book_details btn btn-sm btn-soft-primary" data-bs-toggle="modal" data-bs-target="#exampleModalScrollable"><i class="mdi mdi-pen"></i> Edit</button>
+                                                                        <a href="" class="btn btn-soft-primary btn-sm"><i class="mdi mdi-eye"></i> View</a>
                                                                     </li>
                                                                 </ul>
                                                             </td>

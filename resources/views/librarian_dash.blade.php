@@ -282,16 +282,13 @@
 
                                                     <div class="row">
                                                         <div class="col-6">
-                                                            <h5 class="font-size-15">125</h5>
-                                                            <p class="text-muted mb-0">Checked-out</p>
+                                                            <h5 class="font-size-15">{{$check_out_user}} Book(s)</h5>
+                                                            <p class="text-muted mb-0">Checked-Out</p>
                                                         </div>
                                                         <div class="col-6">
-                                                            <h5 class="font-size-15">15</h5>
-                                                            <p class="text-muted mb-0">Checked-out</p>
+                                                            <h5 class="font-size-15">{{$check_in_user}} Book(s)</h5>
+                                                            <p class="text-muted mb-0">Checked-In</p>
                                                         </div>
-                                                    </div>
-                                                    <div class="mt-4">
-                                                        <a href="javascript: void(0);" class="btn btn-primary waves-effect waves-light btn-sm">View Profile <i class="mdi mdi-arrow-right ms-1"></i></a>
                                                     </div>
                                                 </div>
                                             </div>
@@ -300,21 +297,32 @@
                                 </div>
                                 <div class="card">
                                     <div class="card-body">
-                                        <h4 class="card-title mb-4">Books Borrowed</h4>
+                                        <h4 class="card-title mb-4">Books Check-Outs</h4>
                                         <div class="row">
-                                            <div class="col-sm-6">
+                                            <div class="col-sm-12">
                                                 <p class="text-muted">This month</p>
-                                                <h3>1,200</h3>
-                                                <p class="text-muted"><span class="text-success me-2"> 12% <i class="mdi mdi-arrow-up"></i> </span> From previous Month</p>
-
-                                                <div class="mt-4">
-                                                    <a href="javascript: void(0);" class="btn btn-primary waves-effect waves-light btn-sm">View More <i class="mdi mdi-arrow-right ms-1"></i></a>
-                                                </div>
-                                            </div>
-                                            <div class="col-sm-6">
-                                                <div class="mt-4 mt-sm-0">
-                                                    <div id="radialBar-chart" data-colors='["--bs-primary"]' class="apex-charts"></div>
-                                                </div>
+                                                <h3>{{$borrowed_this_month}} </h3>
+                                                <p class="text-muted">
+                                                    @if ($borrowed_this_month > $borrowed_last_month)
+                                                        @php
+                                                            $percentage = round(($borrowed_this_month - $borrowed_last_month) / $borrowed_this_month * 100);
+                                                        @endphp
+                                                        <span class="text-success me-2">{{$percentage}}% <i class="mdi mdi-arrow-up"></i> </span> From previous Month
+                                                    @endif
+                                                    @if ($borrowed_this_month < $borrowed_last_month)
+                                                        @php
+                                                            $percentage = round(($borrowed_last_month - $borrowed_this_month) / $borrowed_this_month * 100);
+                                                        @endphp
+                                                        <span class="text-danger me-2">{{$percentage}}% <i class="mdi mdi-arrow-down"></i> </span> From previous Month
+                                                    @endif
+                                                    @if ($borrowed_this_month == $borrowed_last_month)
+                                                        @php
+                                                            $percentage = 0;
+                                                        @endphp
+                                                        <input type="hidden" value="{{$percentage}}" id="radial_chart_values">
+                                                        <span class="text-danger me-2">{{$percentage}}% <i class="mdi mdi-arrow-down"></i> </span> From previous Month
+                                                    @endif
+                                                </p>
                                             </div>
                                         </div>
                                         <p class="text-muted mb-0">Books are like magic portals to worlds unknown.</p>
@@ -329,7 +337,7 @@
                                                 <div class="d-flex">
                                                     <div class="flex-grow-1">
                                                         <p class="text-muted fw-medium">Total Books</p>
-                                                        <h4 class="mb-0">1,235</h4>
+                                                        <h4 class="mb-0">{{$book_count}} Books</h4>
                                                     </div>
 
                                                     <div class="flex-shrink-0 align-self-center">
@@ -349,7 +357,7 @@
                                                 <div class="d-flex">
                                                     <div class="flex-grow-1">
                                                         <p class="text-muted fw-medium">Checked Out Today</p>
-                                                        <h4 class="mb-0">350</h4>
+                                                        <h4 class="mb-0">{{$checked_out_today}} Books</h4>
                                                     </div>
 
                                                     <div class="flex-shrink-0 align-self-center ">
@@ -369,7 +377,7 @@
                                                 <div class="d-flex">
                                                     <div class="flex-grow-1">
                                                         <p class="text-muted fw-medium">Checked In Today</p>
-                                                        <h4 class="mb-0">12 Books</h4>
+                                                        <h4 class="mb-0">{{$checked_in_today}} Books</h4>
                                                     </div>
 
                                                     <div class="flex-shrink-0 align-self-center">
@@ -384,7 +392,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-xl-6">
+                                    {{-- <div class="col-xl-6">
                                         <div class="card">
                                             <div class="card-body">
                                                 <h4 class="card-title mb-5">Book Circulation Logs</h4>
@@ -453,65 +461,61 @@
                                                 <div class="text-center mt-4"><a href="javascript: void(0);" class="btn btn-primary waves-effect waves-light btn-sm">View More <i class="mdi mdi-arrow-right ms-1"></i></a></div>
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> --}}
 
-                                    <div class="col-xl-6">
+                                    <div class="col-xl-12">
                                         <div class="card">
                                             <div class="card-body">
                                                 <h4 class="card-title mb-4">Top Borrowed Books</h4>
-        
-                                                <div class="text-center">
-                                                    <div class="mb-4">
-                                                        <i class="bx bx-book text-primary display-4"></i>
+                                                @if (count($most_borrowed_books) > 0)
+                                                    <div class="text-center">
+                                                        <div class="mb-4">
+                                                            <i class="bx bx-book text-primary display-4"></i>
+                                                        </div>
+                                                        <h3>{{$most_borrowed_books[0]->Total}} Times</h3>
+                                                        <p>{{$most_borrowed_books[0]->book_title}}</p>
                                                     </div>
-                                                    <h3>1,456</h3>
-                                                    <p>The River Between</p>
-                                                </div>
-        
-                                                <div class="table-responsive mt-4">
-                                                    <table class="table align-middle table-nowrap">
-                                                        <tbody>
-                                                            <tr>
-                                                                <td style="width: 30%">
-                                                                    <p class="mb-0">The River Between</p>
-                                                                </td>
-                                                                <td style="width: 25%">
-                                                                    <h5 class="mb-0">1,456</h5></td>
-                                                                <td>
-                                                                    <div class="progress bg-transparent progress-sm">
-                                                                        <div class="progress-bar bg-primary rounded" role="progressbar" style="width: 94%" aria-valuenow="94" aria-valuemin="0" aria-valuemax="100"></div>
-                                                                    </div>
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td>
-                                                                    <p class="mb-0">Rich Dad, Poor Dad</p>
-                                                                </td>
-                                                                <td>
-                                                                    <h5 class="mb-0">1,123</h5>
-                                                                </td>
-                                                                <td>
-                                                                    <div class="progress bg-transparent progress-sm">
-                                                                        <div class="progress-bar bg-success rounded" role="progressbar" style="width: 82%" aria-valuenow="82" aria-valuemin="0" aria-valuemax="100"></div>
-                                                                    </div>
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td>
-                                                                    <p class="mb-0">48 Laws of Power</p>
-                                                                </td>
-                                                                <td>
-                                                                    <h5 class="mb-0">1,026</h5>
-                                                                </td>
-                                                                <td>
-                                                                    <div class="progress bg-transparent progress-sm">
-                                                                        <div class="progress-bar bg-warning rounded" role="progressbar" style="width: 70%" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100"></div>
-                                                                    </div>
-                                                                </td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
+                                                    @php
+                                                        $total_count = 0;
+                                                        for ($index=0; $index < count($most_borrowed_books); $index++) { 
+                                                            $total_count += $most_borrowed_books[$index]->Total;
+                                                        }
+                                                        // get the percentage of each book
+                                                        for ($index=0; $index < count($most_borrowed_books); $index++) {
+                                                            $percentage = round(($most_borrowed_books[$index]->Total / $total_count) * 100);
+                                                            $most_borrowed_books[$index]->percentage = $percentage;
+                                                        }
+                                                    @endphp
+            
+                                                    <div class="table-responsive mt-4">
+                                                        <table class="table align-middle table-nowrap">
+                                                            <tbody>
+                                                                @for ($i = 0; $i < count($most_borrowed_books); $i++)
+                                                                    <tr>
+                                                                        <td style="width: 30%">
+                                                                            <p class="mb-0">{{$most_borrowed_books[$i]->book_title}}</p>
+                                                                        </td>
+                                                                        <td style="width: 25%">
+                                                                            <h6 class="mb-0">{{number_format($most_borrowed_books[$i]->Total)}} X</h6></td>
+                                                                        <td>
+                                                                            <div class="progress bg-transparent progress-sm">
+                                                                                <div class="progress-bar bg-primary rounded" role="progressbar" style="width: {{$most_borrowed_books[$i]->percentage}}%" aria-valuenow="{{$most_borrowed_books[$i]->percentage}}" aria-valuemin="0" aria-valuemax="100"></div>
+                                                                            </div>
+                                                                        </td>
+                                                                    </tr>
+                                                                @endfor
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                @else
+                                                    <div class="text-center">
+                                                        <div class="mb-4">
+                                                            <i class="bx bx-book text-primary display-4"></i>
+                                                        </div>
+                                                        <h3>0</h3>
+                                                        <p>No Check-Out Done Yet!</p>
+                                                    </div>
+                                                @endif
                                             </div>
                                         </div>
                                     </div>
@@ -530,192 +534,27 @@
                                             <table id="datatable" class="table align-middle dataTable table-nowrap mb-0 dt-responsive w-100 no-footer dtr-inline">
                                                 <thead class="table-light">
                                                     <tr>
-                                                        <th style="width: 20px;">
-                                                            <div class="form-check font-size-16 align-middle">
-                                                                <input class="form-check-input" type="checkbox" id="transactionCheck01">
-                                                                <label class="form-check-label" for="transactionCheck01"></label>
-                                                            </div>
-                                                        </th>
                                                         <th class="align-middle">Title</th>
+                                                        <th class="align-middle">Author</th>
                                                         <th class="align-middle">ISBN-10</th>
                                                         <th class="align-middle">ISBN-13</th>
-                                                        <th class="align-middle">Publisher</th>
-                                                        <th class="align-middle">Quantity</th>
+                                                        <th class="align-middle">Call No</th>
                                                         <th class="align-middle">Date Registered</th>
-                                                        <th class="align-middle">View Details</th>
+                                                        <th class="align-middle">Actions</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    <tr>
-                                                        <td>
-                                                            <div class="form-check font-size-16">
-                                                                <input class="form-check-input" type="checkbox" id="transactionCheck02">
-                                                                <label class="form-check-label" for="transactionCheck02"></label>
-                                                            </div>
-                                                        </td>
-                                                        <td><a href="javascript: void(0);" class="text-body fw-bold">#SK2540</a> </td>
-                                                        <td>Neal Matthews</td>
-                                                        <td>
-                                                            07 Oct, 2019
-                                                        </td>
-                                                        <td>
-                                                            $400
-                                                        </td>
-                                                        <td>
-                                                            <span class="badge badge-pill badge-soft-success font-size-11">Paid</span>
-                                                        </td>
-                                                        <td>
-                                                            <i class="fab fa-cc-mastercard me-1"></i> Mastercard
-                                                        </td>
-                                                        <td>
-                                                            <!-- Button trigger modal -->
-                                                            <button type="button" class="btn btn-primary btn-sm btn-rounded waves-effect waves-light" data-bs-toggle="modal" data-bs-target=".transaction-detailModal">
-                                                                View Details
-                                                            </button>
-                                                        </td>
-                                                    </tr>
-
-                                                    <tr>
-                                                        <td>
-                                                            <div class="form-check font-size-16">
-                                                                <input class="form-check-input" type="checkbox" id="transactionCheck03">
-                                                                <label class="form-check-label" for="transactionCheck03"></label>
-                                                            </div>
-                                                        </td>
-                                                        <td><a href="javascript: void(0);" class="text-body fw-bold">#SK2541</a> </td>
-                                                        <td>Jamal Burnett</td>
-                                                        <td>
-                                                            07 Oct, 2019
-                                                        </td>
-                                                        <td>
-                                                            $380
-                                                        </td>
-                                                        <td>
-                                                            <span class="badge badge-pill badge-soft-danger font-size-11">Chargeback</span>
-                                                        </td>
-                                                        <td>
-                                                            <i class="fab fa-cc-visa me-1"></i> Visa
-                                                        </td>
-                                                        <td>
-                                                            <!-- Button trigger modal -->
-                                                            <button type="button" class="btn btn-primary btn-sm btn-rounded waves-effect waves-light" data-bs-toggle="modal" data-bs-target=".transaction-detailModal">
-                                                                View Details
-                                                            </button>
-                                                        </td>
-                                                    </tr>
-
-                                                    <tr>
-                                                        <td>
-                                                            <div class="form-check font-size-16">
-                                                                <input class="form-check-input" type="checkbox" id="transactionCheck04">
-                                                                <label class="form-check-label" for="transactionCheck04"></label>
-                                                            </div>
-                                                        </td>
-                                                        <td><a href="javascript: void(0);" class="text-body fw-bold">#SK2542</a> </td>
-                                                        <td>Juan Mitchell</td>
-                                                        <td>
-                                                            06 Oct, 2019
-                                                        </td>
-                                                        <td>
-                                                            $384
-                                                        </td>
-                                                        <td>
-                                                            <span class="badge badge-pill badge-soft-success font-size-11">Paid</span>
-                                                        </td>
-                                                        <td>
-                                                            <i class="fab fa-cc-paypal me-1"></i> Paypal
-                                                        </td>
-                                                        <td>
-                                                            <!-- Button trigger modal -->
-                                                            <button type="button" class="btn btn-primary btn-sm btn-rounded waves-effect waves-light" data-bs-toggle="modal" data-bs-target=".transaction-detailModal">
-                                                                View Details
-                                                            </button>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>
-                                                            <div class="form-check font-size-16">
-                                                                <input class="form-check-input" type="checkbox" id="transactionCheck05">
-                                                                <label class="form-check-label" for="transactionCheck05"></label>
-                                                            </div>
-                                                        </td>
-                                                        <td><a href="javascript: void(0);" class="text-body fw-bold">#SK2543</a> </td>
-                                                        <td>Barry Dick</td>
-                                                        <td>
-                                                            05 Oct, 2019
-                                                        </td>
-                                                        <td>
-                                                            $412
-                                                        </td>
-                                                        <td>
-                                                            <span class="badge badge-pill badge-soft-success font-size-11">Paid</span>
-                                                        </td>
-                                                        <td>
-                                                            <i class="fab fa-cc-mastercard me-1"></i> Mastercard
-                                                        </td>
-                                                        <td>
-                                                            <!-- Button trigger modal -->
-                                                            <button type="button" class="btn btn-primary btn-sm btn-rounded waves-effect waves-light" data-bs-toggle="modal" data-bs-target=".transaction-detailModal">
-                                                                View Details
-                                                            </button>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>
-                                                            <div class="form-check font-size-16">
-                                                                <input class="form-check-input" type="checkbox" id="transactionCheck06">
-                                                                <label class="form-check-label" for="transactionCheck06"></label>
-                                                            </div>
-                                                        </td>
-                                                        <td><a href="javascript: void(0);" class="text-body fw-bold">#SK2544</a> </td>
-                                                        <td>Ronald Taylor</td>
-                                                        <td>
-                                                            04 Oct, 2019
-                                                        </td>
-                                                        <td>
-                                                            $404
-                                                        </td>
-                                                        <td>
-                                                            <span class="badge badge-pill badge-soft-warning font-size-11">Refund</span>
-                                                        </td>
-                                                        <td>
-                                                            <i class="fab fa-cc-visa me-1"></i> Visa
-                                                        </td>
-                                                        <td>
-                                                            <!-- Button trigger modal -->
-                                                            <button type="button" class="btn btn-primary btn-sm btn-rounded waves-effect waves-light" data-bs-toggle="modal" data-bs-target=".transaction-detailModal">
-                                                                View Details
-                                                            </button>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>
-                                                            <div class="form-check font-size-16">
-                                                                <input class="form-check-input" type="checkbox" id="transactionCheck07">
-                                                                <label class="form-check-label" for="transactionCheck07"></label>
-                                                            </div>
-                                                        </td>
-                                                        <td><a href="javascript: void(0);" class="text-body fw-bold">#SK2545</a> </td>
-                                                        <td>Jacob Hunter</td>
-                                                        <td>
-                                                            04 Oct, 2019
-                                                        </td>
-                                                        <td>
-                                                            $392
-                                                        </td>
-                                                        <td>
-                                                            <span class="badge badge-pill badge-soft-success font-size-11">Paid</span>
-                                                        </td>
-                                                        <td>
-                                                            <i class="fab fa-cc-paypal me-1"></i> Paypal
-                                                        </td>
-                                                        <td>
-                                                            <!-- Button trigger modal -->
-                                                            <button type="button" class="btn btn-primary btn-sm btn-rounded waves-effect waves-light" data-bs-toggle="modal" data-bs-target=".transaction-detailModal">
-                                                                View Details
-                                                            </button>
-                                                        </td>
-                                                    </tr>
+                                                    @for ($i = 0; $i < count($book_data); $i++)
+                                                        <tr>
+                                                            <td>{{$book_data[$i]->book_title}}</td>
+                                                            <td>{{$book_data[$i]->book_author}}</td>
+                                                            <td>{{$book_data[$i]->isbn_10}}</td>
+                                                            <td>{{$book_data[$i]->isbn_13}}</td>
+                                                            <td>{{$book_data[$i]->call_no}}</td>
+                                                            <td>{{date("D dS M Y",strtotime($book_data[$i]->date_recorded))}}</td>
+                                                            <td><a href="/Acquisitions/Book-details/{{$book_data[$i]->book_id}}" class="btn btn-sm btn-soft-primary"><i class="mdi mdi-eye-outline"></i> View</a></td>
+                                                        </tr>
+                                                    @endfor
                                                 </tbody>
                                             </table>
                                         </div>
