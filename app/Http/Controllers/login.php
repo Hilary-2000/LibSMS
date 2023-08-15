@@ -58,6 +58,7 @@ class login extends Controller
             session()->put("user_id",$user_id);
             session()->put("profile_loc",$profile_loc);
             session()->put("gender",$gender);
+            session()->put("user_details",$user_data[0]);
 
             // create the user librarian
             /**

@@ -223,6 +223,13 @@ class Circulation extends Controller
             return redirect("/Circulation");
         }
 
+        // check the availability status
+        if ($book_details[0]->availability_status == 0) {
+            // the book is available
+            session()->flash("error","This book has already been checked out! Select another book from your list.");
+            return redirect("/Circulation");
+        }
+
         // add a checkout record
         $book_isbn = $book_details[0]->isbn_13;
         $book_call_number = $book_details[0]->call_no;
@@ -399,6 +406,22 @@ class Circulation extends Controller
         if (count($circulation_record) == 0) {
             session()->flash("error","Circulation record cannot be found.");
             return redirect("/Circulation");
+        }
+
+        // check the books availability status
+        $book_details = DB::select("SELECT * FROM `library_details` WHERE `book_id` = ?",[$circulation_record[0]->book_id]);
+        if (count($book_details) == 0) {
+            session()->flash("error","Book details cannot be found!");
+            return redirect("/Circulation");
+        }
+
+        // no book details
+        if (count($book_details) > 0) {
+            if ($book_details[0]->availability_status == 0) {
+                // if the book is absent do not change the check in status
+                session()->flash("error","You cannot cancel a book`s Check-In status when it has been checked out.");
+                return redirect("/Circulation");
+            }
         }
         
         // update the data to change the check in to check out

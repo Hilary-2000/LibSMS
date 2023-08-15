@@ -4,7 +4,7 @@
     <head>
         
         <meta charset="utf-8" />
-        <title>Check Out | {{ucwords(strtolower(session("fullname")))}} </title>
+        <title>User Management | {{ucwords(strtolower(session("fullname")))}} </title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta content="Ladybird Lbrary Management System" name="description" />
         <meta content="Ladybird Softech Co." name="author" />
@@ -226,7 +226,7 @@
                                 </li>
                             @endif
                             @if (isPresent($lib_priv,"Circulation") || count($lib_priv) == 0)
-                                <li class="mm-active">
+                                <li>
                                     <a href="/Circulation" class="waves-effect">
                                         <i class="bx bx-rotate-left"></i>
                                         <span key="t-file-manager">Circulation</span>
@@ -242,12 +242,12 @@
                                 </li>
                             @endif
                             @if (isPresent($lib_priv,"Settings") || count($lib_priv) == 0)
-                                <li class="">
-                                    <a href="javascript: void(0);" class="waves-effect has-arrow " aria-expanded="false">
+                                <li class="mm-active">
+                                    <a href="javascript: void(0);" class="waves-effect has-arrow mm-active" aria-expanded="false">
                                         <i class="bx bx-cog"></i>
                                         <span key="t-jobs">Settings</span>
                                     </a>
-                                    <ul class="sub-menu " aria-expanded="false" style="height: 0px;">
+                                    <ul class="sub-menu mm-active" aria-expanded="false" style="height: 0px;">
                                         <li><a href="/Settings/User-mgmt" class="active" key="t-job-list"><i class="bx bxs-user"></i> User Management</a></li>
                                     </ul>
                                 </li>
@@ -257,103 +257,108 @@
                 </div>
             </div>
             <!-- Left Sidebar End -->
+
             
+
             <!-- ============================================================== -->
             <!-- Start right Content here -->
             <!-- ============================================================== -->
             <div class="main-content">
+
                 <div class="page-content">
                     <div class="container-fluid">
-                        <a href="/Circulation" class="btn btn-soft-primary btn-sm my-3"><i class="bx bx-left-arrow-alt"></i> Back</a>
+
+                        <!-- start page title -->
                         <div class="row">
                             <div class="col-12">
                                 <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                                    <h4 class="mb-sm-0 font-size-18">Check Out Books</h4>
+                                    <h4 class="mb-sm-0 font-size-18">User Management</h4>
+
                                     <div class="page-title-right">
                                         <ol class="breadcrumb m-0">
-                                            <li class="breadcrumb-item">Book Circulation</li>
-                                            <li class="breadcrumb-item active">Check Out Book</li>
+                                            <li class="breadcrumb-item active">User Management</li>
                                         </ol>
                                     </div>
+
                                 </div>
                             </div>
                         </div>
+                        <!-- end page title -->
+                        
+
                         <div class="row">
-                            <div class="card">
-                                <div class="card-body border-bottom">
-                                    {{-- <a href="/Circulation/check-in" class="btn btn-secondary"><i class="bx bxs-log-in-circle"></i> Check In</a> --}}
-                                    @if (session("success"))
-                                        <div class="alert alert-success alert-dismissible fade show" role="alert">
-                                            <i class="mdi mdi-check-all me-2"></i>
-                                            {{session("success")}}
-                                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            <div class="col-lg-12">
+                                <div class="card">
+                                    <div class="card-body border-bottom">
+                                        @if (session("success"))
+                                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                                <i class="mdi mdi-check-all me-2"></i>
+                                                {{session("success")}}
+                                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                            </div>
+                                        @endif
+                                        @if (session("error"))
+                                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                                <i class="mdi mdi-check-all me-2"></i>
+                                                {{session("error")}}
+                                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                            </div>
+                                        @endif
+                                        <input type="hidden" id="main_keylogger_listener">
+                                        {{-- add the option for scanning --}}
+                                        <div class="d-flex align-items-center">
+                                            <h5 class="mb-0 card-title flex-grow-1">Patron List</h5>
+                                            <div class="flex-shrink-0">
+                                            </div>
                                         </div>
-                                    @endif
-                                    @if (session("error"))
-                                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                            <i class="mdi mdi-check-all me-2"></i>
-                                            {{session("error")}}
-                                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                        </div>
-                                    @endif
-                                    <p class="card-title-desc">This table below shows the books to be checked out.</p>
-                                    <div class="table-responsive">
-                                        <table id="datatable" class="table table-bordered dt-responsive  nowrap w-100">
-                                            <thead>
-                                            <tr>
-                                                <th>No.</th>
-                                                <th>Title</th>
-                                                <th>Author</th>
-                                                <th>ISBN</th>
-                                                <th class="d-none">ISBN-10</th>
-                                                <th class="d-none">Keywords</th>
-                                                <th>Date Acquired</th>
-                                                <th>Call No.</th>
-                                                <th>Actions</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody>
-                                                @for ($i = 0; $i < count($book_list); $i++)
-                                                    <tr>
-                                                        <td>{{$i+1}}</td>
-                                                        <td>{{$book_list[$i]->book_title}}
-                                                            @if ($book_list[$i]->availability_status == 1)
-                                                                <span data-bs-toggle="tooltip" data-bs-placement="top" title="Available" class="badge bg-success">in</span> 
-                                                            @else
-                                                                <span data-bs-toggle="tooltip" data-bs-placement="top" title="Borrowed" class="badge bg-danger">Out</span> 
-                                                            @endif
-                                                        </td>
-                                                        <td>{{$book_list[$i]->book_author}}</td>
-                                                        <td>{{$book_list[$i]->isbn_13}}</td>
-                                                        <td class="d-none" >{{$book_list[$i]->isbn_10}}</td>
-                                                        <td class="d-none" >{{$book_list[$i]->keywords}}</td>
-                                                        <td>{{date("M dS, Y",strtotime($book_list[$i]->date_recorded))}}</td>
-                                                        <td>{{$book_list[$i]->call_no}}</td>
-                                                        <td>
-                                                            @if ($book_list[$i]->availability_status == 1)
-                                                                <ul class="list-unstyled hstack gap-1 mb-0">
-                                                                    <li data-bs-toggle="tooltip" data-bs-placement="top" title="Check-out">
-                                                                        <a href="/Circulation/check-out/{{$book_list[$i]->book_id}}" class="btn btn-sm btn-soft-primary"><i class="bx bx-log-out-circle"></i> Check-Out</a>
-                                                                    </li>
-                                                                </ul>
-                                                            @else
-                                                                <ul class="list-unstyled hstack gap-1 mb-0">
-                                                                    <li data-bs-toggle="tooltip" data-bs-placement="top" title="View borrower details">
-                                                                        <a href="/Circulation/View/check-out/{{$book_list[$i]->book_id}}/{{$book_list[$i]->circulation_id}}" class="btn btn-sm btn-soft-success"><i class="mdi mdi-eye-outline"></i> View</a>
-                                                                    </li>
-                                                                </ul>
-                                                            @endif
-                                                        </td>
-                                                    </tr>
-                                                @endfor
-                                            </tbody>
-                                        </table>
                                     </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                                    <div class="card-body">
+                                        @php
+                                            
+                                        @endphp
+                                        <div class="table-responsive">
+                                            <table id="datatable" class="table table-bordered dt-responsive  nowrap w-100">
+                                                <thead>
+                                                <tr>
+                                                    <th>No.</th>
+                                                    <th>Fullname</th>
+                                                    <th>Role</th>
+                                                    <th>Phone Number</th>
+                                                    <th>Email</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                    
+                                                    @for ($i = 0; $i < count($user_data); $i++)
+                                                        <tr>
+                                                            <td>{{$i+1}}</td>
+                                                            <td>{{ucwords(strtolower($user_data[$i]->fullname))}}</td>
+                                                            <td>{{$user_data[$i]->auth == 1 ? "Headteacher" : ($user_data[$i]->auth == 0 ? "Administrator" : "Librarian")}}</td>
+                                                            <td>{{$user_data[$i]->phone_number}}</td>
+                                                            <td>{{$user_data[$i]->email}}</td>
+                                                            <td>
+                                                                <ul class="list-unstyled hstack gap-1 mb-0">
+                                                                    <li data-bs-toggle="tooltip" data-bs-placement="top" title="View patrons privileges">
+                                                                        <a href="/Settings/User-mgmt/{{$user_data[$i]->user_id}}" class="btn btn-soft-primary btn-sm"><i class="bx bx-cog"></i> Manage</a>
+                                                                    </li>
+                                                                </ul>
+                                                            </td>
+                                                        </tr>
+                                                    @endfor
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div><!--end card-->
+                            </div><!--end col-->
+
+                        </div><!--end row-->
+                        
+
+                    </div> <!-- container-fluid -->
+                </div><!-- End Page-content -->
+                <!-- End Page-content -->
 
                 <footer class="footer">
                     <div class="container-fluid">
@@ -441,8 +446,7 @@
         <script src="/assets/libs/parsleyjs/parsley.min.js"></script>
 
         <!-- Datatable init js -->
-        <script src="/assets/js/pages/datatables.init.js"></script>
-
+        <script src="/assets/js/pages/datatables.init.js"></script> 
         <!-- Alerts Live Demo js -->
         <script src="/assets/js/pages/alerts.init.js"></script>
 

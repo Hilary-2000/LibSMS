@@ -4,7 +4,7 @@
     <head>
         
         <meta charset="utf-8" />
-        <title>Check Out | {{ucwords(strtolower(session("fullname")))}} </title>
+        <title>Reports | {{ucwords(strtolower(session("fullname")))}} </title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta content="Ladybird Lbrary Management System" name="description" />
         <meta content="Ladybird Softech Co." name="author" />
@@ -12,25 +12,25 @@
         <!-- App favicon -->
         <link rel="shortcut icon" href="/images/ladybird_dark.png">
 
-        <link href="/assets/libs/bootstrap-datepicker/css/bootstrap-datepicker.min.css" rel="stylesheet" type="text/css">
+        <link href="assets/libs/bootstrap-datepicker/css/bootstrap-datepicker.min.css" rel="stylesheet" type="text/css">
 
-        <link href="/assets/libs/select2/css/select2.min.css" rel="stylesheet" type="text/css" />
+        <link href="assets/libs/select2/css/select2.min.css" rel="stylesheet" type="text/css" />
 
         <!-- Bootstrap Css -->
-        <link href="/assets/css/bootstrap.min.css" id="bootstrap-style" rel="stylesheet" type="text/css" />
+        <link href="assets/css/bootstrap.min.css" id="bootstrap-style" rel="stylesheet" type="text/css" />
         <!-- Icons Css -->
-        <link href="/assets/css/icons.min.css" rel="stylesheet" type="text/css" />
+        <link href="assets/css/icons.min.css" rel="stylesheet" type="text/css" />
         <!-- App Css-->
-        <link href="/assets/css/app.min.css" id="app-style" rel="stylesheet" type="text/css" />
+        <link href="assets/css/app.min.css" id="app-style" rel="stylesheet" type="text/css" />
         <!-- App js -->
-        <script src="/assets/js/plugin.js"></script>
+        <script src="assets/js/plugin.js"></script>
 
         <!-- DataTables -->
-        <link href="/assets/libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
-        <link href="/assets/libs/datatables.net-buttons-bs4/css/buttons.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+        <link href="assets/libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+        <link href="assets/libs/datatables.net-buttons-bs4/css/buttons.bootstrap4.min.css" rel="stylesheet" type="text/css" />
 
         <!-- Responsive datatable examples -->
-        <link href="/assets/libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+        <link href="assets/libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css" rel="stylesheet" type="text/css" />
 
     </head>
 
@@ -60,19 +60,19 @@
                         <div class="navbar-brand-box">
                             <a href="." class="logo logo-dark">
                                 <span class="logo-sm">
-                                    <img src="/assets/images/logo.svg" alt="" height="22">
+                                    <img src="assets/images/logo.svg" alt="" height="22">
                                 </span>
                                 <span class="logo-lg">
-                                    <img src="/assets/images/logo-dark.png" alt="" height="17">
+                                    <img src="assets/images/logo-dark.png" alt="" height="17">
                                 </span>
                             </a>
 
                             <a href="." class="logo logo-light">
                                 <span class="logo-sm">
-                                    <img src="/images/ladybird_dark-removebg.png" alt="" height="40">
+                                    <img src="images/ladybird_dark-removebg.png" alt="" height="40">
                                 </span>
                                 <span class="logo-lg">
-                                    <img src="/images/ladybird_dark-removebg.png" alt="" height="100">
+                                    <img src="images/ladybird_dark-removebg.png" alt="" height="100">
                                 </span>
                             </a>
                         </div>
@@ -158,7 +158,7 @@
                         <div class="dropdown d-inline-block">
                             <button type="button" class="btn header-item waves-effect" id="page-header-user-dropdown"
                             data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <img class="rounded-circle header-profile-user" src="/assets/images/users/avatar-1.jpg"
+                                <img class="rounded-circle header-profile-user" src="assets/images/users/avatar-1.jpg"
                                     alt="Header Avatar">
                                 <span class="d-none d-xl-inline-block ms-1" key="t-henry">{{session("gender") == "M" ? "Mr." : "Ms."}} {{explode(" ",ucwords(strtolower(session("fullname"))))[0]}}</span>
                                 <i class="mdi mdi-chevron-down d-none d-xl-inline-block"></i>
@@ -226,7 +226,7 @@
                                 </li>
                             @endif
                             @if (isPresent($lib_priv,"Circulation") || count($lib_priv) == 0)
-                                <li class="mm-active">
+                                <li>
                                     <a href="/Circulation" class="waves-effect">
                                         <i class="bx bx-rotate-left"></i>
                                         <span key="t-file-manager">Circulation</span>
@@ -257,103 +257,194 @@
                 </div>
             </div>
             <!-- Left Sidebar End -->
+
             
+
             <!-- ============================================================== -->
             <!-- Start right Content here -->
             <!-- ============================================================== -->
             <div class="main-content">
+
                 <div class="page-content">
                     <div class="container-fluid">
-                        <a href="/Circulation" class="btn btn-soft-primary btn-sm my-3"><i class="bx bx-left-arrow-alt"></i> Back</a>
+
+                        <!-- start page title -->
                         <div class="row">
                             <div class="col-12">
                                 <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                                    <h4 class="mb-sm-0 font-size-18">Check Out Books</h4>
+                                    <h4 class="mb-sm-0 font-size-18">Book Reports</h4>
+
                                     <div class="page-title-right">
                                         <ol class="breadcrumb m-0">
-                                            <li class="breadcrumb-item">Book Circulation</li>
-                                            <li class="breadcrumb-item active">Check Out Book</li>
+                                            <li class="breadcrumb-item active">Book Reports</li>
                                         </ol>
                                     </div>
+
                                 </div>
                             </div>
                         </div>
+                        <!-- end page title -->
+                        
+
                         <div class="row">
-                            <div class="card">
-                                <div class="card-body border-bottom">
-                                    {{-- <a href="/Circulation/check-in" class="btn btn-secondary"><i class="bx bxs-log-in-circle"></i> Check In</a> --}}
-                                    @if (session("success"))
-                                        <div class="alert alert-success alert-dismissible fade show" role="alert">
-                                            <i class="mdi mdi-check-all me-2"></i>
-                                            {{session("success")}}
-                                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            <div class="col-lg-12">
+                                <div class="card">
+                                    <div class="card-body border-bottom">
+                                        @if (session("success"))
+                                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                                <i class="mdi mdi-check-all me-2"></i>
+                                                {{session("success")}}
+                                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                            </div>
+                                        @endif
+                                        @if (session("error"))
+                                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                                <i class="mdi mdi-check-all me-2"></i>
+                                                {{session("error")}}
+                                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                            </div>
+                                        @endif
+                                        {{-- add the option for scanning --}}
+                                        <div class="d-flex align-items-center">
+                                            <h5 class="mb-0 card-title flex-grow-1">Library MIS Reports</h5>
                                         </div>
-                                    @endif
-                                    @if (session("error"))
-                                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                            <i class="mdi mdi-check-all me-2"></i>
-                                            {{session("error")}}
-                                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                        </div>
-                                    @endif
-                                    <p class="card-title-desc">This table below shows the books to be checked out.</p>
-                                    <div class="table-responsive">
-                                        <table id="datatable" class="table table-bordered dt-responsive  nowrap w-100">
-                                            <thead>
-                                            <tr>
-                                                <th>No.</th>
-                                                <th>Title</th>
-                                                <th>Author</th>
-                                                <th>ISBN</th>
-                                                <th class="d-none">ISBN-10</th>
-                                                <th class="d-none">Keywords</th>
-                                                <th>Date Acquired</th>
-                                                <th>Call No.</th>
-                                                <th>Actions</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody>
-                                                @for ($i = 0; $i < count($book_list); $i++)
-                                                    <tr>
-                                                        <td>{{$i+1}}</td>
-                                                        <td>{{$book_list[$i]->book_title}}
-                                                            @if ($book_list[$i]->availability_status == 1)
-                                                                <span data-bs-toggle="tooltip" data-bs-placement="top" title="Available" class="badge bg-success">in</span> 
-                                                            @else
-                                                                <span data-bs-toggle="tooltip" data-bs-placement="top" title="Borrowed" class="badge bg-danger">Out</span> 
-                                                            @endif
-                                                        </td>
-                                                        <td>{{$book_list[$i]->book_author}}</td>
-                                                        <td>{{$book_list[$i]->isbn_13}}</td>
-                                                        <td class="d-none" >{{$book_list[$i]->isbn_10}}</td>
-                                                        <td class="d-none" >{{$book_list[$i]->keywords}}</td>
-                                                        <td>{{date("M dS, Y",strtotime($book_list[$i]->date_recorded))}}</td>
-                                                        <td>{{$book_list[$i]->call_no}}</td>
-                                                        <td>
-                                                            @if ($book_list[$i]->availability_status == 1)
-                                                                <ul class="list-unstyled hstack gap-1 mb-0">
-                                                                    <li data-bs-toggle="tooltip" data-bs-placement="top" title="Check-out">
-                                                                        <a href="/Circulation/check-out/{{$book_list[$i]->book_id}}" class="btn btn-sm btn-soft-primary"><i class="bx bx-log-out-circle"></i> Check-Out</a>
-                                                                    </li>
-                                                                </ul>
-                                                            @else
-                                                                <ul class="list-unstyled hstack gap-1 mb-0">
-                                                                    <li data-bs-toggle="tooltip" data-bs-placement="top" title="View borrower details">
-                                                                        <a href="/Circulation/View/check-out/{{$book_list[$i]->book_id}}/{{$book_list[$i]->circulation_id}}" class="btn btn-sm btn-soft-success"><i class="mdi mdi-eye-outline"></i> View</a>
-                                                                    </li>
-                                                                </ul>
-                                                            @endif
-                                                        </td>
-                                                    </tr>
-                                                @endfor
-                                            </tbody>
-                                        </table>
+                                        <hr>
+                                        <form class="row" method="GET" action="/Reports">
+                                            <div class="col-md-3">
+                                                <label for="book_options_inside" class="form-control-label">Book Options</label>
+                                                <select name="book_options_inside" id="book_options_inside" class="form-control" required>
+                                                    <option hidden value="">Select book option</option>
+                                                    <option {{session('book_options_inside') == "book_information" ? "selected" : ""}} value="book_information">Book Information</option>
+                                                    <option {{session('book_options_inside') == "latest_acquisition" ? "selected" : ""}} value="latest_acquisition">Acquisition</option>
+                                                    <option {{session('book_options_inside') == "checked_out" ? "selected" : ""}} value="checked_out">Checked Out</option>
+                                                    <option {{session('book_options_inside') == "checked_in" ? "selected" : ""}} value="checked_in">Checked In</option>
+                                                    <option {{session('book_options_inside') == "due_checked_in" ? "selected" : ""}} value="due_checked_in">Borrowed due for Check-In</option>
+                                                    <option {{session('book_options_inside') == "to_be_due_checkin" ? "selected" : ""}} value="to_be_due_checkin">Due for Check-In & days before</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-3 {{(session('book_options_inside') == "latest_acquisition" || session('book_options_inside') == "checked_out" ||session('book_options_inside') == "checked_in" || session('book_options_inside') == "due_checked_in") ? "" : "d-none"}}" id="date_selection_option">
+                                                <label for="date_type_selection" class="form-control-label">Date Selection Options</label>
+                                                <select name="date_type_selection" id="date_type_selection" class="form-control">
+                                                    <option hidden value="">Select date option</option>
+                                                    <option {{session("date_type_selection") == "specific_date" ? "selected" : ""}} selected value="specific_date">Specific Date</option>
+                                                    <option {{session("date_type_selection") == "between_periods" ? "selected" : ""}} value="between_periods">Between Periods</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-3 {{(session('book_options_inside') == "latest_acquisition" || session('book_options_inside') == "checked_out" ||session('book_options_inside') == "checked_in" || session('book_options_inside') == "due_checked_in") && session("date_type_selection") == "specific_date" ? "" : "d-none"}}" id="single_date">
+                                                <label for="select_date_1" class="form-control-label">Select Date:</label>
+                                                <input type="date" value="{{(session("select_date_1") != null) ? session("select_date_1") : date("Y-m-d")}}" class="form-control" name="select_date_1" id="select_date_1">
+                                            </div>
+                                            <div class="col-md-3 {{(session('book_options_inside') == "latest_acquisition" || session('book_options_inside') == "checked_out" ||session('book_options_inside') == "checked_in" || session('book_options_inside') == "due_checked_in") && session("date_type_selection") == "between_periods" ? "" : "d-none"}}" id="from_date">
+                                                <label for="select_date_from" class="form-control-label">From:</label>
+                                                <input type="date" value="{{(session("select_date_from") != null) ? session("select_date_from") : date("Y-m-d",strtotime("-7 days"))}}" class="form-control" name="select_date_from" id="select_date_from">
+                                            </div>
+                                            <div class="col-md-3 {{(session('book_options_inside') == "latest_acquisition" || session('book_options_inside') == "checked_out" ||session('book_options_inside') == "checked_in" || session('book_options_inside') == "due_checked_in") && session("date_type_selection") == "between_periods" ? "" : "d-none"}}" id="to_date">
+                                                <label for="select_date_to" class="form-control-label">To:</label>
+                                                <input type="date" value="{{(session("select_date_to") != null) ? session("select_date_to") : date("Y-m-d")}}" class="form-control" name="select_date_to" id="select_date_to">
+                                            </div>
+                                            <div class="col-md-3">
+                                                <button class="mt-3 btn btn-primary" type="submit" id="filter_button"><i class="bx bx-filter-alt"></i> Display</button>
+                                            </div>
+                                        </form>
                                     </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                                    @if (isset($book_list))
+                                    <div class="card-body">
+                                        <div class="table-responsive">
+                                            <table id="datatable" class="table table-bordered dt-responsive  nowrap w-100">
+                                                <thead>
+                                                <tr>
+                                                    <th>No.</th>
+                                                    <th>Title</th>
+                                                    <th>Author</th>
+                                                    <th>ISBN</th>
+                                                    <th class="d-none">ISBN-10</th>
+                                                    <th class="d-none">Keywords</th>
+                                                    <th>Date Acquired</th>
+                                                    <th>Call No.</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @for ($i = 0; $i < count($book_list); $i++)
+                                                        <tr>
+                                                            <td>{{$i+1}}</td>
+                                                            <td>{{$book_list[$i]->book_title}}
+                                                                @if ($book_list[$i]->availability_status == 1)
+                                                                    <span data-bs-toggle="tooltip" data-bs-placement="top" title="Available" class="badge bg-success">in</span> 
+                                                                @else
+                                                                    <span data-bs-toggle="tooltip" data-bs-placement="top" title="Borrowed" class="badge bg-danger">Out</span> 
+                                                                @endif
+                                                            </td>
+                                                            <td>{{$book_list[$i]->book_author}}</td>
+                                                            <td>{{$book_list[$i]->isbn_13}}</td>
+                                                            <td class="d-none" >{{$book_list[$i]->isbn_10}}</td>
+                                                            <td class="d-none" >{{$book_list[$i]->keywords}}</td>
+                                                            <td>{{date("M dS, Y",strtotime($book_list[$i]->date_recorded))}}</td>
+                                                            <td>{{$book_list[$i]->call_no}}</td>
+                                                            <td>
+                                                                <ul class="list-unstyled hstack gap-1 mb-0">
+                                                                    <li data-bs-toggle="tooltip" data-bs-placement="top" title="View">
+                                                                        <a href="/Acquisitions/Book-details/{{$book_list[$i]->book_id}}" class="btn btn-sm btn-soft-primary"><i class="mdi mdi-eye-outline"></i> View</a>
+                                                                    </li>
+                                                                    {{-- <li data-bs-toggle="tooltip" data-bs-placement="top" title="Delete">
+                                                                        <button class="btn btn-soft-danger btn-sm delete_data" id="delete_data{{$book_list[$i]->book_id}}"><i class="mdi mdi-delete-outline"></i></button>
+                                                                    </li> --}}
+                                                                </ul>
+                                                            </td>
+                                                        </tr>
+                                                    @endfor
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    @else
+                                        <div class="card-body">
+                                            <div class="container text-center">
+                                                <h5 class="card-title">{{$search_heading}}</h5>
+                                            </div>
+                                            <div class="table-responsive">
+                                                <table id="datatable" class="table table-bordered dt-responsive nowrap w-100">
+                                                    <thead>
+                                                    <tr>
+                                                        @for ($i = 0; $i < count($table_heading); $i++)
+                                                            <th>{{$table_heading[$i]}}</th>
+                                                        @endfor
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @for ($index = 0; $index < count($book_data); $index++)
+                                                            <tr>
+                                                                @for ($i = 0; $i < count($book_data[$index]); $i++)
+                                                                    @if (($i+1) == count($book_data[$index]))
+                                                                        <td>
+                                                                            <ul class="list-unstyled hstack gap-1 mb-0">
+                                                                                @for ($indx = 0; $indx < count($book_data[$index][$i]); $indx++)
+                                                                                    <li data-bs-toggle="tooltip" data-bs-placement="top" data-bs-original-title="View">
+                                                                                        <a href="{{$book_data[$index][$i][$indx]->href}}" class="btn btn-sm btn-soft-primary">{!!$book_data[$index][$i][$indx]->show!!}</a>
+                                                                                    </li>
+                                                                                @endfor
+                                                                            </ul>
+                                                                        </td>
+                                                                    @else
+                                                                        <td>{!!$book_data[$index][$i]!!}</td>
+                                                                    @endif
+                                                                @endfor
+                                                            </tr>
+                                                        @endfor
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    @endif
+                                </div><!--end card-->
+                            </div><!--end col-->
+
+                        </div><!--end row-->
+                        
+
+                    </div> <!-- container-fluid -->
+                </div><!-- End Page-content -->
+                <!-- End Page-content -->
 
                 <footer class="footer">
                     <div class="container-fluid">
@@ -393,7 +484,7 @@
 
                 <div class="p-4">
                     <div class="mb-2">
-                        <img src="/assets/images/layouts/layout-1.jpg" class="img-thumbnail" alt="layout images">
+                        <img src="assets/images/layouts/layout-1.jpg" class="img-thumbnail" alt="layout images">
                     </div>
 
                     <div class="form-check form-switch mb-3">
@@ -402,7 +493,7 @@
                     </div>
     
                     <div class="mb-2">
-                        <img src="/assets/images/layouts/layout-2.jpg" class="img-thumbnail" alt="layout images">
+                        <img src="assets/images/layouts/layout-2.jpg" class="img-thumbnail" alt="layout images">
                     </div>
                     <div class="form-check form-switch mb-3">
                         <input class="form-check-input theme-choice" type="checkbox" id="dark-mode-switch">
@@ -441,10 +532,11 @@
         <script src="/assets/libs/parsleyjs/parsley.min.js"></script>
 
         <!-- Datatable init js -->
-        <script src="/assets/js/pages/datatables.init.js"></script>
-
+        <script src="assets/js/pages/datatables.init.js"></script>
+        <!-- Datatable init js -->
+        <script src="assets/js/reports.js"></script>
         <!-- Alerts Live Demo js -->
-        <script src="/assets/js/pages/alerts.init.js"></script>
+        <script src="assets/js/pages/alerts.init.js"></script> 
 
         <script src="/assets/js/app.js"></script>
     </body>

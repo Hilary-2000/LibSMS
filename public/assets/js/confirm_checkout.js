@@ -46,6 +46,8 @@ window.onload = function () {
     setTimeout(() => {
         cObj("select_staff_details").classList.add("d-none");
     }, 1000);
+    var book_thumbnail = document.getElementById("book_thumbnail_holder");
+    document.getElementById("book_thumbnails").src = book_thumbnail.value;
 }
 
 cObj("book_borrower").onchange = function () {

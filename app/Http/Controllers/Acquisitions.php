@@ -470,6 +470,16 @@ class Acquisitions extends Controller
         $book_language = $request->input("book_language");
         $no_of_revisions = $request->input("no_of_revisions");
 
+        // check if the book call number is present
+        $book_dets = DB::select("SELECT * FROM `library_details` WHERE `call_no` = ? AND NOT `book_id` = ?",[$book_call_no,$book_ids]);
+        if (count($book_dets) > 0) {
+            session()->flash("error","The book call number is already used by another book, Use another call-no");
+            return redirect("/Acquisitions/Book-details/".$book_ids);
+        }
+
+        // update the call number on the circulation table
+        $update = DB::update("UPDATE `book_circulation` SET `book_call_number` = ? WHERE `book_id` = ?",[$book_call_no,$book_ids]);
+
         // UPDATE THE DATA IN THE DATABASE
         $update_data = DB::update("UPDATE `library_details` SET `book_title` = ?, `book_author` = ?, `book_publishers` = ?, `published_date` = ?, `thumbnail_location` = ?, `book_category` = ?, `isbn_13` = ?, `isbn_10` = ?, `physical_dimensions` = ?, `no_of_revisions` = ?, `call_no` = ?, `language` = ?, `description` = ?, `shelf_no_location` = ?, `no_of_pages` = ? WHERE `book_id` = ?",[$book_title,$book_author,$book_publishers,$date_published,$book_cover_url,$book_category,$isbn_13,$isbn_10,$book_dimensions,$no_of_revisions,$book_call_no,$book_language,$book_description,$book_location,$no_of_pages,$book_ids]);
 

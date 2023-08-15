@@ -4,6 +4,8 @@ use App\Http\Controllers\Acquisitions;
 use App\Http\Controllers\Cataloguing;
 use App\Http\Controllers\Circulation;
 use App\Http\Controllers\login;
+use App\Http\Controllers\Reports;
+use App\Http\Controllers\Settings;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -49,6 +51,14 @@ Route::get("/Circulation/Cancel/check-out/{circulation_id}",[Circulation::class,
 Route::post("/Circulation/ExtendReturnDate",[Circulation::class,"extendReturnDate"]);
 Route::get("/Circulation/Confirm/check-in/{circulation_id}",[Circulation::class,"ConfirmCheckIn"]);
 Route::get("/Circulation/Cancel/check-in/{circulation_id}",[Circulation::class,"cancelCheckIn"]);
+
+// Reports
+Route::get("/Reports",[Reports::class,"getReports"]);
+
+// setting
+Route::get("/Settings/User-mgmt",[Settings::class,"userMgmt"]);
+Route::get("/Settings/User-mgmt/{user_id}",[Settings::class,"showUserDetails"]);
+Route::post("/settings/store_privileges",[Settings::class,"changePrivileges"]);
 
 // LOGOUT
 Route::get("/Logout",[login::class,"Logout"]);

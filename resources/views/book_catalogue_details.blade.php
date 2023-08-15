@@ -165,9 +165,6 @@
                             </button>
                             <div class="dropdown-menu dropdown-menu-end">
                                 <!-- item-->
-                                <a class="dropdown-item" href="#"><i class="bx bx-user font-size-16 align-middle me-1"></i> <span key="t-profile">Profile</span></a>
-                                <a class="dropdown-item d-block" href="#"><i class="bx bx-wrench font-size-16 align-middle me-1"></i> <span key="t-settings">Settings</span></a>
-                                <a class="dropdown-item" href="#"><i class="bx bx-lock-open font-size-16 align-middle me-1"></i> <span key="t-lock-screen">Lock screen</span></a>
                                 <div class="dropdown-divider"></div>
                                 <a class="dropdown-item text-danger" href="/Logout"><i class="bx bx-power-off font-size-16 align-middle me-1 text-danger"></i> <span key="t-logout">Logout</span></a>
                             </div>
@@ -185,51 +182,76 @@
 
             <!-- ========== Left Sidebar Start ========== -->
             <div class="vertical-menu">
-
                 <div data-simplebar class="h-100">
-
                     <!--- Sidemenu -->
                     <div id="sidebar-menu">
+                        @php
+                            $lib_priv = json_decode(session()->get("user_details")->library_previleges,true);
+                            function isPresent($array,$needle){
+                                if ($array == null) {
+                                    return false;
+                                }
+                                for ($index=0; $index < count($array); $index++) { 
+                                    if ($array[$index] == $needle) {
+                                        return true;
+                                    }
+                                }
+                                return false;
+                            }
+                        @endphp
                         <!-- Left Menu Start -->
                         <ul class="metismenu list-unstyled" id="side-menu">
                             <li class="menu-title" key="t-menu">Menu</li>
                             {{-- dashboard --}}
-                            <li>
+                            <li class="">
                                 <a href="/Dashboard" class="waves-effect">
                                     <i class="bx bx-home-circle"></i>
                                     <span key="t-chat">Dashboard</span>
                                 </a>
                             </li>
-                            <li>
-                                <a href="/Acquisitions" class="waves-effect">
-                                    <i class="bx bx-add-to-queue"></i>
-                                    <span key="t-file-manager">Acquisitions</span>
-                                </a>
-                            </li>
-                            <li class="mm-active">
-                                <a href="/Cataloging" class="waves-effect">
-                                    <i class="bx bx-file"></i>
-                                    <span key="t-file-manager">Cataloging</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="/Circulation" class="waves-effect">
-                                    <i class="bx bx-rotate-left"></i>
-                                    <span key="t-file-manager">Circulation</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="/Administration" class="waves-effect">
-                                    <i class="bx bx-building"></i>
-                                    <span key="t-file-manager">Administration</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="/Settings" class="waves-effect">
-                                    <i class="bx bx-cog"></i>
-                                    <span key="t-file-manager">Settings</span>
-                                </a>
-                            </li>
+                            @if (isPresent($lib_priv,"Acquisition") || count($lib_priv) == 0)
+                                <li>
+                                    <a href="/Acquisitions" class="waves-effect">
+                                        <i class="bx bx-add-to-queue"></i>
+                                        <span key="t-file-manager">Acquisitions</span>
+                                    </a>
+                                </li>
+                            @endif
+                            @if (isPresent($lib_priv,"Cataloging") || count($lib_priv) == 0)
+                                <li>
+                                    <a href="/Cataloging" class="waves-effect">
+                                        <i class="bx bx-file"></i>
+                                        <span key="t-file-manager">Cataloging</span>
+                                    </a>
+                                </li>
+                            @endif
+                            @if (isPresent($lib_priv,"Circulation") || count($lib_priv) == 0)
+                                <li>
+                                    <a href="/Circulation" class="waves-effect">
+                                        <i class="bx bx-rotate-left"></i>
+                                        <span key="t-file-manager">Circulation</span>
+                                    </a>
+                                </li>
+                            @endif
+                            @if (isPresent($lib_priv,"Reports") || count($lib_priv) == 0)
+                                <li>
+                                    <a href="/Reports" class="waves-effect">
+                                        <i class="bx bxs-report"></i>
+                                        <span key="t-file-manager">Reports</span>
+                                    </a>
+                                </li>
+                            @endif
+                            @if (isPresent($lib_priv,"Settings") || count($lib_priv) == 0)
+                                <li class="">
+                                    <a href="javascript: void(0);" class="waves-effect has-arrow " aria-expanded="false">
+                                        <i class="bx bx-cog"></i>
+                                        <span key="t-jobs">Settings</span>
+                                    </a>
+                                    <ul class="sub-menu " aria-expanded="false" style="height: 0px;">
+                                        <li><a href="/Settings/User-mgmt" class="active" key="t-job-list"><i class="bx bxs-user"></i> User Management</a></li>
+                                    </ul>
+                                </li>
+                            @endif
                     </div>
                     <!-- Sidebar -->
                 </div>
@@ -323,9 +345,11 @@
                                                             <td>{{date("D dS M Y",strtotime($book_data_all[$i]->date_recorded))}}</td>
                                                             <td>
                                                                 <ul class="list-unstyled hstack gap-1 mb-0">
-                                                                    <li data-bs-toggle="tooltip" data-bs-placement="top" title="Edit">
+                                                                    <li data-bs-toggle="tooltip" data-bs-placement="top" title="Edit Catalogue Details">
                                                                         <button type="button" id="book_details_{{$book_data_all[$i]->book_id}}" class="book_details btn btn-sm btn-soft-primary" data-bs-toggle="modal" data-bs-target="#exampleModalScrollable"><i class="mdi mdi-pen"></i> Edit</button>
-                                                                        <a href="" class="btn btn-soft-primary btn-sm"><i class="mdi mdi-eye"></i> View</a>
+                                                                    </li>
+                                                                    <li>
+                                                                        <a href="/Acquisitions/Book-details/{{$book_data_all[$i]->book_id}}" class="btn btn-soft-primary btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="View book details"><i class="mdi mdi-eye"></i> Details</a>
                                                                     </li>
                                                                 </ul>
                                                             </td>
