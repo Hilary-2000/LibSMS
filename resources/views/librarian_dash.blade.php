@@ -146,7 +146,7 @@
                         <div class="dropdown d-inline-block">
                             <button type="button" class="btn header-item waves-effect" id="page-header-user-dropdown"
                             data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <img class="rounded-circle header-profile-user" src="assets/images/users/avatar-1.jpg"
+                                <img class="rounded-circle header-profile-user" src="https://lsims.ladybirdsmis.com/sims/{{(session()->get("user_details")->profile_loc != null && strlen(trim(session()->get("user_details")->profile_loc)) > 0) ? session()->get("user_details")->profile_loc : "images/dp.png"}}"
                                     alt="Header Avatar">
                                 <span class="d-none d-xl-inline-block ms-1" key="t-henry">{{session("gender") == "M" ? "Mr." : "Ms."}} {{explode(" ",ucwords(strtolower(session("fullname"))))[0]}}</span>
                                 <i class="mdi mdi-chevron-down d-none d-xl-inline-block"></i>
@@ -221,7 +221,7 @@
                                     </a>
                                 </li>
                             @endif
-                            @if (isPresent($lib_priv,"Reports") || count($lib_priv) == 0)
+                            @if (isPresent($lib_priv,"Report") || count($lib_priv) == 0)
                                 <li>
                                     <a href="/Reports" class="waves-effect">
                                         <i class="bx bxs-report"></i>
@@ -293,7 +293,7 @@
                                         <div class="row">
                                             <div class="col-sm-4">
                                                 <div class="avatar-md profile-user-wid mb-4">
-                                                    <img src="assets/images/users/avatar-1.jpg" alt="" class="img-thumbnail rounded-circle">
+                                                    <img src="https://lsims.ladybirdsmis.com/sims/{{(session()->get("user_details")->profile_loc != null && strlen(trim(session()->get("user_details")->profile_loc)) > 0) ? session()->get("user_details")->profile_loc : "images/dp.png"}}" alt="" class="img-thumbnail rounded-circle">
                                                 </div>
                                                 <h5 class="font-size-15 text-truncate">{{session("gender") == "M" ? "Mr." : "Ms."}} {{explode(" ",ucwords(strtolower(session("fullname"))))[0]}}</h5>
                                                 <p class="text-muted mb-0 text-truncate">{{session("auth") == 1 ? "Headteacher" : (session("auth") == 0 ? "Administrator" : "Librarian")}}</p>

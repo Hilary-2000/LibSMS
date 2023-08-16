@@ -10,6 +10,10 @@ class Cataloguing extends Controller
 {
     //Manages Cataloguing
     function Cataloging(){
+        if (session("school_details") == null) {
+            session()->flash("error","Your session has expired, Login to proceed!");
+            return redirect("/");
+        }
         // GET THE BOOKS DETAILS BY GROUPING WITH THE ISBN NUMBER
         $database_name = session("school_details")->database_name;
         // SET THE DATABASE NAME AS PER THE STUDENT ADMISSION NO
@@ -42,6 +46,10 @@ class Cataloguing extends Controller
 
     // get book details with the book id
     function editBookDets($book_isbn){
+        if (session("school_details") == null) {
+            session()->flash("error","Your session has expired, Login to proceed!");
+            return redirect("/");
+        }
         // GET THE BOOKS DETAILS BY GROUPING WITH THE ISBN NUMBER
         $database_name = session("school_details")->database_name;
         // SET THE DATABASE NAME AS PER THE STUDENT ADMISSION NO
@@ -65,6 +73,10 @@ class Cataloguing extends Controller
     }
 
     function editBooks(Request $request){
+        if (session("school_details") == null) {
+            session()->flash("error","Your session has expired, Login to proceed!");
+            return redirect("/");
+        }
         // GET THE BOOKS DETAILS BY GROUPING WITH THE ISBN NUMBER
         $database_name = session("school_details")->database_name;
         // SET THE DATABASE NAME AS PER THE STUDENT ADMISSION NO

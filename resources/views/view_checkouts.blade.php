@@ -158,7 +158,7 @@
                         <div class="dropdown d-inline-block">
                             <button type="button" class="btn header-item waves-effect" id="page-header-user-dropdown"
                             data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <img class="rounded-circle header-profile-user" src="/assets/images/users/avatar-1.jpg"
+                                <img class="rounded-circle header-profile-user" src="https://lsims.ladybirdsmis.com/sims/{{(session()->get("user_details")->profile_loc != null && strlen(trim(session()->get("user_details")->profile_loc)) > 0) ? session()->get("user_details")->profile_loc : "images/dp.png"}}"
                                     alt="Header Avatar">
                                 <span class="d-none d-xl-inline-block ms-1" key="t-henry">{{session("gender") == "M" ? "Mr." : "Ms."}} {{explode(" ",ucwords(strtolower(session("fullname"))))[0]}}</span>
                                 <i class="mdi mdi-chevron-down d-none d-xl-inline-block"></i>
@@ -233,7 +233,7 @@
                                     </a>
                                 </li>
                             @endif
-                            @if (isPresent($lib_priv,"Reports") || count($lib_priv) == 0)
+                            @if (isPresent($lib_priv,"Report") || count($lib_priv) == 0)
                                 <li>
                                     <a href="/Reports" class="waves-effect">
                                         <i class="bx bxs-report"></i>
@@ -645,13 +645,6 @@
         {{-- validation --}}
         <script src="/assets/libs/parsleyjs/parsley.min.js"></script>
         <script src="/assets/js/pages/form-validation.init.js"></script>
-
-        <!-- JAVASCRIPT -->
-        {{-- <script src="/assets/libs/jquery/jquery.min.js"></script> --}}
-        <script src="/assets/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
-        <script src="/assets/libs/metismenu/metisMenu.min.js"></script>
-        <script src="/assets/libs/simplebar/simplebar.min.js"></script>
-        <script src="/assets/libs/node-waves/waves.min.js"></script>
 
         <script src="/assets/libs/select2/js/select2.min.js"></script>
         <script src="/assets/libs/bootstrap-datepicker/js/bootstrap-datepicker.min.js"></script>

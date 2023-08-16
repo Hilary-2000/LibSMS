@@ -11,6 +11,10 @@ class Circulation extends Controller
 {
     //this will manage book circulations
     function circulationDashboard(){
+        if (session("school_details") == null) {
+            session()->flash("error","Your session has expired, Login to proceed!");
+            return redirect("/");
+        }
         // GET THE BOOKS DETAILS BY GROUPING WITH THE ISBN NUMBER
         $database_name = session("school_details")->database_name;
         // SET THE DATABASE NAME AS PER THE STUDENT ADMISSION NO
@@ -118,6 +122,10 @@ class Circulation extends Controller
 
     // this link check outs
     function Circulation_Checkout(){
+        if (session("school_details") == null) {
+            session()->flash("error","Your session has expired, Login to proceed!");
+            return redirect("/");
+        }
         // GET THE BOOKS DETAILS BY GROUPING WITH THE ISBN NUMBER
         $database_name = session("school_details")->database_name;
         // SET THE DATABASE NAME AS PER THE STUDENT ADMISSION NO
@@ -142,6 +150,10 @@ class Circulation extends Controller
     }
 
     function checkOut($book_id){
+        if (session("school_details") == null) {
+            session()->flash("error","Your session has expired, Login to proceed!");
+            return redirect("/");
+        }
         // GET THE BOOKS DETAILS BY GROUPING WITH THE ISBN NUMBER
         $database_name = session("school_details")->database_name;
         // SET THE DATABASE NAME AS PER THE STUDENT ADMISSION NO
@@ -190,6 +202,10 @@ class Circulation extends Controller
     }
 
     function confirmCheckOut(Request $request){
+        if (session("school_details") == null) {
+            session()->flash("error","Your session has expired, Login to proceed!");
+            return redirect("/");
+        }
         // GET THE BOOKS DETAILS BY GROUPING WITH THE ISBN NUMBER
         $database_name = session("school_details")->database_name;
         // SET THE DATABASE NAME AS PER THE STUDENT ADMISSION NO
@@ -250,6 +266,10 @@ class Circulation extends Controller
     }
     // view a book checked out
     function viewCheckOut($book_id,$circulation_id){
+        if (session("school_details") == null) {
+            session()->flash("error","Your session has expired, Login to proceed!");
+            return redirect("/");
+        }
         // GET THE BOOKS DETAILS BY GROUPING WITH THE ISBN NUMBER
         $database_name = session("school_details")->database_name;
         // SET THE DATABASE NAME AS PER THE STUDENT ADMISSION NO
@@ -308,6 +328,10 @@ class Circulation extends Controller
         return view("view_checkouts",["book_details" => $book_details[0],"book_borrow_data" => $book_borrow_data]);
     }
     function cancelCirculationRecord($circulation_id){
+        if (session("school_details") == null) {
+            session()->flash("error","Your session has expired, Login to proceed!");
+            return redirect("/");
+        }
         // GET THE BOOKS DETAILS BY GROUPING WITH THE ISBN NUMBER
         $database_name = session("school_details")->database_name;
         // SET THE DATABASE NAME AS PER THE STUDENT ADMISSION NO
@@ -335,6 +359,10 @@ class Circulation extends Controller
     }
 
     function extendReturnDate(Request $request){
+        if (session("school_details") == null) {
+            session()->flash("error","Your session has expired, Login to proceed!");
+            return redirect("/");
+        }
         // GET THE BOOKS DETAILS BY GROUPING WITH THE ISBN NUMBER
         $database_name = session("school_details")->database_name;
         // SET THE DATABASE NAME AS PER THE STUDENT ADMISSION NO
@@ -361,6 +389,10 @@ class Circulation extends Controller
         return redirect("/Circulation/View/check-out/".$circulation_record[0]->book_id."/".$circulation_id);
     }
     function ConfirmCheckIn($circulation_id){
+        if (session("school_details") == null) {
+            session()->flash("error","Your session has expired, Login to proceed!");
+            return redirect("/");
+        }
         // GET THE BOOKS DETAILS BY GROUPING WITH THE ISBN NUMBER
         $database_name = session("school_details")->database_name;
         // SET THE DATABASE NAME AS PER THE STUDENT ADMISSION NO
@@ -392,6 +424,10 @@ class Circulation extends Controller
         return redirect("/Circulation");
     }
     function cancelCheckIn($circulation_id){
+        if (session("school_details") == null) {
+            session()->flash("error","Your session has expired, Login to proceed!");
+            return redirect("/");
+        }
         // change the book recieve status
         // GET THE BOOKS DETAILS BY GROUPING WITH THE ISBN NUMBER
         $database_name = session("school_details")->database_name;

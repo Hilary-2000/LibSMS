@@ -11,6 +11,10 @@ class Reports extends Controller
 {
     //handle all reports requests
     function getReports(Request $request){
+        if (session("school_details") == null) {
+            session()->flash("error","Your session has expired, Login to proceed!");
+            return redirect("/");
+        }
         // check if the isbn number is present in the database and return book details
         $database_name = session('school_details')->database_name;
         // SET THE DATABASE NAME AS PER THE STUDENT ADMISSION NO

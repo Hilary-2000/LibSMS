@@ -169,14 +169,18 @@ document.addEventListener('keyup', function (event) {
     if (document.activeElement === cObj("hold_book_isbn_value")) {
         if (valObj("hold_book_isbn_value").trim().length == 10) {
             var runAjax = setTimeout(() => {
-                sendAjaxRequest();
-                // console.log("10th");
+                if (!cObj("allow_typing").checked) {
+                    sendAjaxRequest();
+                    // console.log("10th");
+                }
             }, 1000);
             tenth_id = runAjax;
         }
         if (valObj("hold_book_isbn_value").trim().length == 13) {
-            sendAjaxRequest();
-            // console.log("13th");
+            if (!cObj("allow_typing").checked) {
+                sendAjaxRequest();
+                // console.log("13th");
+            }
         }
         // check if more text is typed
         checkMoreText(tenth_id);

@@ -12,6 +12,10 @@ class Acquisitions extends Controller
 {
     //handle Acquisitions
     function Acquisitions(){
+        if (session("school_details") == null) {
+            session()->flash("error","Your session has expired, Login to proceed!");
+            return redirect("/");
+        }
         $database_name = session("school_details")->database_name;
         // SET THE DATABASE NAME AS PER THE STUDENT ADMISSION NO
         config(['database.connections.mysql2.database' => $database_name]);
@@ -47,6 +51,10 @@ class Acquisitions extends Controller
     }
 
     function addBook(Request $request){
+        if (session("school_details") == null) {
+            session()->flash("error","Your session has expired, Login to proceed!");
+            return redirect("/");
+        }
         $database_name = session("school_details")->database_name;
         // SET THE DATABASE NAME AS PER THE STUDENT ADMISSION NO
         config(['database.connections.mysql2.database' => $database_name]);
@@ -126,6 +134,10 @@ class Acquisitions extends Controller
     }
 
     function getBookDetails(Request $request){
+        if (session("school_details") == null) {
+            session()->flash("error","Your session has expired, Login to proceed!");
+            return redirect("/");
+        }
         // return $request;
         
         // get ISBN no
@@ -336,6 +348,10 @@ class Acquisitions extends Controller
 
     // get the book data
     function viewBookData($book_id){
+        if (session("school_details") == null) {
+            session()->flash("error","Your session has expired, Login to proceed!");
+            return redirect("/");
+        }
         // check if the isbn number is present in the database and return book details
         $database_name = session("school_details")->database_name;
         // SET THE DATABASE NAME AS PER THE STUDENT ADMISSION NO
@@ -445,6 +461,10 @@ class Acquisitions extends Controller
     }
 
     function updateBooks(Request $request){
+        if (session("school_details") == null) {
+            session()->flash("error","Your session has expired, Login to proceed!");
+            return redirect("/");
+        }
         // check if the isbn number is present in the database and return book details
         $database_name = session("school_details")->database_name;
         // SET THE DATABASE NAME AS PER THE STUDENT ADMISSION NO
@@ -489,6 +509,10 @@ class Acquisitions extends Controller
     }
 
     function deleteBook($book_id){
+        if (session("school_details") == null) {
+            session()->flash("error","Your session has expired, Login to proceed!");
+            return redirect("/");
+        }
         // check if the isbn number is present in the database and return book details
         $database_name = session("school_details")->database_name;
         // SET THE DATABASE NAME AS PER THE STUDENT ADMISSION NO
@@ -507,6 +531,10 @@ class Acquisitions extends Controller
 
     // CHECKS IF JSON IS EMPTY
     function isJsonDataPresent($jsonString) {
+        if (session("school_details") == null) {
+            session()->flash("error","Your session has expired, Login to proceed!");
+            return redirect("/");
+        }
         // CHECK IF ITS VALID JSON
         if (!$this->isValidJson($jsonString)) {
             return true;

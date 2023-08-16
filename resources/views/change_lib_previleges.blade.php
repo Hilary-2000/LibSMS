@@ -158,7 +158,7 @@
                         <div class="dropdown d-inline-block">
                             <button type="button" class="btn header-item waves-effect" id="page-header-user-dropdown"
                             data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <img class="rounded-circle header-profile-user" src="/assets/images/users/avatar-1.jpg"
+                                <img class="rounded-circle header-profile-user" src="https://lsims.ladybirdsmis.com/sims/{{(session()->get("user_details")->profile_loc != null && strlen(trim(session()->get("user_details")->profile_loc)) > 0) ? session()->get("user_details")->profile_loc : "images/dp.png"}}"
                                     alt="Header Avatar">
                                 <span class="d-none d-xl-inline-block ms-1" key="t-henry">{{session("gender") == "M" ? "Mr." : "Ms."}} {{explode(" ",ucwords(strtolower(session("fullname"))))[0]}}</span>
                                 <i class="mdi mdi-chevron-down d-none d-xl-inline-block"></i>
@@ -223,7 +223,7 @@
                                     </a>
                                 </li>
                             @endif
-                            @if (isPresent($lib_priv,"Reports") || count($lib_priv) == 0)
+                            @if (isPresent($lib_priv,"Report") || count($lib_priv) == 0)
                                 <li>
                                     <a href="/Reports" class="waves-effect">
                                         <i class="bx bxs-report"></i>
@@ -286,7 +286,7 @@
                                             </div>
                                         </div>
                                         <div class="container text-center">
-                                            <img class="img-thumbnail rounded-circle avatar-xl mt-4" src="http://192.168.88.241:81/sims/{{$user_data->profile_loc}}" alt="Profile Picture" height="200">
+                                            <img class="img-thumbnail rounded-circle avatar-xl mt-4" src="https://lsims.ladybirdsmis.com/sims/{{$user_data->profile_loc}}" alt="Profile Picture" height="200">
                                         </div>
                                         <div class="row">
                                             <div class="col-md-12">
