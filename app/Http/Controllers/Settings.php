@@ -51,6 +51,11 @@ class Settings extends Controller
 
         // proceed and get the user information
         // return session()->get("user_details");
+        // isLinkValid($url)
+
+        // check if it has a valid image
+        $user_data[0]->profile_loc = $this->isLinkValid("https://lsims.ladybirdsmis.com/sims/".$user_data[0]->profile_loc) && $user_data[0]->profile_loc != null ? $user_data[0]->profile_loc : "images/dp.png";
+        // return $user_data;
         return view("change_lib_previleges",["user_data" => $user_data[0]]);
     }
 
@@ -74,5 +79,24 @@ class Settings extends Controller
         session()->flash("success","Privileges have been updated successfully!");
         return redirect("/Settings/User-mgmt/".$user_id);
         
+    }
+    
+    function isLinkValid($url) {
+        // check if the url is null
+        if ($url == null) {
+            return false;
+        }
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_exec($ch);
+        
+        $statusCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        if ($statusCode == 200) {
+            return true; // Valid link
+        } else {
+            return false; // Invalid link
+        }
     }
 }

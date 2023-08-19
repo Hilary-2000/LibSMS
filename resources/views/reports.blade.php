@@ -348,55 +348,55 @@
                                         </form>
                                     </div>
                                     @if (isset($book_list))
-                                    <div class="card-body">
-                                        <div class="table-responsive">
-                                            <table id="datatable" class="table table-bordered dt-responsive  nowrap w-100">
-                                                <thead>
-                                                <tr>
-                                                    <th>No.</th>
-                                                    <th>Title</th>
-                                                    <th>Author</th>
-                                                    <th>ISBN</th>
-                                                    <th class="d-none">ISBN-10</th>
-                                                    <th class="d-none">Keywords</th>
-                                                    <th>Date Acquired</th>
-                                                    <th>Call No.</th>
-                                                    <th>Actions</th>
-                                                </tr>
-                                                </thead>
-                                                <tbody>
-                                                    @for ($i = 0; $i < count($book_list); $i++)
-                                                        <tr>
-                                                            <td>{{$i+1}}</td>
-                                                            <td>{{$book_list[$i]->book_title}}
-                                                                @if ($book_list[$i]->availability_status == 1)
-                                                                    <span data-bs-toggle="tooltip" data-bs-placement="top" title="Available" class="badge bg-success">in</span> 
-                                                                @else
-                                                                    <span data-bs-toggle="tooltip" data-bs-placement="top" title="Borrowed" class="badge bg-danger">Out</span> 
-                                                                @endif
-                                                            </td>
-                                                            <td>{{$book_list[$i]->book_author}}</td>
-                                                            <td>{{$book_list[$i]->isbn_13}}</td>
-                                                            <td class="d-none" >{{$book_list[$i]->isbn_10}}</td>
-                                                            <td class="d-none" >{{$book_list[$i]->keywords}}</td>
-                                                            <td>{{date("M dS, Y",strtotime($book_list[$i]->date_recorded))}}</td>
-                                                            <td>{{$book_list[$i]->call_no}}</td>
-                                                            <td>
-                                                                <ul class="list-unstyled hstack gap-1 mb-0">
-                                                                    <li data-bs-toggle="tooltip" data-bs-placement="top" title="View">
-                                                                        <a href="/Acquisitions/Book-details/{{$book_list[$i]->book_id}}" class="btn btn-sm btn-soft-primary"><i class="mdi mdi-eye-outline"></i> View</a>
-                                                                    </li>
-                                                                    {{-- <li data-bs-toggle="tooltip" data-bs-placement="top" title="Delete">
-                                                                        <button class="btn btn-soft-danger btn-sm delete_data" id="delete_data{{$book_list[$i]->book_id}}"><i class="mdi mdi-delete-outline"></i></button>
-                                                                    </li> --}}
-                                                                </ul>
-                                                            </td>
-                                                        </tr>
-                                                    @endfor
-                                                </tbody>
-                                            </table>
+                                        <div class="card-body">
+                                            <div class="table-responsive">
+                                                <table id="datatable" class="table table-bordered dt-responsive  nowrap w-100">
+                                                    <thead>
+                                                    <tr>
+                                                        <th>No.</th>
+                                                        <th>Title</th>
+                                                        <th>Author</th>
+                                                        <th>ISBN</th>
+                                                        <th class="d-none">ISBN-10</th>
+                                                        <th class="d-none">Keywords</th>
+                                                        <th>Date Acquired</th>
+                                                        <th>Call No.</th>
+                                                        <th>Actions</th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @for ($i = 0; $i < count($book_list); $i++)
+                                                            <tr>
+                                                                <td>{{$i+1}}</td>
+                                                                <td>{{$book_list[$i]->book_title}}
+                                                                    @if ($book_list[$i]->availability_status == 1)
+                                                                        <span data-bs-toggle="tooltip" data-bs-placement="top" title="Available" class="badge bg-success">in</span> 
+                                                                    @else
+                                                                        <span data-bs-toggle="tooltip" data-bs-placement="top" title="Borrowed" class="badge bg-danger">Out</span> 
+                                                                    @endif
+                                                                </td>
+                                                                <td>{{$book_list[$i]->book_author}}</td>
+                                                                <td>{{$book_list[$i]->isbn_13}}</td>
+                                                                <td class="d-none" >{{$book_list[$i]->isbn_10}}</td>
+                                                                <td class="d-none" >{{$book_list[$i]->keywords}}</td>
+                                                                <td>{{date("M dS, Y",strtotime($book_list[$i]->date_recorded))}}</td>
+                                                                <td>{{$book_list[$i]->call_no}}</td>
+                                                                <td>
+                                                                    <ul class="list-unstyled hstack gap-1 mb-0">
+                                                                        <li data-bs-toggle="tooltip" data-bs-placement="top" title="View">
+                                                                            <a href="/Acquisitions/Book-details/{{$book_list[$i]->book_id}}" class="btn btn-sm btn-soft-primary"><i class="mdi mdi-eye-outline"></i> View</a>
+                                                                        </li>
+                                                                        {{-- <li data-bs-toggle="tooltip" data-bs-placement="top" title="Delete">
+                                                                            <button class="btn btn-soft-danger btn-sm delete_data" id="delete_data{{$book_list[$i]->book_id}}"><i class="mdi mdi-delete-outline"></i></button>
+                                                                        </li> --}}
+                                                                    </ul>
+                                                                </td>
+                                                            </tr>
+                                                        @endfor
+                                                    </tbody>
+                                                </table>
+                                            </div>
                                         </div>
-                                    </div>
                                     @else
                                         <div class="card-body">
                                             <div class="container text-center">
@@ -419,7 +419,7 @@
                                                                         <td>
                                                                             <ul class="list-unstyled hstack gap-1 mb-0">
                                                                                 @for ($indx = 0; $indx < count($book_data[$index][$i]); $indx++)
-                                                                                    <li data-bs-toggle="tooltip" data-bs-placement="top" data-bs-original-title="View">
+                                                                                    <li data-bs-toggle="tooltip" data-bs-placement="top" data-bs-original-title="{{isset($book_data[$index][$i][$indx]->title) ? $book_data[$index][$i][$indx]->title : ""}}">
                                                                                         <a href="{{$book_data[$index][$i][$indx]->href}}" class="btn btn-sm btn-soft-primary">{!!$book_data[$index][$i][$indx]->show!!}</a>
                                                                                     </li>
                                                                                 @endfor

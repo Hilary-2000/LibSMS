@@ -59,6 +59,7 @@ class Reports extends Controller
                     $link_details = new stdClass();
                     $link_details->show = "<i class=\"mdi mdi-eye\"></i> View";
                     $link_details->href = "/Acquisitions/Book-details/".$book_details[$index]->book_id;
+                    $link_details->title = "View Book Details";
                     array_push($book_data_inside,[$link_details]);
 
                     // push the data to the main array holder
@@ -100,8 +101,9 @@ class Reports extends Controller
                     array_push($book_data_inside,date("D dS M Y",strtotime($book_details[$index]->date_recorded)));
                     array_push($book_data_inside,$book_details[$index]->call_no);
                     $link_details = new stdClass();
-                    $link_details->show = "<i class=\"mdi mdi-eye\"></i> View";
+                    $link_details->show = "<i class=\"mdi mdi-eye\"></i>";
                     $link_details->href = "/Acquisitions/Book-details/".$book_details[$index]->book_id;
+                    $link_details->title = "View Book Details";
                     array_push($book_data_inside,[$link_details]);
 
                     // push the data to the main array holder
@@ -164,9 +166,15 @@ class Reports extends Controller
                     array_push($book_data_inside,date("D dS M Y",strtotime($book_details[$index]->date_checked_out)));
                     array_push($book_data_inside,date("D dS M Y",strtotime($book_details[$index]->expected_return_date)));
                     $link_details = new stdClass();
-                    $link_details->show = "<i class=\"mdi mdi-eye\"></i> Borrower";
+                    $link_details->show = "<i class=\"mdi mdi-eye\"></i>";
                     $link_details->href = "/Circulation/View/check-out/".$book_details[$index]->book_id."/".$book_details[$index]->circulation_id;
-                    array_push($book_data_inside,[$link_details]);
+                    $link_details->title = "View Check-Out Details";
+                    // array_push($book_data_inside,[$link_details]);
+                    $link_details_2 = new stdClass();
+                    $link_details_2->show = "<i class=\"bx bx-info-circle\"></i>";
+                    $link_details_2->href = "/Circulation/View/check-out/".$book_details[$index]->book_id."/".$book_details[$index]->circulation_id;
+                    $link_details_2->title = "View Borrower details";
+                    array_push($book_data_inside,[$link_details,$link_details_2]);
 
                     // push the data to the main array holder
                     array_push($book_data,$book_data_inside);
@@ -237,8 +245,9 @@ class Reports extends Controller
                     array_push($book_data_inside,date("D dS M Y",strtotime($book_details[$index]->date_checked_out)));
                     array_push($book_data_inside,($book_details[$index]->return_date != "NULL" && $book_details[$index]->return_date != null) ? date("D dS M Y",strtotime($book_details[$index]->return_date)) : "N/A");
                     $link_details = new stdClass();
-                    $link_details->show = "<i class=\"mdi mdi-eye\"></i> View";
+                    $link_details->show = "<i class=\"mdi mdi-eye\"></i>";
                     $link_details->href = "/Acquisitions/Book-details/".$book_details[$index]->book_id;
+                    $link_details->title = "View book details";
                     array_push($book_data_inside,[$link_details]);
 
                     // push the data to the main array holder
@@ -310,8 +319,9 @@ class Reports extends Controller
                     array_push($book_data_inside,date("D dS M Y",strtotime($book_details[$index]->date_checked_out)));
                     array_push($book_data_inside,date("D dS M Y",strtotime($book_details[$index]->expected_return_date)));
                     $link_details = new stdClass();
-                    $link_details->show = "<i class=\"mdi mdi-eye\"></i>Borrower";
+                    $link_details->show = "<i class=\"mdi mdi-eye\"></i>";
                     $link_details->href = "/Circulation/View/check-out/".$book_details[$index]->book_id."/".$book_details[$index]->circulation_id;
+                    $link_details->title = "View Borrower details";
                     array_push($book_data_inside,[$link_details]);
 
                     // push the data to the main array holder
@@ -360,11 +370,18 @@ class Reports extends Controller
                     array_push($book_data_inside,($BD != null ? $BD->isbn_10 : "N/A"));
                     array_push($book_data_inside,($BD != null ? $BD->isbn_13 : "N/A"));
                     array_push($book_data_inside,date("D dS M Y",strtotime($book_details[$index]->date_checked_out)));
-                    array_push($book_data_inside,($book_details[$index]->return_date != "NULL" && $book_details[$index]->return_date != null) ? date("D dS M Y",strtotime($book_details[$index]->return_date)) : "N/A");
+                    array_push($book_data_inside,date("D dS M Y",strtotime($book_details[$index]->expected_return_date)));
+                    
                     $link_details = new stdClass();
-                    $link_details->show = "<i class=\"mdi mdi-eye-outline\"></i> View";
+                    $link_details->show = "<i class=\"mdi mdi-eye-outline\"></i>";
                     $link_details->href = "/Acquisitions/Book-details/".$book_details[$index]->book_id;
-                    array_push($book_data_inside,[$link_details]);
+                    $link_details->title = "View Book Details";
+                    // array_push($book_data_inside,[$link_details]);
+                    $link_details_2 = new stdClass();
+                    $link_details_2->show = "<i class=\"bx bx-info-circle\"></i>";
+                    $link_details_2->href = "/Circulation/View/check-out/".$book_details[$index]->book_id."/".$book_details[$index]->circulation_id;
+                    $link_details_2->title = "View Borrower details";
+                    array_push($book_data_inside,[$link_details,$link_details_2]);
 
                     // push the data to the main array holder
                     array_push($book_data,$book_data_inside);

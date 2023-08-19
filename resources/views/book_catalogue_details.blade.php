@@ -218,7 +218,7 @@
                                 </li>
                             @endif
                             @if (isPresent($lib_priv,"Cataloging") || count($lib_priv) == 0)
-                                <li>
+                                <li class="mm-active">
                                     <a href="/Cataloging" class="waves-effect">
                                         <i class="bx bx-file"></i>
                                         <span key="t-file-manager">Cataloging</span>

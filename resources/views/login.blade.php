@@ -109,19 +109,19 @@
                                         <div class="mb-3">
                                             <label for="school_code" class="form-label">School Code</label>
                                             <div class="autocomplete">
-                                                <input type="text" value="{{session("school_code") ? session("school_code") : ""}}" class="form-control" name="school_code"  id="school_code" placeholder="Enter school_code">
+                                                <input type="text" value="{{session("school_code") ? session("school_code") : ""}}" class="form-control" name="school_code"  id="school_code" placeholder="Enter school code or Type school name" required>
                                             </div>
                                         </div>
 
                                         <div class="mb-3">
                                             <label for="username" class="form-label">Username</label>
-                                            <input type="text" value="{{session("username") ? session("username") : ""}}" class="form-control" name="username"  id="username" placeholder="Enter username">
+                                            <input type="text" value="{{session("username") ? session("username") : ""}}" class="form-control" name="username"  id="username" placeholder="Enter username" required>
                                         </div>
                 
                                         <div class="mb-3">
                                             <label class="form-label">Password</label>
                                             <div class="input-group auth-pass-inputgroup">
-                                                <input type="password" class="form-control" name="user-password" placeholder="Enter password" aria-label="Password" aria-describedby="password-addon">
+                                                <input type="password" class="form-control" name="user-password" placeholder="Enter password" aria-label="Password" aria-describedby="password-addon" required>
                                                 <button class="btn btn-light " type="button"  id="password-addon"><i class="mdi mdi-eye-outline"></i></button>
                                             </div>
                                         </div>

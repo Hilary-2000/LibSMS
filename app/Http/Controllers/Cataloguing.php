@@ -61,6 +61,12 @@ class Cataloguing extends Controller
         // get the books details
         $book_data = DB::select("SELECT * FROM `library_details` WHERE `isbn_13` = ? ORDER BY `book_id` DESC",[$book_isbn]);
         // return $book_data;
+        // set the book thumbnail
+        for ($index=0; $index < count($book_data); $index++) {
+            if ($index == 0) {
+                $book_data[$index]->thumbnail_location = $this->isLinkValid($book_data[$index]->thumbnail_location) ? $book_data[$index]->thumbnail_location : "/images/book_cover.jpg";
+            }
+        }
 
         // get the subjects
         $subjects = DB::select("SELECT * FROM `table_subject`");
@@ -122,6 +128,24 @@ class Cataloguing extends Controller
             }
             session()->flash("error","Book details not found!");
             return redirect("/Cataloging");
+        }
+    }
+    function isLinkValid($url) {
+        // check if the url is null
+        if ($url == null) {
+            return false;
+        }
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_exec($ch);
+        
+        $statusCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        if ($statusCode == 200) {
+            return true; // Valid link
+        } else {
+            return false; // Invalid link
         }
     }
 }

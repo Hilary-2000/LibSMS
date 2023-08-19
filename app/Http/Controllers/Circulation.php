@@ -135,7 +135,7 @@ class Circulation extends Controller
         DB::setDefaultConnection("mysql2");
 
         // get the books
-        $books = DB::select("SELECT * FROM `library_details` ORDER BY `book_id` DESC");
+        $books = DB::select("SELECT * FROM `library_details` WHERE `availability_status` = '1' ORDER BY `book_id` DESC;");
         for ($index=0; $index < count($books); $index++) { 
             // get record where the book was borrowed
             $book_details = DB::select("SELECT * FROM `book_circulation` WHERE `book_id` = ? AND `return_status` = '0' ORDER BY `circulation_id` DESC",[$books[$index]->book_id]);
@@ -168,6 +168,9 @@ class Circulation extends Controller
             session()->flash("error","Book details not found!");
             return redirect("/Circulation/check-out");
         }
+
+        // check if it has a valid image
+        $book_details[0]->thumbnail_location = $this->isLinkValid($book_details[0]->thumbnail_location) ? $book_details[0]->thumbnail_location : "/images/book_cover.jpg";
 
         // get all classes
         $classes = DB::select("SELECT * FROM `settings` WHERE `sett` = 'class'");
@@ -286,6 +289,8 @@ class Circulation extends Controller
             session()->flash("error","The book borrowed seems to not be found in your records!");
             return redirect("/Circulation/check-out");
         }
+        // check if it has a valid image
+        $book_details[0]->thumbnail_location = $this->isLinkValid($book_details[0]->thumbnail_location) ? $book_details[0]->thumbnail_location : "/images/book_cover.jpg";
         
 
         // get the student or teacher details
@@ -479,5 +484,24 @@ class Circulation extends Controller
             return "Grade ".$data;
         }
         return $data;
+    }
+
+    function isLinkValid($url) {
+        // check if the url is null
+        if ($url == null) {
+            return false;
+        }
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_exec($ch);
+        
+        $statusCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        if ($statusCode == 200) {
+            return true; // Valid link
+        } else {
+            return false; // Invalid link
+        }
     }
 }

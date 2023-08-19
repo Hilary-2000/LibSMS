@@ -366,72 +366,74 @@ class Acquisitions extends Controller
         // if books are present then we proceed to get more details
         if (count($book_details) > 0) {
             // get the subjects present in school
-        // get the list of subjects taught in school
-        $subjects = DB::select("SELECT * FROM `table_subject`");
-        $subject_name = [];
-        for ($index=0; $index < count($subjects); $index++) { 
-            array_push($subject_name,$subjects[$index]->display_name);
-        }
-
-        // get the book circulation record
-        $book_circulation_list = DB::select("SELECT * FROM `book_circulation` WHERE `book_id` = ? ORDER BY `circulation_id` DESC",[$book_id]);
-        $book_circulation_details = [];
-        for ($index=0; $index < count($book_circulation_list); $index++) {
-            $book_borrower = "N/A";
-            if ($book_circulation_list[$index]->user_borrowing == "staff") {
-                // connect to mysql 2
-                DB::setDefaultConnection("mysql");
-                // borrower name
-                $borrower_name = DB::select("SELECT * FROM `user_tbl` WHERE `user_id` = ?",[$book_circulation_list[$index]->user_checked_out]);
-                $book_borrower = count($borrower_name) > 0 ? ucwords(strtolower($borrower_name[0]->fullname)) : "N/A";
-            }else{
-                // connect to mysql 2
-                DB::setDefaultConnection("mysql2");
-                // borrower name
-                $borrower_name = DB::select("SELECT * FROM `student_data` WHERE `adm_no` = ?",[$book_circulation_list[$index]->user_checked_out]);
-                $book_borrower = count($borrower_name) > 0 ? ucwords(strtolower($borrower_name[0]->first_name." ".$borrower_name[0]->second_name)) : "N/A";
+            // get the list of subjects taught in school
+            $subjects = DB::select("SELECT * FROM `table_subject`");
+            $subject_name = [];
+            for ($index=0; $index < count($subjects); $index++) { 
+                array_push($subject_name,$subjects[$index]->display_name);
             }
 
-            // checkout name
-            // connect to mysql 2
-            DB::setDefaultConnection("mysql");
-            $check_out_name = DB::select("SELECT * FROM `user_tbl` WHERE `user_id` = ?",[$book_circulation_list[$index]->checked_out_by]);
-            $check_in_name = DB::select("SELECT * FROM `user_tbl` WHERE `user_id` = ?",[$book_circulation_list[$index]->checked_in_by]);
-
-            if ($book_circulation_list[$index]->return_date != "NULL" && $book_circulation_list[$index]->return_date != NULL) {
-                // check in circulation
-                $circulation_desc = "Returned on <b>".date("D dS M Y @ H:i:s A", strtotime($book_circulation_list[$index]->return_date))."</b> by <b>".$book_borrower." (".$book_circulation_list[$index]->user_borrowing.")</b> was expected to return on <b>".date("D dS M Y", strtotime($book_circulation_list[$index]->expected_return_date))."</b>";
-                // EXP RD
-                $exp_RD = date("Ymd", strtotime($book_circulation_list[$index]->expected_return_date));
-                $RD = date("Ymd", strtotime($book_circulation_list[$index]->return_date));
-                if ($exp_RD == $RD) {
-                    $circulation_desc.=" but returned on the same day. Checked in by <b>".(count($check_in_name) > 0 ? ucwords(strtolower($check_in_name[0]->fullname)) : "N/A")."</b>";
-                }elseif ($exp_RD > $RD) {
-                    $circulation_desc.=" but returned <b>".$this->getDateDifference($RD,$exp_RD)." day(s)</b> earlier. Checked in by <b>".(count($check_in_name) > 0 ? ucwords(strtolower($check_in_name[0]->fullname)) : "N/A")."</b>";
+            // get the book circulation record
+            $book_circulation_list = DB::select("SELECT * FROM `book_circulation` WHERE `book_id` = ? ORDER BY `circulation_id` DESC",[$book_id]);
+            $book_circulation_details = [];
+            for ($index=0; $index < count($book_circulation_list); $index++) {
+                $book_borrower = "N/A";
+                if ($book_circulation_list[$index]->user_borrowing == "staff") {
+                    // connect to mysql 2
+                    DB::setDefaultConnection("mysql");
+                    // borrower name
+                    $borrower_name = DB::select("SELECT * FROM `user_tbl` WHERE `user_id` = ?",[$book_circulation_list[$index]->user_checked_out]);
+                    $book_borrower = count($borrower_name) > 0 ? ucwords(strtolower($borrower_name[0]->fullname)) : "N/A";
                 }else{
-                    $circulation_desc.=" but returned <b>".$this->getDateDifference($RD,$exp_RD)." day(s)</b> later. Checked in by <b>".(count($check_in_name) > 0 ? ucwords(strtolower($check_in_name[0]->fullname)) : "N/A")."</b>";
+                    // connect to mysql 2
+                    DB::setDefaultConnection("mysql2");
+                    // borrower name
+                    $borrower_name = DB::select("SELECT * FROM `student_data` WHERE `adm_no` = ?",[$book_circulation_list[$index]->user_checked_out]);
+                    $book_borrower = count($borrower_name) > 0 ? ucwords(strtolower($borrower_name[0]->first_name." ".$borrower_name[0]->second_name)) : "N/A";
                 }
 
-                $data = new stdClass();
-                $data->date = $book_circulation_list[$index]->return_date;
-                $data->description = $circulation_desc;
+                // checkout name
+                // connect to mysql 2
+                DB::setDefaultConnection("mysql");
+                $check_out_name = DB::select("SELECT * FROM `user_tbl` WHERE `user_id` = ?",[$book_circulation_list[$index]->checked_out_by]);
+                $check_in_name = DB::select("SELECT * FROM `user_tbl` WHERE `user_id` = ?",[$book_circulation_list[$index]->checked_in_by]);
 
-                // add data description
+                if ($book_circulation_list[$index]->return_date != "NULL" && $book_circulation_list[$index]->return_date != NULL) {
+                    // check in circulation
+                    $circulation_desc = "Returned on <b>".date("D dS M Y @ H:i:s A", strtotime($book_circulation_list[$index]->return_date))."</b> by <b>".$book_borrower." (".$book_circulation_list[$index]->user_borrowing.")</b> was expected to return on <b>".date("D dS M Y", strtotime($book_circulation_list[$index]->expected_return_date))."</b>";
+                    // EXP RD
+                    $exp_RD = date("Ymd", strtotime($book_circulation_list[$index]->expected_return_date));
+                    $RD = date("Ymd", strtotime($book_circulation_list[$index]->return_date));
+                    if ($exp_RD == $RD) {
+                        $circulation_desc.=" but returned on the same day. Checked in by <b>".(count($check_in_name) > 0 ? ucwords(strtolower($check_in_name[0]->fullname)) : "N/A")."</b>";
+                    }elseif ($exp_RD > $RD) {
+                        $circulation_desc.=" but returned <b>".$this->getDateDifference($RD,$exp_RD)." day(s)</b> earlier. Checked in by <b>".(count($check_in_name) > 0 ? ucwords(strtolower($check_in_name[0]->fullname)) : "N/A")."</b>";
+                    }else{
+                        $circulation_desc.=" but returned <b>".$this->getDateDifference($RD,$exp_RD)." day(s)</b> later. Checked in by <b>".(count($check_in_name) > 0 ? ucwords(strtolower($check_in_name[0]->fullname)) : "N/A")."</b>";
+                    }
+
+                    $data = new stdClass();
+                    $data->date = $book_circulation_list[$index]->return_date;
+                    $data->description = $circulation_desc;
+
+                    // add data description
+                    array_push($book_circulation_details,$data);
+                }
+                
+                // circulation description
+                $circulation_desc = "Borrowed on <b>".date("D dS M Y @ H:i:s A", strtotime($book_circulation_list[$index]->date_checked_out))."</b> by <b>".$book_borrower." (".$book_circulation_list[$index]->user_borrowing.")</b> expected to return on <b>".date("D dS M Y", strtotime($book_circulation_list[$index]->expected_return_date))."</b>. Checked out by <b>".(count($check_out_name) > 0 ? ucwords(strtolower($check_out_name[0]->fullname)) : "N/A")."</b>";
+
+                $data = new stdClass();
+                $data->date = $book_circulation_list[$index]->date_checked_out;
+                $data->description = $circulation_desc;
                 array_push($book_circulation_details,$data);
             }
-            
-            // circulation description
-            $circulation_desc = "Borrowed on <b>".date("D dS M Y @ H:i:s A", strtotime($book_circulation_list[$index]->date_checked_out))."</b> by <b>".$book_borrower." (".$book_circulation_list[$index]->user_borrowing.")</b> expected to return on <b>".date("D dS M Y", strtotime($book_circulation_list[$index]->expected_return_date))."</b>. Checked out by <b>".(count($check_out_name) > 0 ? ucwords(strtolower($check_out_name[0]->fullname)) : "N/A")."</b>";
+            // return $book_circulation_details;
 
-            $data = new stdClass();
-            $data->date = $book_circulation_list[$index]->date_checked_out;
-            $data->description = $circulation_desc;
-            array_push($book_circulation_details,$data);
-        }
-        // return $book_circulation_details;
-
-        // get the book details
-        return view("book_details",["book_circulation_details" => $book_circulation_details,"book_details" => $book_details[0], "subject_name" => $subject_name]);
+            // get the book details
+            $book_details[0]->thumbnail_location = $this->isLinkValid($book_details[0]->thumbnail_location) ? $book_details[0]->thumbnail_location : "/images/book_cover.jpg";
+            // return $book_details;
+            return view("book_details",["book_circulation_details" => $book_circulation_details,"book_details" => $book_details[0], "subject_name" => $subject_name]);
         }else {
             session()->flash("error","Book details not found, try another books!");
             return redirect("/Acquisitions");
@@ -556,5 +558,24 @@ class Acquisitions extends Controller
     
         // Check if the decoding was successful and there was no error
         return json_last_error() === JSON_ERROR_NONE;
+    }
+
+    function isLinkValid($url) {
+        // check if the url is null
+        if ($url == null) {
+            return false;
+        }
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_exec($ch);
+        
+        $statusCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        if ($statusCode == 200) {
+            return true; // Valid link
+        } else {
+            return false; // Invalid link
+        }
     }
 }

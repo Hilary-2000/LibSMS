@@ -58,6 +58,9 @@ class login extends Controller
             session()->put("user_id",$user_id);
             session()->put("profile_loc",$profile_loc);
             session()->put("gender",$gender);
+
+            // before adding user details check if their dp is valid
+            $user_data[0]->profile_loc = $this->isLinkValid("https://lsims.ladybirdsmis.com/sims/".$user_data[0]->profile_loc) ? $user_data[0]->profile_loc : "images/dp.png";
             session()->put("user_details",$user_data[0]);
 
             // create the user librarian
@@ -208,6 +211,9 @@ class login extends Controller
                 session()->put("user_id",$user_id);
                 session()->put("profile_loc",$profile_loc);
                 session()->put("gender",$gender);
+
+                // before adding user details check if their dp is valid
+                $user_data[0]->profile_loc = $this->isLinkValid("https://lsims.ladybirdsmis.com/sims/".$user_data[0]->profile_loc) ? $user_data[0]->profile_loc : "images/dp.png";
                 session()->put("user_details",$user_data[0]);
 
                 // create the user librarian
@@ -561,6 +567,24 @@ class login extends Controller
             return ' ';
         } else {
             return "";
+        }
+    }
+    function isLinkValid($url) {
+        // check if the url is null
+        if ($url == null) {
+            return false;
+        }
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_exec($ch);
+        
+        $statusCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        if ($statusCode == 200) {
+            return true; // Valid link
+        } else {
+            return false; // Invalid link
         }
     }
 }
