@@ -23,6 +23,18 @@ class login extends Controller
         session()->flash("user_password",$user_password);
         session()->flash("remember_check", $remember_check);
 
+        // check if the school code is accepted to access the library
+        $accept_access = DB::select("SELECT * FROM `school_information` WHERE `school_code` = ?",[$school_code]);
+        if (count($accept_access) == 0) {
+            session()->flash("error","Cannot login, CONTACT US ASAP!");
+            return redirect("/");
+        }
+
+        if ($accept_access[0]->library_access == 0) {
+            session()->flash("error","Your library account has not been activated! Contact us to activate your account!");
+            return redirect("/");
+        }
+
         // confirm if the user is the right one.
         $encrypt_password = $this->encryptCode($user_password);
         $user_data = DB::select("SELECT * FROM `user_tbl` WHERE `school_code` = ? AND `username` = ? AND `password` = ?",[$school_code,$username,$encrypt_password]);
@@ -181,11 +193,23 @@ class login extends Controller
             $username = Cookie::get("username");
             $user_password = Cookie::get("user_password");
 
+
+            // check if the school code is accepted to access the library
+            $accept_access = DB::select("SELECT * FROM `school_information` WHERE `school_code` = ?",[$school_code]);
+            if (count($accept_access) == 0) {
+                session()->flash("error","Cannot login, CONTACT US ASAP!");
+                return redirect("/");
+            }
+    
+            if ($accept_access[0]->library_access == 0) {
+                session()->flash("error","Your library account has not been activated! Contact us to activate your account!");
+                return redirect("/");
+            }
+
             // confirm if the user is the right one.
             $encrypt_password = $this->encryptCode($user_password);
             $user_data = DB::select("SELECT * FROM `user_tbl` WHERE `school_code` = ? AND `username` = ? AND `password` = ?",[$school_code,$username,$encrypt_password]);
             
-
             // if the data returns the user data then the password is correct
             if (count($user_data) > 0) {
                 // check if the username password match case sensitively

@@ -565,6 +565,8 @@ class Acquisitions extends Controller
         if ($url == null) {
             return false;
         }
+
+        // use curl
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_exec($ch);
