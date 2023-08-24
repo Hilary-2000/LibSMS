@@ -82,14 +82,14 @@
                             </div>
                             <div class="card-body pt-0"> 
                                 <div class="auth-logo">
-                                    <a href="." class="auth-logo-light">
+                                    <a href="https://ladybirdsmis.com/" class="auth-logo-light">
                                         <div class="avatar-md profile-user-wid mb-4">
                                             <span class="avatar-title rounded-circle bg-light">
                                                 <img src="images/ladybird_dark.png" alt="" class="rounded-circle" height="75">
                                             </span>
                                         </div>
                                     </a>
-                                    <a href="." class="auth-logo-dark">
+                                    <a href="https://ladybirdsmis.com/" class="auth-logo-dark">
                                         <div class="avatar-md profile-user-wid mb-4">
                                             <span class="avatar-title rounded-circle bg-light">
                                                 <img src="images/ladybird_dark.png" alt="" class="rounded-circle" height="75">
@@ -138,7 +138,7 @@
                                         </div>
 
                                         <div class="mt-4 text-center">
-                                            <a href="auth-recoverpw.html" class="text-muted"><i class="mdi mdi-lock me-1"></i> Forgot your password?</a>
+                                            <a href="https://ladybirdsmis.com/" class=""><i class="mdi mdi-web me-1"></i> Return to Main Website</a>
                                         </div>
                                     </form>
                                 </div>

@@ -298,6 +298,7 @@ class login extends Controller
         }
         return view("login",["school_list"=>$schools_list]);
     }
+    
     function Logout(){
         // destroy all the cookies
         Cookie::queue(Cookie::forget("school_code"));
