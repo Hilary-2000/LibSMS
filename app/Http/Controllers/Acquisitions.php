@@ -46,8 +46,15 @@ class Acquisitions extends Controller
         for ($index=0; $index < count($subjects); $index++) { 
             array_push($subject_name,$subjects[$index]->display_name);
         }
+        // get libraries
+        $libraries = [];
+        $my_libraries = DB::select("SELECT * FROM `settings` WHERE `sett` = 'libraries'");
+
+        // check if my libraries has anything
+        $libraries = count($my_libraries) > 0 ? json_decode($my_libraries[0]->valued) : [];
+
         // return $select;
-        return view("acqusitions",["book_list" => $select,"subject_name" => $subject_name, "larger_length" => $larger_length]);
+        return view("acqusitions",["libraries" => $libraries,"book_list" => $select,"subject_name" => $subject_name, "larger_length" => $larger_length]);
     }
 
     function addBook(Request $request){
@@ -78,6 +85,7 @@ class Acquisitions extends Controller
         $book_language = $request->input("book_language");
         $no_of_revisions = $request->input("no_of_revisions");
         $no_of_pages = $request->input("no_of_pages");
+        $library_location = $request->input("library_location");
         // return $request;
 
         // check the book call number if present
@@ -99,6 +107,7 @@ class Acquisitions extends Controller
             session()->flash("book_language",$book_language);
             session()->flash("no_of_revisions",$no_of_revisions);
             session()->flash("no_of_pages",$no_of_pages);
+            session()->flash("library_location",$library_location);
             
             session()->flash("error","The book call number \"$book_call_no\" is present, Recreate a different one!");
             return redirect("/Acquisitions");
@@ -121,13 +130,14 @@ class Acquisitions extends Controller
             session()->flash("book_language",$book_language);
             session()->flash("no_of_revisions",$no_of_revisions);
             session()->flash("no_of_pages",$no_of_pages);
+            session()->flash("library_location",$library_location);
 
             session()->flash("error","The book ISBN-13 no \"$isbn_13\" should be equal to 13 characters! It has ".strlen(trim($isbn_13))." characters.");
             return redirect("/Acquisitions");
         }
 
         // save the book details
-        $save_image = DB::insert("INSERT INTO `library_details` (`book_title`,`book_author`,`book_publishers`,`published_date`,`thumbnail_location`,`book_category`,`isbn_13`,`isbn_10`,`date_recorded`,`physical_dimensions`,`no_of_revisions`,`call_no`,`language`,`description`,`shelf_no_location`,`no_of_pages`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",[$book_title,$book_author,$book_publishers,$date_published,$book_cover_url,$book_category,$isbn_13,$isbn_10,date("YmdHis"),$book_dimensions,$no_of_revisions,$book_call_no,$book_language,$book_description,$book_location,$no_of_pages]);
+        $save_image = DB::insert("INSERT INTO `library_details` (`book_title`,`book_author`,`book_publishers`,`published_date`,`thumbnail_location`,`book_category`,`isbn_13`,`isbn_10`,`date_recorded`,`physical_dimensions`,`no_of_revisions`,`call_no`,`language`,`description`,`shelf_no_location`,`no_of_pages`,`library_location`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",[$book_title,$book_author,$book_publishers,$date_published,$book_cover_url,$book_category,$isbn_13,$isbn_10,date("YmdHis"),$book_dimensions,$no_of_revisions,$book_call_no,$book_language,$book_description,$book_location,$no_of_pages,$library_location]);
 
         session()->flash("success","\"$book_title\" has been recorded successfully");
         return redirect("/Acquisitions");
@@ -433,7 +443,16 @@ class Acquisitions extends Controller
             // get the book details
             $book_details[0]->thumbnail_location = $this->isLinkValid($book_details[0]->thumbnail_location) ? $book_details[0]->thumbnail_location : "/images/book_cover.jpg";
             // return $book_details;
-            return view("book_details",["book_circulation_details" => $book_circulation_details,"book_details" => $book_details[0], "subject_name" => $subject_name]);
+
+            // connect to mysql 2
+            DB::setDefaultConnection("mysql2");
+            // get libraries
+            $libraries = [];
+            $my_libraries = DB::select("SELECT * FROM `settings` WHERE `sett` = 'libraries'");
+
+            // check if my libraries has anything
+            $libraries = count($my_libraries) > 0 ? json_decode($my_libraries[0]->valued) : [];
+            return view("book_details",["libraries" => $libraries, "book_circulation_details" => $book_circulation_details,"book_details" => $book_details[0], "subject_name" => $subject_name]);
         }else {
             session()->flash("error","Book details not found, try another books!");
             return redirect("/Acquisitions");
@@ -491,6 +510,7 @@ class Acquisitions extends Controller
         $book_dimensions = $request->input("book_dimensions");
         $book_language = $request->input("book_language");
         $no_of_revisions = $request->input("no_of_revisions");
+        $library_location = $request->input("library_location");
 
         // check if the book call number is present
         $book_dets = DB::select("SELECT * FROM `library_details` WHERE `call_no` = ? AND NOT `book_id` = ?",[$book_call_no,$book_ids]);
@@ -503,7 +523,7 @@ class Acquisitions extends Controller
         $update = DB::update("UPDATE `book_circulation` SET `book_call_number` = ? WHERE `book_id` = ?",[$book_call_no,$book_ids]);
 
         // UPDATE THE DATA IN THE DATABASE
-        $update_data = DB::update("UPDATE `library_details` SET `book_title` = ?, `book_author` = ?, `book_publishers` = ?, `published_date` = ?, `thumbnail_location` = ?, `book_category` = ?, `isbn_13` = ?, `isbn_10` = ?, `physical_dimensions` = ?, `no_of_revisions` = ?, `call_no` = ?, `language` = ?, `description` = ?, `shelf_no_location` = ?, `no_of_pages` = ? WHERE `book_id` = ?",[$book_title,$book_author,$book_publishers,$date_published,$book_cover_url,$book_category,$isbn_13,$isbn_10,$book_dimensions,$no_of_revisions,$book_call_no,$book_language,$book_description,$book_location,$no_of_pages,$book_ids]);
+        $update_data = DB::update("UPDATE `library_details` SET `book_title` = ?, `book_author` = ?, `book_publishers` = ?, `published_date` = ?, `thumbnail_location` = ?, `book_category` = ?, `isbn_13` = ?, `isbn_10` = ?, `physical_dimensions` = ?, `no_of_revisions` = ?, `call_no` = ?, `language` = ?, `description` = ?, `shelf_no_location` = ?, `no_of_pages` = ?, `library_location` = ? WHERE `book_id` = ?",[$book_title,$book_author,$book_publishers,$date_published,$book_cover_url,$book_category,$isbn_13,$isbn_10,$book_dimensions,$no_of_revisions,$book_call_no,$book_language,$book_description,$book_location,$no_of_pages,$library_location,$book_ids]);
 
         // update the data
         session()->flash("success","\"".$book_title."\" details have been updated successfully!");

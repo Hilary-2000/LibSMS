@@ -247,8 +247,9 @@
                                         <i class="bx bx-cog"></i>
                                         <span key="t-jobs">Settings</span>
                                     </a>
-                                    <ul class="sub-menu " aria-expanded="false" style="height: 0px;">
-                                        <li><a href="/Settings/User-mgmt" class="active" key="t-job-list"><i class="bx bxs-user"></i> User Management</a></li>
+                                    <ul class="sub-menu" aria-expanded="false" style="height: 0px;">
+                                        <li><a href="/Settings/User-mgmt" key="t-job-list"><i class="bx bxs-user"></i> User Management</a></li>
+                                        <li><a href="/Settings/Library-mgmt" key="t-job-list"><i class="bx bxs-book"></i> Library Management</a></li>
                                     </ul>
                                 </li>
                             @endif

@@ -59,6 +59,10 @@ Route::get("/Reports",[Reports::class,"getReports"]);
 Route::get("/Settings/User-mgmt",[Settings::class,"userMgmt"]);
 Route::get("/Settings/User-mgmt/{user_id}",[Settings::class,"showUserDetails"]);
 Route::post("/settings/store_privileges",[Settings::class,"changePrivileges"]);
+Route::get("/Settings/Library-mgmt",[Settings::class,"libraryManagement"]);
+Route::post("/Setting/Library-mgmt/Update",[Settings::class,"UpdateSettings"]);
+Route::post("/Setting/Library-mgmt/New",[Settings::class,"NewLibrary"]);
+Route::get("/Settings/Lib-Management/Delete/{record_id}",[Settings::class,"deleteLibrary"]);
 
 // LOGOUT
 Route::get("/Logout",[login::class,"Logout"]);

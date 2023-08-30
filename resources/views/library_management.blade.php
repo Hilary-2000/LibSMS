@@ -4,7 +4,7 @@
     <head>
         
         <meta charset="utf-8" />
-        <title>Check Out | {{ucwords(strtolower(session("fullname")))}} </title>
+        <title>User Management | {{ucwords(strtolower(session("fullname")))}} </title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta content="Ladybird Lbrary Management System" name="description" />
         <meta content="Ladybird Softech Co." name="author" />
@@ -226,7 +226,7 @@
                                 </li>
                             @endif
                             @if (isPresent($lib_priv,"Circulation") || count($lib_priv) == 0)
-                                <li class="mm-active">
+                                <li>
                                     <a href="/Circulation" class="waves-effect">
                                         <i class="bx bx-rotate-left"></i>
                                         <span key="t-file-manager">Circulation</span>
@@ -258,103 +258,184 @@
                 </div>
             </div>
             <!-- Left Sidebar End -->
+
             
+
             <!-- ============================================================== -->
             <!-- Start right Content here -->
             <!-- ============================================================== -->
             <div class="main-content">
+
                 <div class="page-content">
                     <div class="container-fluid">
-                        <a href="/Circulation" class="btn btn-soft-primary btn-sm my-3"><i class="bx bx-left-arrow-alt"></i> Back</a>
+
+                        <!-- start page title -->
                         <div class="row">
                             <div class="col-12">
                                 <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                                    <h4 class="mb-sm-0 font-size-18">Check Out Books</h4>
+                                    <h4 class="mb-sm-0 font-size-18">Library Management</h4>
+
                                     <div class="page-title-right">
                                         <ol class="breadcrumb m-0">
-                                            <li class="breadcrumb-item">Book Circulation</li>
-                                            <li class="breadcrumb-item active">Check Out Book</li>
+                                            <li class="breadcrumb-item active">Library Management</li>
                                         </ol>
                                     </div>
+
                                 </div>
                             </div>
                         </div>
+                        <!-- end page title -->
+                        
+
                         <div class="row">
-                            <div class="card">
-                                <div class="card-body border-bottom">
-                                    {{-- <a href="/Circulation/check-in" class="btn btn-secondary"><i class="bx bxs-log-in-circle"></i> Check In</a> --}}
-                                    @if (session("success"))
-                                        <div class="alert alert-success alert-dismissible fade show" role="alert">
-                                            <i class="mdi mdi-check-all me-2"></i>
-                                            {{session("success")}}
-                                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            <div class="col-lg-12">
+                                <div class="card">
+                                    <div class="card-body border-bottom">
+                                        @if (session("success"))
+                                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                                <i class="mdi mdi-check-all me-2"></i>
+                                                {{session("success")}}
+                                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                            </div>
+                                        @endif
+                                        @if (session("error"))
+                                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                                <i class="mdi mdi-check-all me-2"></i>
+                                                {{session("error")}}
+                                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                            </div>
+                                        @endif
+                                        <input type="hidden" id="main_keylogger_listener">
+                                        {{-- add the option for scanning --}}
+                                        <div class="d-flex align-items-center">
+                                            <h5 class="mb-0 card-title flex-grow-1">Library List</h5>
+                                            <div class="flex-shrink-0">
+                                                <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modal_two"><i class="bx bx-plus"></i> Add Library</button>
+                                            </div>
                                         </div>
-                                    @endif
-                                    @if (session("error"))
-                                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                            <i class="mdi mdi-check-all me-2"></i>
-                                            {{session("error")}}
-                                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                        </div>
-                                    @endif
-                                    <p class="card-title-desc">This table below shows the books to be checked out.</p>
-                                    <div class="table-responsive">
-                                        <table id="datatable" class="table table-bordered dt-responsive  nowrap w-100">
-                                            <thead>
-                                            <tr>
-                                                <th>No.</th>
-                                                <th>Title</th>
-                                                <th>Author</th>
-                                                <th>ISBN</th>
-                                                <th class="d-none">ISBN-10</th>
-                                                <th class="d-none">Keywords</th>
-                                                <th>Date Acquired</th>
-                                                <th>Call No.</th>
-                                                <th>Actions</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody>
-                                                @for ($i = 0; $i < count($book_list); $i++)
-                                                    <tr>
-                                                        <td>{{$i+1}}</td>
-                                                        <td>{{$book_list[$i]->book_title}}
-                                                            @if ($book_list[$i]->availability_status == 1)
-                                                                <span data-bs-toggle="tooltip" data-bs-placement="top" title="Available" class="badge bg-success">in</span> 
-                                                            @else
-                                                                <span data-bs-toggle="tooltip" data-bs-placement="top" title="Borrowed" class="badge bg-danger">Out</span> 
-                                                            @endif
-                                                        </td>
-                                                        <td>{{$book_list[$i]->book_author}}</td>
-                                                        <td>{{$book_list[$i]->isbn_13}}</td>
-                                                        <td class="d-none" >{{$book_list[$i]->isbn_10}}</td>
-                                                        <td class="d-none" >{{$book_list[$i]->keywords}}</td>
-                                                        <td>{{date("M dS, Y",strtotime($book_list[$i]->date_recorded))}}</td>
-                                                        <td>{{$book_list[$i]->call_no}}</td>
-                                                        <td>
-                                                            @if ($book_list[$i]->availability_status == 1)
-                                                                <ul class="list-unstyled hstack gap-1 mb-0">
-                                                                    <li data-bs-toggle="tooltip" data-bs-placement="top" title="Check-out">
-                                                                        <a href="/Circulation/check-out/{{$book_list[$i]->book_id}}" class="btn btn-sm btn-soft-primary"><i class="bx bx-log-out-circle"></i> Check-Out</a>
-                                                                    </li>
-                                                                </ul>
-                                                            @else
-                                                                <ul class="list-unstyled hstack gap-1 mb-0">
-                                                                    <li data-bs-toggle="tooltip" data-bs-placement="top" title="View borrower details">
-                                                                        <a href="/Circulation/View/check-out/{{$book_list[$i]->book_id}}/{{$book_list[$i]->circulation_id}}" class="btn btn-sm btn-soft-success"><i class="mdi mdi-eye-outline"></i> View</a>
-                                                                    </li>
-                                                                </ul>
-                                                            @endif
-                                                        </td>
-                                                    </tr>
-                                                @endfor
-                                            </tbody>
-                                        </table>
                                     </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                                    <div class="card-body">
+                                        <!-- center modal -->
+                                        <div class="modal fade bs-example-modal-center" id="modal_one" tabindex="-1" role="dialog" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title">Edit Library Name</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <form method="POST" action="/Setting/Library-mgmt/Update" class="needs-validation" novalidate>
+                                                            @csrf
+                                                            <input type="hidden" name="library_id" value="0" id="library_id">
+                                                            <div class="mb-3">
+                                                                <label for="library_name" class="form-control-label">Library Name</label>
+                                                                <input type="text" class="form-control" name="library_name" id="library_name" placeholder="Library Name" required>
+                                                                <div class="valid-feedback">
+                                                                    Looks good!
+                                                                </div>
+                                                                <div class="invalid-feedback">
+                                                                    Set the Library Name.
+                                                                </div>
+                                                            </div>
+                                                            <button class="w-100 btn btn-soft-success" type="submit"><i class="bx bx-save"></i> Save</button>
+                                                        </form>
+                                                    </div>
+                                                </div><!-- /.modal-content -->
+                                            </div><!-- /.modal-dialog -->
+                                        </div><!-- /.modal -->
+
+                                        <!-- center modal -->
+                                        <div class="modal fade bs-example-modal-center" tabindex="-1" id="modal_two" role="dialog" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title">Register New Library</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <form method="POST" action="/Setting/Library-mgmt/New" class="needs-validation" novalidate>
+                                                            @csrf
+                                                            <div class="mb-3">
+                                                                <label for="library_name_new" class="form-control-label">Library Name</label>
+                                                                <input type="text" class="form-control" name="library_name_new" id="library_name_new" placeholder="Library Name" required>
+                                                                <div class="valid-feedback">
+                                                                    Looks good!
+                                                                </div>
+                                                                <div class="invalid-feedback">
+                                                                    Set the Library Name.
+                                                                </div>
+                                                            </div>
+                                                            <button class="w-100 btn btn-soft-success" type="submit"><i class="bx bx-save"></i> Save</button>
+                                                        </form>
+                                                    </div>
+                                                </div><!-- /.modal-content -->
+                                            </div><!-- /.modal-dialog -->
+                                        </div><!-- /.modal -->
+
+                                        <!-- center modal -->
+                                        <div class="modal fade bs-example-modal-center" tabindex="-1" id="modal_three" role="dialog" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title">Confirm Delete</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <p>Are you sure you want to permanent delete <b id="library_name_delete">Library Name</b>?</p>
+                                                        <a href="/Settings/Lib-Management/Delete/0" id="delete_lib_link" class="btn btn-outline btn-danger my-3 w-100"><i class="bx bx-trash"></i> Delete</a>
+                                                    </div>
+                                                </div><!-- /.modal-content -->
+                                            </div><!-- /.modal-dialog -->
+                                        </div><!-- /.modal -->
+
+                                        <div class="table-responsive">
+                                            <table id="datatable" class="table table-bordered dt-responsive  nowrap w-100">
+                                                <thead>
+                                                <tr>
+                                                    <th>No.</th>
+                                                    <th>Library Name</th>
+                                                    <th>Total Books</th>
+                                                    <th>Total Checked Out</th>
+                                                    <th>Total Remaining</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                    
+                                                    @for ($i = 0; $i < count($libraries); $i++)
+                                                        <tr>
+                                                            <td>{{$i+1}}</td>
+                                                            <td>{{ucwords(strtolower($libraries[$i]->Name))}} <input type="hidden" value="{{ucwords(strtolower($libraries[$i]->Name))}}" id="library_name_holder_{{ucwords(strtolower($libraries[$i]->id))}}" value=""></td>
+                                                            <td>{{$libraries[$i]->total}} Book(s)</td>
+                                                            <td>{{$libraries[$i]->checked_out}} Book(s)</td>
+                                                            <td>{{$libraries[$i]->total - $libraries[$i]->checked_out}} Book(s)</td>
+                                                            <td>
+                                                                <ul class="list-unstyled hstack gap-1 mb-0">
+                                                                    <li data-bs-toggle="tooltip" data-bs-placement="top" title="Edit Library details">
+                                                                        <button class="btn btn-outline-primary btn-sm edit_book_details" id="edit_book_details_{{$libraries[$i]->id}}" data-bs-toggle="modal" data-bs-target="#modal_one"><i class="bx bx-pen"></i></button>
+                                                                    </li>
+                                                                    @if ($libraries[$i]->id != 1)
+                                                                        <li data-bs-toggle="tooltip" data-bs-placement="top" title="Delete">
+                                                                            <button class="btn btn-outline-danger btn-sm delete_book" id="delete_book_{{$libraries[$i]->id}}" data-bs-toggle="modal" data-bs-target="#modal_three"><i class="bx bx-trash"></i></button>
+                                                                        </li>
+                                                                    @endif
+                                                                </ul>
+                                                            </td>
+                                                        </tr>
+                                                    @endfor
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div><!--end card-->
+                            </div><!--end col-->
+
+                        </div><!--end row-->
+                        
+
+                    </div> <!-- container-fluid -->
+                </div><!-- End Page-content -->
+                <!-- End Page-content -->
 
                 <footer class="footer">
                     <div class="container-fluid">
@@ -442,11 +523,45 @@
         <script src="/assets/libs/parsleyjs/parsley.min.js"></script>
 
         <!-- Datatable init js -->
-        <script src="/assets/js/pages/datatables.init.js"></script>
-
+        <script src="/assets/js/pages/datatables.init.js"></script> 
         <!-- Alerts Live Demo js -->
         <script src="/assets/js/pages/alerts.init.js"></script>
 
         <script src="/assets/js/app.js"></script>
+
+        <script>
+            var library_name = document.getElementById("library_name");
+            var library_id = document.getElementById("library_id");
+            var edit_book_details = document.getElementsByClassName("edit_book_details");
+            var delete_book = document.getElementsByClassName("delete_book");
+            
+            // set the click event listener
+            for (let index = 0; index < edit_book_details.length; index++) {
+                const element = edit_book_details[index];
+                element.addEventListener("click", showBookDetails);
+            }
+
+            // data setter function
+            function showBookDetails () {
+                var this_id = this.id.substr(18);
+                var library_name_holder = document.getElementById("library_name_holder_"+this_id).value;
+                library_name.value = library_name_holder;
+                library_id.value = this_id;
+            }
+
+            // delete all books
+            for (let index = 0; index < delete_book.length; index++) {
+                const element = delete_book[index];
+                element.addEventListener("click",deleteBook);
+            }
+
+            // delete data
+            function deleteBook() {
+                var this_id = this.id.substr(12);
+                var library_name_holder = document.getElementById("library_name_holder_"+this_id).value;
+                document.getElementById("library_name_delete").innerText = library_name_holder;
+                document.getElementById("delete_lib_link").href = "/Settings/Lib-Management/Delete/"+this_id;
+            }
+        </script>
     </body>
 </html>

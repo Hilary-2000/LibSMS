@@ -200,8 +200,16 @@ class Circulation extends Controller
         $school_code = session("school_details")->school_code;
         $staff_details = DB::select("SELECT * FROM `user_tbl` WHERE `school_code` = ?",[$school_code]);
         
+        // connect to mysql 2
+        DB::setDefaultConnection("mysql2");
+        // get libraries
+        $libraries = [];
+        $my_libraries = DB::select("SELECT * FROM `settings` WHERE `sett` = 'libraries'");
+
+        // check if my libraries has anything
+        $libraries = count($my_libraries) > 0 ? json_decode($my_libraries[0]->valued) : [];
         // return view
-        return view("check_out_specific_book",["book_details" => $book_details[0],"student_detail" => $student_detail,"staff_details" => $staff_details]);
+        return view("check_out_specific_book",["libraries" => $libraries, "book_details" => $book_details[0],"student_detail" => $student_detail,"staff_details" => $staff_details]);
     }
 
     function confirmCheckOut(Request $request){

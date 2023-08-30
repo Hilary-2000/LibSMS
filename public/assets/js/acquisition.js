@@ -5,7 +5,6 @@ function cObj(params) {
 function valObj(params) {
     return document.getElementById(params).value;
 }
-
 function stopInterval(id) {
     clearInterval(id);
 }
@@ -89,7 +88,7 @@ function sendAjaxRequest() {
                 cObj("prev_call_no").innerText = "Last Call No : {"+responseData.last_call_no+"}";
 
                 // set the book image thumbnail
-                var image_url = responseData.cover_url.length > 0 ? responseData.cover_url.substr(0,responseData.cover_url.length-5)+"L.jpg" : "";
+                var image_url = responseData.cover_url != null ? (responseData.cover_url.length > 0 ? responseData.cover_url.substr(0,responseData.cover_url.length-5)+"L.jpg" : "/images/book_cover.jpg") : "/images/book_cover.jpg";
                 cObj("book_cover_image").src = image_url;
                 cObj("book_cover_url").value = image_url;
 

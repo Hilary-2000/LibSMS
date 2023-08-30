@@ -247,8 +247,9 @@
                                         <i class="bx bx-cog"></i>
                                         <span key="t-jobs">Settings</span>
                                     </a>
-                                    <ul class="sub-menu " aria-expanded="false" style="height: 0px;">
-                                        <li><a href="/Settings/User-mgmt" class="active" key="t-job-list"><i class="bx bxs-user"></i> User Management</a></li>
+                                    <ul class="sub-menu" aria-expanded="false" style="height: 0px;">
+                                        <li><a href="/Settings/User-mgmt" key="t-job-list"><i class="bx bxs-user"></i> User Management</a></li>
+                                        <li><a href="/Settings/Library-mgmt" key="t-job-list"><i class="bx bxs-book"></i> Library Management</a></li>
                                     </ul>
                                 </li>
                             @endif
@@ -437,33 +438,9 @@
                                                                             </div>
                                                                             <div class="col-md-12">
                                                                                 <div class="mb-3">
-                                                                                    <label for="book_category" class="form-label">Book Category / Subject</label>
-                                                                                    <select name="book_category" id="book_category" class="form-control">
-                                                                                        <option value="">Select Option</option>
-                                                                                        @for ($i = 0; $i < count($subject_name); $i++)
-                                                                                            <option {{session("book_category") == $subject_name[$i] ? "selected" : ""}} value="{{$subject_name[$i]}}">{{$subject_name[$i]}}</option>
-                                                                                        @endfor
-                                                                                    </select>
-                                                                                </div>
-                                                                            </div>
-                                                                            <div class="col-md-12">
-                                                                                <div class="mb-3">
                                                                                     <label for="book_publishers" class="form-label">Publishers</label>
                                                                                     <input type="text" value="{{session("book_publishers") ? session("book_publishers") : ""}}" name="book_publishers" class="form-control" id="book_publishers"
                                                                                         placeholder="Book Publishers" required>
-                                                                                        <div class="valid-feedback">
-                                                                                            Looks good!
-                                                                                        </div>
-                                                                                        <div class="invalid-feedback">
-                                                                                            Should not be empty.
-                                                                                        </div>
-                                                                                </div>
-                                                                            </div>
-                                                                            <div class="col-md-12">
-                                                                                <div class="mb-3">
-                                                                                    <label for="date_published" class="form-label">Date Published</label>
-                                                                                    <input type="date" value="{{session("date_published") ? session("date_published") : date("Y-m-d")}}" name="date_published" class="form-control" id="date_published"
-                                                                                        placeholder="Last name" required>
                                                                                         <div class="valid-feedback">
                                                                                             Looks good!
                                                                                         </div>
@@ -485,11 +462,54 @@
                                                                                         </div>
                                                                                 </div>
                                                                             </div>
-                                                                            <div class="col-md-12">
+                                                                            <hr>
+                                                                            <div class="col-md-6">
                                                                                 <div class="mb-3">
                                                                                     <label for="book_location" class="form-label">Book Location</label>
                                                                                     <input type="text" name="book_location" value="{{session("book_location") ? session("book_location") : ""}}"  class="form-control" id="book_location"
                                                                                         placeholder="Shelf No, Row Number">
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col-md-6">
+                                                                                <div class="mb-3">
+                                                                                    <label for="library_location" class="form-label">Library Located</label>
+                                                                                    <select name="library_location" id="library_location" class="form-control" required>
+                                                                                        <option hidden value="">Select Option</option>
+                                                                                        @for ($i = 0; $i < count($libraries); $i++)
+                                                                                            <option {{session('library_location') == $libraries[$i]->id ? 'selected' : ''}} value="{{$libraries[$i]->id}}">{{ucwords(strtolower($libraries[$i]->Name))}}</option>
+                                                                                        @endfor
+                                                                                    </select>
+                                                                                    <div class="valid-feedback">
+                                                                                        Looks good!
+                                                                                    </div>
+                                                                                    <div class="invalid-feedback">
+                                                                                        Select the library the book is Located!.
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                            <hr>
+                                                                            <div class="col-md-12">
+                                                                                <div class="mb-3">
+                                                                                    <label for="book_category" class="form-label">Book Category / Subject</label>
+                                                                                    <select name="book_category" id="book_category" class="form-control">
+                                                                                        <option value="">Select Option</option>
+                                                                                        @for ($i = 0; $i < count($subject_name); $i++)
+                                                                                            <option {{session("book_category") == $subject_name[$i] ? "selected" : ""}} value="{{$subject_name[$i]}}">{{$subject_name[$i]}}</option>
+                                                                                        @endfor
+                                                                                    </select>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col-md-12">
+                                                                                <div class="mb-3">
+                                                                                    <label for="date_published" class="form-label">Date Published</label>
+                                                                                    <input type="date" value="{{session("date_published") ? session("date_published") : date("Y-m-d")}}" name="date_published" class="form-control" id="date_published"
+                                                                                        placeholder="Last name" required>
+                                                                                        <div class="valid-feedback">
+                                                                                            Looks good!
+                                                                                        </div>
+                                                                                        <div class="invalid-feedback">
+                                                                                            Should not be empty.
+                                                                                        </div>
                                                                                 </div>
                                                                             </div>
                                                                             <div class="col-md-12">

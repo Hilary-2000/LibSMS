@@ -247,8 +247,9 @@
                                         <i class="bx bx-cog"></i>
                                         <span key="t-jobs">Settings</span>
                                     </a>
-                                    <ul class="sub-menu " aria-expanded="false" style="height: 0px;">
-                                        <li><a href="/Settings/User-mgmt" class="active" key="t-job-list"><i class="bx bxs-user"></i> User Management</a></li>
+                                    <ul class="sub-menu" aria-expanded="false" style="height: 0px;">
+                                        <li><a href="/Settings/User-mgmt" key="t-job-list"><i class="bx bxs-user"></i> User Management</a></li>
+                                        <li><a href="/Settings/Library-mgmt" key="t-job-list"><i class="bx bxs-book"></i> Library Management</a></li>
                                     </ul>
                                 </li>
                             @endif
@@ -435,8 +436,26 @@
                                                     </div>
                                                     <div class="col-md-4">
                                                         <div class="mb-3">
-                                                            <label class="form-label"><b>Publishers</b></label>
-                                                            <p>{{(isset($book_details->book_publishers) && strlen($book_details->book_publishers) > 0)? $book_details->book_publishers : "N/A"}}</p>
+                                                            <label class="form-label"><b>Location</b></label>
+                                                            <p>
+                                                                @if($book_details->availability_status == 0)
+                                                                    Borrowed
+                                                                @else
+                                                                    Available at:
+                                                                    @if(isset($book_details->shelf_no_location) && strlen($book_details->shelf_no_location) > 0)
+                                                                        <b>{!! $book_details->shelf_no_location !!} - 
+                                                                            @for ($i = 0; $i < count($libraries); $i++)
+                                                                                @if($book_details->library_location == $libraries[$i]->id)
+                                                                                    {{$libraries[$i]->Name}}
+                                                                                @endif
+                                                                            @endfor
+                                                                        </b>
+                                                                    
+                                                                    @else
+                                                                        <b>Location Not Set!</b>
+                                                                    @endif
+                                                                @endif
+                                                            </p>
                                                         </div>
                                                     </div>
                                                     <div class="col-md-4">
@@ -477,19 +496,8 @@
                                                     </div>
                                                     <div class="col-md-4">
                                                         <div class="mb-3">
-                                                            <label class="form-label"><b>Location</b></label>
-                                                            <p>
-                                                                @if($book_details->availability_status == 0)
-                                                                    Borrowed
-                                                                @else
-                                                                    Available at:
-                                                                    @if(isset($book_details->shelf_no_location) && strlen($book_details->shelf_no_location) > 0)
-                                                                        <b>{!! $book_details->shelf_no_location !!}</b>
-                                                                    @else
-                                                                        <b>Location Not Set!</b>
-                                                                    @endif
-                                                                @endif
-                                                            </p>
+                                                            <label class="form-label"><b>Publishers</b></label>
+                                                            <p>{{(isset($book_details->book_publishers) && strlen($book_details->book_publishers) > 0)? $book_details->book_publishers : "N/A"}}</p>
                                                         </div>
                                                     </div>
                                                     <div class="col-md-12">
