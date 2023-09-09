@@ -326,13 +326,20 @@
                                                 <p class="text-muted">This month</p>
                                                 <h3>{{$borrowed_this_month}} </h3>
                                                 <p class="text-muted">
-                                                    @if ($borrowed_this_month > $borrowed_last_month)
+                                                    @if ($borrowed_this_month == 0 && $borrowed_last_month == 0)
+                                                        @php
+                                                            $percentage = 0;
+                                                        @endphp
+                                                        <input type="hidden" value="{{$percentage}}" id="radial_chart_values">
+                                                        <span class="text-danger me-2">{{$percentage}}% <i class="mdi mdi-arrow-down"></i> </span> From previous Month
+                                                    @endif
+                                                    @if ($borrowed_this_month > $borrowed_last_month && ($borrowed_this_month != 0 && $borrowed_last_month != 0))
                                                         @php
                                                             $percentage = round(($borrowed_this_month - $borrowed_last_month) / $borrowed_this_month * 100);
                                                         @endphp
                                                         <span class="text-success me-2">{{$percentage}}% <i class="mdi mdi-arrow-up"></i> </span> From previous Month
                                                     @endif
-                                                    @if ($borrowed_this_month < $borrowed_last_month)
+                                                    @if ($borrowed_this_month < $borrowed_last_month && ($borrowed_this_month != 0 && $borrowed_last_month != 0))
                                                         @php
                                                             $percentage = round(($borrowed_last_month - $borrowed_this_month) / $borrowed_this_month * 100);
                                                         @endphp

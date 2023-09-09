@@ -364,7 +364,7 @@
                                                                     @for ($i = 0; $i < count($student_detail); $i++)
                                                                         <optgroup label="{{$student_detail[$i]->class_name}}">
                                                                             @for ($index = 0; $index < count($student_detail[$i]->student_data); $index++)
-                                                                                <option value="{{$student_detail[$i]->student_data[$index]->adm_no}}">{{ucwords(strtolower($student_detail[$i]->student_data[$index]->first_name." ".$student_detail[$i]->student_data[$index]->first_name))." {".$student_detail[$i]->student_data[$index]->adm_no."}"}}</option>
+                                                                                <option value="{{$student_detail[$i]->student_data[$index]->adm_no}}">{{ucwords(strtolower($student_detail[$i]->student_data[$index]->first_name." ".$student_detail[$i]->student_data[$index]->second_name." ".$student_detail[$i]->student_data[$index]->surname))." {".$student_detail[$i]->student_data[$index]->adm_no."}"}}</option>
                                                                             @endfor
                                                                         </optgroup>
                                                                     @endfor

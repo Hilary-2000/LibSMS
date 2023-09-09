@@ -11,7 +11,8 @@ date_default_timezone_set('Africa/Nairobi');
 class Acquisitions extends Controller
 {
     //handle Acquisitions
-    function Acquisitions(){
+    function Acquisitions(Request $request){
+        // return $request;
         if (session("school_details") == null) {
             session()->flash("error","Your session has expired, Login to proceed!");
             return redirect("/");
@@ -24,7 +25,15 @@ class Acquisitions extends Controller
         DB::setDefaultConnection("mysql2");
         
         // get the list of books recorded
-        $select = DB::select("SELECT * FROM `library_details` ORDER BY `book_id` DESC");
+        $search_title = null;
+        if (count($request->input()) > 0) {
+            // keyword
+            $keyword = $request->input("keyword_search");
+            $search_title = $keyword;
+            $select = DB::select("SELECT * FROM `library_details` WHERE `book_title` LIKE \"%".$keyword."%\" OR `book_author` LIKE \"%".$keyword."%\" OR `book_publishers` LIKE \"%".$keyword."%\" OR `isbn_13` LIKE \"%".$keyword."%\" OR `isbn_10` LIKE \"%".$keyword."%\" OR `shelf_no_location` LIKE \"%".$keyword."%\" OR `call_no` LIKE \"%".$keyword."%\" OR `shelf_no_location` LIKE \"%".$keyword."%\" OR `keywords` LIKE \"%".$keyword."%\" LIMIT 100");
+        }else {
+            $select = DB::select("SELECT * FROM `library_details` ORDER BY `book_id` DESC LIMIT 100");
+        }
 
         $larger_length = 0;
         for ($index=0; $index < count($select); $index++) {
@@ -54,7 +63,7 @@ class Acquisitions extends Controller
         $libraries = count($my_libraries) > 0 ? json_decode($my_libraries[0]->valued) : [];
 
         // return $select;
-        return view("acqusitions",["libraries" => $libraries,"book_list" => $select,"subject_name" => $subject_name, "larger_length" => $larger_length]);
+        return view("acqusitions",["search_title" => $search_title,"libraries" => $libraries,"book_list" => $select,"subject_name" => $subject_name, "larger_length" => $larger_length]);
     }
 
     function addBook(Request $request){
@@ -442,7 +451,6 @@ class Acquisitions extends Controller
 
             // get the book details
             $book_details[0]->thumbnail_location = $this->isLinkValid($book_details[0]->thumbnail_location) ? $book_details[0]->thumbnail_location : "/images/book_cover.jpg";
-            // return $book_details;
 
             // connect to mysql 2
             DB::setDefaultConnection("mysql2");
@@ -580,24 +588,33 @@ class Acquisitions extends Controller
         return json_last_error() === JSON_ERROR_NONE;
     }
 
-    function isLinkValid($url) {
-        // check if the url is null
-        if ($url == null) {
-            return false;
-        }
 
-        // use curl
-        $ch = curl_init($url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_exec($ch);
+    function KeywordSearch($keyword){
+        if (session("school_details") == null) {
+            return [];
+        }
+        // check if the isbn number is present in the database and return book details
+        $database_name = session("school_details")->database_name;
+        // SET THE DATABASE NAME AS PER THE STUDENT ADMISSION NO
+        config(['database.connections.mysql2.database' => $database_name]);
         
-        $statusCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
+        // connect to mysql 2
+        DB::setDefaultConnection("mysql2");
 
-        if ($statusCode == 200) {
-            return true; // Valid link
-        } else {
-            return false; // Invalid link
-        }
+        // get the table details with the keyword
+        $book_details = DB::select("SELECT * FROM `library_details` WHERE `book_title` LIKE '%".$keyword."%' OR `book_author` LIKE '%".$keyword."%' OR `book_publishers` LIKE '%".$keyword."%' OR `isbn_13` LIKE '%".$keyword."%' OR `isbn_10` LIKE '%".$keyword."%' OR `shelf_no_location` LIKE '%".$keyword."%' OR `call_no` LIKE '%".$keyword."%' OR `shelf_no_location` LIKE '%".$keyword."%' OR `keywords` LIKE '%".$keyword."%'");
+
+        // no book details
+        return $book_details;
+    }
+
+    function isLinkValid($url) {
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_NOBODY, true);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_exec($ch);
+        $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+        return $http_code == 200;
     }
 }

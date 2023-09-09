@@ -9,7 +9,7 @@ date_default_timezone_set('Africa/Nairobi');
 class Cataloguing extends Controller
 {
     //Manages Cataloguing
-    function Cataloging(){
+    function Cataloging(Request $request){
         if (session("school_details") == null) {
             session()->flash("error","Your session has expired, Login to proceed!");
             return redirect("/");
@@ -23,10 +23,16 @@ class Cataloguing extends Controller
         DB::setDefaultConnection("mysql2");
 
         // get books
-        $select = DB::select("SELECT `isbn_13`, COUNT(`isbn_13`) AS 'Total' FROM `library_details` GROUP BY `isbn_13`;");
-        
+        $search_results = null;
+        if (count($request->input()) > 0) {
+            $keyword = $request->input("keyword_search");
+            $search_results = $keyword;
+            $select = DB::select("SELECT `isbn_13`, COUNT(`isbn_13`) AS 'Total' FROM `library_details` WHERE `book_title` LIKE \"%".$keyword."%\" OR `book_author` LIKE \"%".$keyword."%\" OR `book_publishers` LIKE \"%".$keyword."%\" OR `isbn_13` LIKE \"%".$keyword."%\" OR `isbn_10` LIKE \"%".$keyword."%\" OR `shelf_no_location` LIKE \"%".$keyword."%\" OR `call_no` LIKE \"%".$keyword."%\" OR `shelf_no_location` LIKE \"%".$keyword."%\" OR `keywords` LIKE \"%".$keyword."%\" GROUP BY `isbn_13` LIMIT 100;");
+        }else {
+            $select = DB::select("SELECT `isbn_13`, COUNT(`isbn_13`) AS 'Total' FROM `library_details` GROUP BY `isbn_13` LIMIT 100;");
+        }
         // get the different books you have
-        for ($index=0; $index < count($select); $index++) { 
+        for ($index=0; $index < count($select); $index++) {
             // get the number of records of each book group
             $details = DB::select("SELECT * FROM `library_details` WHERE `isbn_13` = ?;",[$select[$index]->isbn_13]);
             
@@ -41,7 +47,39 @@ class Cataloguing extends Controller
             $select[$index] = array_merge($details[0],$select[$index]);
         }
         // return $select;
-        return view("catalogue",["book_list" => $select]);
+        return view("catalogue",["search_results" => $search_results,"book_list" => $select]);
+    }
+    function keywordSearch($keyword){
+        if (session("school_details") == null) {
+            session()->flash("error","Your session has expired, Login to proceed!");
+            return redirect("/");
+        }
+        // GET THE BOOKS DETAILS BY GROUPING WITH THE ISBN NUMBER
+        $database_name = session("school_details")->database_name;
+        // SET THE DATABASE NAME AS PER THE STUDENT ADMISSION NO
+        config(['database.connections.mysql2.database' => $database_name]);
+        
+        // connect to mysql 2
+        DB::setDefaultConnection("mysql2");
+
+        // get books
+        $select = DB::select("SELECT `isbn_13`, COUNT(`isbn_13`) AS 'Total' FROM `library_details` WHERE `book_title` LIKE '%".$keyword."%' OR `book_author` LIKE '%".$keyword."%' OR `book_publishers` LIKE '%".$keyword."%' OR `isbn_13` LIKE '%".$keyword."%' OR `isbn_10` LIKE '%".$keyword."%' OR `shelf_no_location` LIKE '%".$keyword."%' OR `call_no` LIKE '%".$keyword."%' OR `shelf_no_location` LIKE '%".$keyword."%' OR `keywords` LIKE '%".$keyword."%' GROUP BY `isbn_13` LIMIT 100;");
+        // get the different books you have
+        for ($index=0; $index < count($select); $index++) {
+            // get the number of records of each book group
+            $details = DB::select("SELECT * FROM `library_details` WHERE `isbn_13` = ?;",[$select[$index]->isbn_13]);
+            
+            //encode
+            $details[0] = json_encode($details[0]);
+            $select[$index] = json_encode($select[$index]);
+
+            // decode
+            $details[0] = json_decode($details[0], true);
+            $select[$index] = json_decode($select[$index], true);
+            // return $select[$index];
+            $select[$index] = array_merge($details[0],$select[$index]);
+        }
+        return $select;
     }
 
     // get book details with the book id
@@ -131,21 +169,12 @@ class Cataloguing extends Controller
         }
     }
     function isLinkValid($url) {
-        // check if the url is null
-        if ($url == null) {
-            return false;
-        }
         $ch = curl_init($url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_NOBODY, true);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
         curl_exec($ch);
-        
-        $statusCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
-
-        if ($statusCode == 200) {
-            return true; // Valid link
-        } else {
-            return false; // Invalid link
-        }
+        return $http_code == 200;
     }
 }

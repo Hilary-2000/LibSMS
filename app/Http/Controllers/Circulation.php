@@ -58,8 +58,8 @@ class Circulation extends Controller
 
         // connect to mysql 2
         DB::setDefaultConnection("mysql2");
-        // get checked in with a limit of 500 records first
-        $checked_in = DB::select("SELECT * FROM `book_circulation` WHERE `return_status` = '1' ORDER BY `return_date` DESC LIMIT 500");
+        // get checked in with a limit of 300 records first
+        $checked_in = DB::select("SELECT * FROM `book_circulation` WHERE `return_status` = '1' ORDER BY `return_date` DESC LIMIT 300");
 
         // get who borrowed the book
         for ($index=0; $index < count($checked_in); $index++) { 
@@ -121,7 +121,8 @@ class Circulation extends Controller
     }
 
     // this link check outs
-    function Circulation_Checkout(){
+    function Circulation_Checkout(Request $request){
+        // return $request;
         if (session("school_details") == null) {
             session()->flash("error","Your session has expired, Login to proceed!");
             return redirect("/");
@@ -135,7 +136,14 @@ class Circulation extends Controller
         DB::setDefaultConnection("mysql2");
 
         // get the books
-        $books = DB::select("SELECT * FROM `library_details` WHERE `availability_status` = '1' ORDER BY `book_id` DESC;");
+        $search_title = null;
+        if (count($request->input()) > 0) {
+            $keyword = $request->input("keyword_search");
+            $search_title = $keyword;
+            $books = DB::select("SELECT * FROM `library_details` WHERE `availability_status` = '1' AND (`book_title` LIKE \"%".$keyword."%\" OR `book_author` LIKE \"%".$keyword."%\" OR `book_publishers` LIKE \"%".$keyword."%\" OR `isbn_13` LIKE \"%".$keyword."%\" OR `isbn_10` LIKE \"%".$keyword."%\" OR `shelf_no_location` LIKE \"%".$keyword."%\" OR `call_no` LIKE \"%".$keyword."%\" OR `shelf_no_location` LIKE \"%".$keyword."%\" OR `keywords` LIKE \"%".$keyword."%\") ORDER BY `book_id` DESC LIMIT 100;");
+        }else {
+            $books = DB::select("SELECT * FROM `library_details` WHERE `availability_status` = '1' ORDER BY `book_id` DESC LIMIT 100");
+        }
         for ($index=0; $index < count($books); $index++) { 
             // get record where the book was borrowed
             $book_details = DB::select("SELECT * FROM `book_circulation` WHERE `book_id` = ? AND `return_status` = '0' ORDER BY `circulation_id` DESC",[$books[$index]->book_id]);
@@ -146,7 +154,7 @@ class Circulation extends Controller
         }
 
         // return value
-        return view("check_out",["book_list" => $books]);
+        return view("check_out",["search_title" => $search_title ,"book_list" => $books]);
     }
 
     function checkOut($book_id){
@@ -495,21 +503,12 @@ class Circulation extends Controller
     }
 
     function isLinkValid($url) {
-        // check if the url is null
-        if ($url == null) {
-            return false;
-        }
         $ch = curl_init($url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_NOBODY, true);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
         curl_exec($ch);
-        
-        $statusCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
-
-        if ($statusCode == 200) {
-            return true; // Valid link
-        } else {
-            return false; // Invalid link
-        }
+        return $http_code == 200;
     }
 }

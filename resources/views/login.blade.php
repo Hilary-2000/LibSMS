@@ -260,6 +260,7 @@
                             if (x) x[currentFocus].click();
                         }
                     }
+                    console.log(currentFocus);
                 });
             
                 function addActive(x) {

@@ -35,11 +35,13 @@ Route::post("/Acquisitions/update-book",[Acquisitions::class,"updateBooks"]);
 Route::get("/Acquisitions/getBookDetails",[Acquisitions::class,"getBookDetails"]);
 Route::get("/Acquisitions/Book-details/{book_id}",[Acquisitions::class,"viewBookData"]);
 Route::get("/Acquisitions/Delete-book/{book_id}",[Acquisitions::class,"deleteBook"]);
+Route::get("/Acquisitions/keyword_search/{keyword}",[Acquisitions::class,"KeywordSearch"]);
 
 // Cataloguing
 Route::get("/Cataloging",[Cataloguing::class,"Cataloging"]);
 Route::get("/Cataloging/Edit/{book_isbn}",[Cataloguing::class,"editBookDets"]);
 Route::post("/Catalogue/EditBooks",[Cataloguing::class,"editBooks"]);
+Route::get("/Cataloguing/keyword_search/{keywords}",[Cataloguing::class,"keywordSearch"]);
 
 // Circulation
 Route::get("/Circulation",[Circulation::class,"circulationDashboard"]);

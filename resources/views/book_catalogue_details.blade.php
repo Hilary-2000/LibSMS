@@ -281,7 +281,6 @@
                                             <li class="breadcrumb-item active">Book Cataloguing</li>
                                         </ol>
                                     </div>
-
                                 </div>
                             </div>
                         </div>

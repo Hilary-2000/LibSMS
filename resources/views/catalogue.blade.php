@@ -34,6 +34,46 @@
 
     </head>
 
+    {{-- autocomplete style for school listing --}}
+    <style>
+        /*the container must be positioned relative:*/
+        .autocomplete {
+            position: relative;
+            display: inline-block;
+            width: 100%
+        }
+
+        .autocomplete-items {
+            position: absolute;
+            border: 1px solid #d4d4d4;
+            border-bottom: none;
+            border-top: none;
+            z-index: 99;
+            /*position the autocomplete items to be the same width as the container:*/
+            top: 100%;
+            left: 0;
+            right: 0;
+        }
+
+        .autocomplete-items div {
+            padding: 10px;
+            cursor: pointer;
+            background-color: #fff;
+            border-bottom: 1px solid #d4d4d4;
+        }
+
+        /*when hovering an item:*/
+        .autocomplete-items div:hover {
+            background-color: #e9e9e9;
+        }
+
+        /*when navigating through the items using the arrow keys:*/
+        .autocomplete-active {
+            background-color: DodgerBlue !important;
+            color: #ffffff;
+        }
+    </style>
+
     <body data-sidebar="dark">
 
     <!-- <body data-layout="horizontal" data-topbar="dark"> -->
@@ -316,7 +356,51 @@
                                     </div>
 
                                     <div class="card-body">
-                                        <p class="card-desc">This table shows all the different books you have in your library!</p>
+                                        <div class="mt-3">
+                                            <p><b>Note:</b></p>
+                                            <ul>
+                                                <li>In this section you will be able to modify your books location and call numbers, this is called <b>Cataloguing</b></li>
+                                                <li>The table below displays the books present in the library but groups those that share the same title and ISBN <b>eg Rich Dad, Poor Dad - 10 books</b></li>
+                                                <li>This table below will display the first <b>100 records</b> to increase page perfomance.</li>
+                                                <li>For more results use the advanced search!</li>
+                                            </ul>
+                                            <div class="d-flex gap-2 flex-wrap mb-3">
+                                                <button class="btn btn-outline-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+                                                    Advanced Search
+                                                </button>
+                                            </div>
+                                            <div class="collapse {{$search_results != null ? 'show' : ''}}" id="collapseExample">
+                                                <div class="card border border-3 shadow-none card-body text-muted mb-0">
+                                                    <div class="form-group">
+                                                        <div class="d-none">
+                                                            <div style="max-width:20px;max-height:20px;" class="spinner-grow text-primary m-1 d-none" id="book_isbn_loader_in" role="status">
+                                                                <span class="sr-only">Loading...</span>
+                                                            </div>
+                                                        </div>
+                                                        @if ($search_results != null)
+                                                            <a href="/Cataloging" class="btn btn-soft-primary btn-sm mb-3">Reset</a><br>
+                                                        @endif
+                                                        <label for="keyword_search" class="form-control-label">Advanced Keyword Search</label>
+                                                        <form class="row" method="GET" action="/Cataloging">
+                                                            <div class="col-lg-9">
+                                                                <div class="autocomplete">
+                                                                    <input type="text" value="{{$search_results != null ? $search_results : ''}}" name="keyword_search" id="keyword_search" class="form-control" placeholder="USE: ISBN, Book Title, Author, Call Number, Publisher" required>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-lg-3">
+                                                                <button id="submit_advance_search" class="btn btn-light" type="submit"><i class="mdi mdi-search-outline"></i>Advanced Search</button>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <hr>
+                                        <h6 class="text-center"><u>Catalogue Table
+                                            @if ($search_results != null)
+                                                <span>: Results for "{{$search_results}}"</span>
+                                            @endif
+                                            </u></h6>
                                         <div class="table-responsive">
                                             <table id="datatable" class="table table-bordered dt-responsive  nowrap w-100">
                                                 <thead>
@@ -454,5 +538,6 @@
         <script src="/assets/js/pages/alerts.init.js"></script>
 
         <script src="/assets/js/app.js"></script>
+        <script src="/assets/js/catalogue.js"></script>
     </body>
 </html>

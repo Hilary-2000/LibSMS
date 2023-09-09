@@ -50,6 +50,9 @@ cObj("book_options_inside").onchange = function () {
         cObj("single_date").classList.add("d-none");
         cObj("from_date").classList.add("d-none");
         cObj("to_date").classList.add("d-none");
+
+        // DISPLAY AN ERROR MESSAGE TELLING THEM THAT THE SYSTEM WOULD HANG OF THAT HAPPENS.
+        alert("If you have more than 500 books your system might get slower!","danger",cObj("liveAlertPlaceholder"));
     }else if (this_value == "checked_out") {
         cObj("date_selection_option").classList.remove("d-none");
         if(valObj("date_type_selection") == "specific_date"){

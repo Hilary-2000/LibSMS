@@ -729,7 +729,15 @@
                                                         <p>
                                                             Available at:
                                                             @if(isset($book_details->shelf_no_location) && strlen($book_details->shelf_no_location) > 0)
-                                                                <b>{!! $book_details->shelf_no_location !!}</b>
+                                                                <b>{!! $book_details->shelf_no_location !!}</b> 
+                                                                <br>Library Located : 
+                                                                <b>
+                                                                    @for ($i = 0; $i < count($libraries); $i++)
+                                                                        @if($book_details->library_location == $libraries[$i]->id)
+                                                                            {{$libraries[$i]->Name}}
+                                                                        @endif
+                                                                    @endfor 
+                                                                </b>
                                                             @else
                                                                 <b>Location Not Set!</b>
                                                             @endif

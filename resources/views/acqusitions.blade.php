@@ -34,6 +34,46 @@
 
     </head>
 
+    {{-- autocomplete style for school listing --}}
+    <style>
+        /*the container must be positioned relative:*/
+        .autocomplete {
+            position: relative;
+            display: inline-block;
+            width: 100%
+        }
+
+        .autocomplete-items {
+            position: absolute;
+            border: 1px solid #d4d4d4;
+            border-bottom: none;
+            border-top: none;
+            z-index: 99;
+            /*position the autocomplete items to be the same width as the container:*/
+            top: 100%;
+            left: 0;
+            right: 0;
+        }
+
+        .autocomplete-items div {
+            padding: 10px;
+            cursor: pointer;
+            background-color: #fff;
+            border-bottom: 1px solid #d4d4d4;
+        }
+
+        /*when hovering an item:*/
+        .autocomplete-items div:hover {
+            background-color: #e9e9e9;
+        }
+
+        /*when navigating through the items using the arrow keys:*/
+        .autocomplete-active {
+            background-color: DodgerBlue !important;
+            color: #ffffff;
+        }
+    </style>
+
     <body data-sidebar="dark">
 
     <!-- <body data-layout="horizontal" data-topbar="dark"> -->
@@ -313,6 +353,44 @@
                                                 <button type="button" id="show_windows" class="btn btn-primary waves-effect waves-light" data-bs-toggle="modal" data-bs-target="#exampleModalScrollable"><i class="bx bx-plus"></i> Add a Book</button>
                                             </div>
                                         </div>
+                                        <div class="mt-3">
+                                            <p><b>Note:</b></p>
+                                            <ul>
+                                                <li>This table will only display the first 100 books to increase page perfomance.</li>
+                                                <li>For more results use the advanced search below!</li>
+                                                <li>To view all your book navigate to the report section.</li>
+                                            </ul>
+                                            <div class="d-flex gap-2 flex-wrap mb-3">
+                                                <button class="btn btn-outline-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+                                                    Advanced Search
+                                                </button>
+                                            </div>
+                                            <div class="collapse {{$search_title != null ? 'show' : ''}}" id="collapseExample">
+                                                <div class="card border border-3 shadow-none card-body text-muted mb-0">
+                                                    <div class="form-group">
+                                                        <div class="d-none">
+                                                            <div style="max-width:20px;max-height:20px;" class="spinner-grow text-primary m-1 d-none" id="book_isbn_loader_in" role="status">
+                                                                <span class="sr-only">Loading...</span>
+                                                            </div>
+                                                        </div>
+                                                        @if ($search_title != null)
+                                                            <a href="/Acquisitions" class="btn btn-soft-primary btn-sm mb-3">Reset</a><br>
+                                                        @endif
+                                                        <label for="keyword_search" class="form-control-label">Advanced Keyword Search</label>
+                                                        <form class="row" method="GET" action="/Acquisitions">
+                                                            <div class="col-lg-9">
+                                                                <div class="autocomplete">
+                                                                    <input type="text" value="{{$search_title != null ? $search_title : ''}}" name="keyword_search" id="keyword_search" class="form-control" placeholder="USE: ISBN, Book Title, Author, Call Number, Publisher" required>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-lg-3">
+                                                                <button id="submit_advance_search" class="btn btn-light" type="submit"><i class="mdi mdi-search-outline"></i>Advanced Search</button>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
 
                                     <!-- Scrollable modal -->
@@ -563,7 +641,13 @@
                                             </div><!-- /.modal-content -->
                                         </div><!-- /.modal-dialog -->
                                     </div><!-- /.modal -->
+
                                     <div class="card-body">
+                                        <h6 class="text-center"><u>Book Table
+                                            @if ($search_title != null)
+                                                : Result for "{{$search_title}}"
+                                            @endif
+                                            </u></h6>
                                         @php
                                             function elongateData($larger_length,$data){
                                                 // get the length of the string
@@ -614,11 +698,13 @@
                                                             <td>
                                                                 <ul class="list-unstyled hstack gap-1 mb-0">
                                                                     <li data-bs-toggle="tooltip" data-bs-placement="top" title="View">
-                                                                        <a href="/Acquisitions/Book-details/{{$book_list[$i]->book_id}}" class="btn btn-sm btn-soft-primary"><i class="mdi mdi-eye-outline"></i> View</a>
+                                                                        <a href="/Acquisitions/Book-details/{{$book_list[$i]->book_id}}" class="btn btn-sm btn-soft-primary"><i class="mdi mdi-eye-outline"></i></a>
                                                                     </li>
-                                                                    {{-- <li data-bs-toggle="tooltip" data-bs-placement="top" title="Delete">
-                                                                        <button class="btn btn-soft-danger btn-sm delete_data" id="delete_data{{$book_list[$i]->book_id}}"><i class="mdi mdi-delete-outline"></i></button>
-                                                                    </li> --}}
+                                                                    @if ($book_list[$i]->availability_status == 1)
+                                                                        <li data-bs-toggle="tooltip" data-bs-placement="top" title="Check-Out">
+                                                                            <a href="/Circulation/check-out/{{$book_list[$i]->book_id}}" class="btn btn-sm btn-soft-warning"><i class="bx bx-log-out-circle"></i></a>
+                                                                        </li>
+                                                                    @endif
                                                                 </ul>
                                                             </td>
                                                         </tr>

@@ -391,7 +391,7 @@ class Reports extends Controller
             return view("reports",["book_data" => $book_data,"table_heading" => $table_heading,"search_heading" => $search_heading]);
         }else{
             // return "Book";
-            $book_list = DB::select("SELECT * FROM `library_details` ORDER BY `book_id` DESC");
+            $book_list = DB::select("SELECT * FROM `library_details` ORDER BY `book_id` DESC LIMIT 100");
             return view("reports",["book_list" => $book_list]);
         }
     }

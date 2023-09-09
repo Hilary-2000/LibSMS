@@ -310,12 +310,15 @@
                                             <h5 class="mb-0 card-title flex-grow-1">Library MIS Reports</h5>
                                         </div>
                                         <hr>
+                                        <div class="col-md-12 my-2">
+                                            <div id="liveAlertPlaceholder"><div>
+                                        </div>
                                         <form class="row" method="GET" action="/Reports">
                                             <div class="col-md-3">
                                                 <label for="book_options_inside" class="form-control-label">Book Options</label>
                                                 <select name="book_options_inside" id="book_options_inside" class="form-control" required>
                                                     <option hidden value="">Select book option</option>
-                                                    <option {{session('book_options_inside') == "book_information" ? "selected" : ""}} value="book_information">Book Information</option>
+                                                    <option {{session('book_options_inside') == "book_information" ? "selected" : ""}} value="book_information">All Book Information</option>
                                                     <option {{session('book_options_inside') == "latest_acquisition" ? "selected" : ""}} value="latest_acquisition">Acquisition</option>
                                                     <option {{session('book_options_inside') == "checked_out" ? "selected" : ""}} value="checked_out">Checked Out</option>
                                                     <option {{session('book_options_inside') == "checked_in" ? "selected" : ""}} value="checked_in">Checked In</option>

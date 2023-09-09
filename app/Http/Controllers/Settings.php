@@ -251,21 +251,12 @@ class Settings extends Controller
     }
     
     function isLinkValid($url) {
-        // check if the url is null
-        if ($url == null) {
-            return false;
-        }
         $ch = curl_init($url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_NOBODY, true);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
         curl_exec($ch);
-        
-        $statusCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
-
-        if ($statusCode == 200) {
-            return true; // Valid link
-        } else {
-            return false; // Invalid link
-        }
+        return $http_code == 200;
     }
 }
