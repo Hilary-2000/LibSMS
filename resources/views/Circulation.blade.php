@@ -298,7 +298,7 @@
                                     @endif
                                     <p class="card-title-desc">Click the button below to check out a book borrowed.</p>
                                     <a href="/Circulation/check-out" class="btn btn-secondary"><i class="bx bxs-log-out-circle"></i> Check Out</a>
-                                    <a href="/Circulation/Stats" class="btn btn-secondary"><i class="bx bx-stats"></i> Statistics</a>
+                                    <a href="/Circulation/Stats" class="btn btn-secondary"><i class="bx bx-stats"></i> Statistics <span class="badge bg-success">new</span></a>
                                     
                                     <!--  Large modal example -->
                                     <div class="modal fade" id="bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
