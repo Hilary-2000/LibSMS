@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\LibraryDetail;
 use DateTime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -17,6 +18,7 @@ class Acquisitions extends Controller
             session()->flash("error","Your session has expired, Login to proceed!");
             return redirect("/");
         }
+
         $database_name = session("school_details")->database_name;
         // SET THE DATABASE NAME AS PER THE STUDENT ADMISSION NO
         config(['database.connections.mysql2.database' => $database_name]);
@@ -30,9 +32,29 @@ class Acquisitions extends Controller
             // keyword
             $keyword = $request->input("keyword_search");
             $search_title = $keyword;
-            $select = DB::select("SELECT * FROM `library_details` WHERE `book_title` LIKE \"%".$keyword."%\" OR `book_author` LIKE \"%".$keyword."%\" OR `book_publishers` LIKE \"%".$keyword."%\" OR `isbn_13` LIKE \"%".$keyword."%\" OR `isbn_10` LIKE \"%".$keyword."%\" OR `shelf_no_location` LIKE \"%".$keyword."%\" OR `call_no` LIKE \"%".$keyword."%\" OR `shelf_no_location` LIKE \"%".$keyword."%\" OR `keywords` LIKE \"%".$keyword."%\" LIMIT 100");
+            $select = DB::select("SELECT * FROM `library_details` WHERE `book_title` LIKE \"%".$keyword."%\" OR `book_author` LIKE \"%".$keyword."%\" OR `book_publishers` LIKE \"%".$keyword."%\" OR `isbn_13` LIKE \"%".$keyword."%\" OR `isbn_10` LIKE \"%".$keyword."%\" OR `shelf_no_location` LIKE \"%".$keyword."%\" OR `call_no` LIKE \"%".$keyword."%\" OR `keywords` LIKE \"%".$keyword."%\" LIMIT 100");
+            
+            // using paginate
+            // $library_details = LibraryDetail::where(function($query) use ($keyword) {
+            //     $query->where('book_title', 'like', '%'.$keyword.'%')
+            //           ->orWhere('book_author', 'like', '%'.$keyword.'%')
+            //           ->orWhere('book_publishers', 'like', '%'.$keyword.'%')
+            //           ->orWhere('isbn_13', 'like', '%'.$keyword.'%')
+            //           ->orWhere('isbn_10', 'like', '%'.$keyword.'%')
+            //           ->orWhere('shelf_no_location', 'like', '%'.$keyword.'%')
+            //           ->orWhere('call_no', 'like', '%'.$keyword.'%')
+            //           ->orWhere('keywords', 'like', '%'.$keyword.'%');
+            // })
+            // ->paginate(20);
+            
+            // $select = $library_details;
+            // return $library_details;
         }else {
             $select = DB::select("SELECT * FROM `library_details` ORDER BY `book_id` DESC LIMIT 100");
+
+            // use paginate
+            // $library_details = LibraryDetail::paginate(20);
+            // $select = $library_details;
         }
 
         $larger_length = 0;

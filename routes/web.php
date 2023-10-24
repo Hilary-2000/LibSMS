@@ -53,6 +53,10 @@ Route::get("/Circulation/Cancel/check-out/{circulation_id}",[Circulation::class,
 Route::post("/Circulation/ExtendReturnDate",[Circulation::class,"extendReturnDate"]);
 Route::get("/Circulation/Confirm/check-in/{circulation_id}",[Circulation::class,"ConfirmCheckIn"]);
 Route::get("/Circulation/Cancel/check-in/{circulation_id}",[Circulation::class,"cancelCheckIn"]);
+Route::get("/Circulation/Stats",[Circulation::class,"circulationStats"]);
+Route::get("/Circulation/Stats/View/Student/{student_id}",[Circulation::class,"viewStudentStats"]);
+Route::get("/Circulation/Stats/View/Staff/{staff_id}",[Circulation::class,"viewStaffStats"]);
+Route::get("/Circulation/Book-Stats/View/{book_stats}",[Circulation::class,"viewBookStats"]);
 
 // Reports
 Route::get("/Reports",[Reports::class,"getReports"]);

@@ -320,7 +320,7 @@
                                 </div>
                                 <div class="card">
                                     <div class="card-body">
-                                        <h4 class="card-title mb-4">Books Check-Outs</h4>
+                                        <h4 class="card-title mb-4">Books Checked-Out</h4>
                                         <div class="row">
                                             <div class="col-sm-12">
                                                 <p class="text-muted">This month</p>
@@ -731,7 +731,7 @@
                             </div>
                             <div class="col-sm-6">
                                 <div class="text-sm-end d-none d-sm-block">
-                                    <b>Date Updated : </b>19th August 2023 <-> 12:08AM
+                                    <b>Date Updated : </b>12th Sep 2023  11:08AM
                                 </div>
                             </div>
                         </div>

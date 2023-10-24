@@ -268,7 +268,7 @@
                 <div class="page-content">
                     <div class="container-fluid">
                         <div class="container my-2">
-                            <a href="/Circulation/check-out" class="btn btn-soft-primary btn-sm"><i class="bx bx-left-arrow-alt"></i> Back</a>
+                            <a href="{{url()->previous()}}" class="btn btn-soft-primary btn-sm"><i class="bx bx-left-arrow-alt"></i> Back</a>
                         </div>
                         <!-- start page title -->
                         <div class="row">
@@ -583,7 +583,7 @@
                             </div>
                             <div class="col-sm-6">
                                 <div class="text-sm-end d-none d-sm-block">
-                                    <b>Date Updated : </b>19th August 2023 <-> 12:08AM
+                                    <b>Date Updated : </b>12th Sep 2023  11:08AM
                                 </div>
                             </div>
                         </div>

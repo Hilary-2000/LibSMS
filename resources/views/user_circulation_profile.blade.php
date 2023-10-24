@@ -4,7 +4,7 @@
     <head>
         
         <meta charset="utf-8" />
-        <title>Book Circulation | {{ucwords(strtolower(session("fullname")))}} </title>
+        <title>Circulation Profile | {{ucwords(strtolower(session("fullname")))}} </title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta content="Ladybird Lbrary Management System" name="description" />
         <meta content="Ladybird Softech Co." name="author" />
@@ -12,25 +12,25 @@
         <!-- App favicon -->
         <link rel="shortcut icon" href="/images/ladybird_dark.png">
 
-        <link href="assets/libs/bootstrap-datepicker/css/bootstrap-datepicker.min.css" rel="stylesheet" type="text/css">
+        <link href="/assets/libs/bootstrap-datepicker/css/bootstrap-datepicker.min.css" rel="stylesheet" type="text/css">
 
-        <link href="assets/libs/select2/css/select2.min.css" rel="stylesheet" type="text/css" />
+        <link href="/assets/libs/select2/css/select2.min.css" rel="stylesheet" type="text/css" />
 
         <!-- Bootstrap Css -->
-        <link href="assets/css/bootstrap.min.css" id="bootstrap-style" rel="stylesheet" type="text/css" />
+        <link href="/assets/css/bootstrap.min.css" id="bootstrap-style" rel="stylesheet" type="text/css" />
         <!-- Icons Css -->
-        <link href="assets/css/icons.min.css" rel="stylesheet" type="text/css" />
+        <link href="/assets/css/icons.min.css" rel="stylesheet" type="text/css" />
         <!-- App Css-->
-        <link href="assets/css/app.min.css" id="app-style" rel="stylesheet" type="text/css" />
+        <link href="/assets/css/app.min.css" id="app-style" rel="stylesheet" type="text/css" />
         <!-- App js -->
-        <script src="assets/js/plugin.js"></script>
+        <script src="/assets/js/plugin.js"></script>
 
         <!-- DataTables -->
-        <link href="assets/libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
-        <link href="assets/libs/datatables.net-buttons-bs4/css/buttons.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+        <link href="/assets/libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+        <link href="/assets/libs/datatables.net-buttons-bs4/css/buttons.bootstrap4.min.css" rel="stylesheet" type="text/css" />
 
         <!-- Responsive datatable examples -->
-        <link href="assets/libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+        <link href="/assets/libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css" rel="stylesheet" type="text/css" />
 
     </head>
 
@@ -60,19 +60,19 @@
                         <div class="navbar-brand-box">
                             <a href="." class="logo logo-dark">
                                 <span class="logo-sm">
-                                    <img src="assets/images/logo.svg" alt="" height="22">
+                                    <img src="/assets/images/logo.svg" alt="" height="22">
                                 </span>
                                 <span class="logo-lg">
-                                    <img src="assets/images/logo-dark.png" alt="" height="17">
+                                    <img src="/assets/images/logo-dark.png" alt="" height="17">
                                 </span>
                             </a>
 
                             <a href="." class="logo logo-light">
                                 <span class="logo-sm">
-                                    <img src="images/ladybird_dark-removebg.png" alt="" height="40">
+                                    <img src="/images/ladybird_dark-removebg.png" alt="" height="40">
                                 </span>
                                 <span class="logo-lg">
-                                    <img src="images/ladybird_dark-removebg.png" alt="" height="100">
+                                    <img src="/images/ladybird_dark-removebg.png" alt="" height="100">
                                 </span>
                             </a>
                         </div>
@@ -226,7 +226,7 @@
                                 </li>
                             @endif
                             @if (isPresent($lib_priv,"Circulation") || count($lib_priv) == 0)
-                                <li>
+                                <li class="mm-active">
                                     <a href="/Circulation" class="waves-effect">
                                         <i class="bx bx-rotate-left"></i>
                                         <span key="t-file-manager">Circulation</span>
@@ -270,10 +270,11 @@
                         <div class="row">
                             <div class="col-12">
                                 <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                                    <h4 class="mb-sm-0 font-size-18">Book Circulation</h4>
+                                    <h4 class="mb-sm-0 font-size-18">Borrower Circulation Profile</h4>
                                     <div class="page-title-right">
                                         <ol class="breadcrumb m-0">
-                                            <li class="breadcrumb-item active">Book Circulation</li>
+                                            <li class="breadcrumb-item"><a href="/Cataloging">Book Circulation</a></li>
+                                            <li class="breadcrumb-item active">Borrower Circulation Profile</li>
                                         </ol>
                                     </div>
                                 </div>
@@ -296,10 +297,69 @@
                                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                                         </div>
                                     @endif
-                                    <p class="card-title-desc">Click the button below to check out a book borrowed.</p>
-                                    <a href="/Circulation/check-out" class="btn btn-secondary"><i class="bx bxs-log-out-circle"></i> Check Out</a>
-                                    <a href="/Circulation/Stats" class="btn btn-secondary"><i class="bx bx-stats"></i> Statistics</a>
-                                    
+                                    <a href="{{url()->previous() ?? '/Circulation/Stats'}}" class="btn btn-soft-primary btn-sm"><i class="bx bx-left-arrow-alt"></i> Back</a>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-lg-4">
+                                            <div class="d-flex">
+                                                <div class="flex-shrink-0 me-3">
+                                                    <img src="{{$borrower_data->dp}}" alt="" class="avatar-md rounded-circle img-thumbnail">
+                                                </div>
+                                                <div class="flex-grow-1 align-self-center">
+                                                    <div class="text-muted">
+                                                        <h5 class="mb-1">{{ucwords(strtolower($borrower_data->fullname))}}</h5>
+                                                        <p class="mb-0">{{$borrower_data->role}}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+            
+                                        <div class="col-lg-8 align-self-center">
+                                            <div class="text-lg-center mt-4 mt-lg-0">
+                                                <div class="row">
+                                                    <div class="col-4">
+                                                        <div>
+                                                            <p class="text-muted text-truncate mb-2"> <b style="cursor: pointer;" data-bs-toggle="tooltip" data-bs-placement="top" aria-label="Books borrowed by {{ucwords(strtolower($borrower_data->fullname))}} but not yet returned." data-bs-original-title="Books borrowed by {{ucwords(strtolower($borrower_data->fullname))}} but not yet returned."><i class="mdi mdi-information-outline font-size-15 pt-1"></i></b> Books Checked Out - <span class="badge bg-danger font-size-10 p-1">Out</span></p>
+                                                            <h5 class="mb-0">{{$books_checked_out}} Book(s)</h5>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-4">
+                                                        <div>
+                                                            <p class="text-muted text-truncate mb-2"> <b style="cursor: pointer;" data-bs-toggle="tooltip" data-bs-placement="top" aria-label="Books borrowed by {{ucwords(strtolower($borrower_data->fullname))}} and returned." data-bs-original-title="Books borrowed by {{ucwords(strtolower($borrower_data->fullname))}} and returned."><i class="mdi mdi-information-outline font-size-15 pt-1"></i></b> Books Checked In - <span class="badge bg-success font-size-10 p-1">In</span></p>
+                                                            <h5 class="mb-0">{{$books_checked_in}} Book(s)</h5>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-4">
+                                                        <div>
+                                                            <p class="text-muted text-truncate mb-2">Most Borrowed Book</p>
+                                                            <h5 class="mb-0">{{count($total_books) > 0 ? $total_books[0]->book_title : "N.A"}}</h5>
+                                                            @if (count($total_books) > 0)
+                                                                <span class="badge bg-success font-size-10 p-1">{{"Borrowed ".$total_books[0]->Total." Time(s)"}}</span>
+                                                            @endif
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+            
+                                        {{-- <div class="col-lg-4 d-none d-lg-block">
+                                            <div class="clearfix mt-4 mt-lg-0">
+                                                <div class="dropdown float-end">
+                                                    <button class="btn btn-primary" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                        <i class="bx bxs-cog align-middle me-1"></i> Setting
+                                                    </button>
+                                                    <div class="dropdown-menu dropdown-menu-end">
+                                                        <a class="dropdown-item" href="#">Action</a>
+                                                        <a class="dropdown-item" href="#">Another action</a>
+                                                        <a class="dropdown-item" href="#">Something else</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div> --}}
+                                        
+                                    </div>
+                                    <!-- end row -->
                                     <!--  Large modal example -->
                                     <div class="modal fade" id="bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
                                         <div class="modal-dialog modal-lg modal-dialog-centered">
@@ -405,24 +465,181 @@
                                         </div>
                                     </div>
 
+                                    <hr class="my-4">
+                                    <!-- Nav tabs -->
+                                    <ul class="nav nav-tabs nav-tabs-custom nav-justified" role="tablist">
+                                        <li class="nav-item">
+                                            <a class="nav-link" data-bs-toggle="tab" href="#checked_in" role="tab">
+                                                <span class="d-block d-sm-none"><i class="bx bx-log-in-circle"></i></span>
+                                                <span class="d-none d-sm-block">Books Checked In</span> 
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link active" data-bs-toggle="tab" href="#checked_out" role="tab">
+                                                <span class="d-block d-sm-none"><i class="bx bx-log-out-circle"></i></span>
+                                                <span class="d-none d-sm-block">Books Checked Out</span> 
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link " data-bs-toggle="tab" href="#circulation_stats" role="tab">
+                                                <span class="d-block d-sm-none"><i class="bx bx-log-out-circle"></i></span>
+                                                <span class="d-none d-sm-block">Circulation History</span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                    <!-- Tab panes -->
+                                    <div class="tab-content p-3 text-muted">
+                                        <div class="tab-pane" id="checked_in" role="tabpanel">
+                                            <div class="card">
+                                                <div class="card-body border-bottom">
+                                                    <h4 class="card-title">Books Checked In</h4>
+                                                    <p class="card-title-desc">This table displays books that were borrowed and have been returned.</p>
+                                                    <div class="table-responsive">
+                                                        <table id="datatable" class="table table-bordered dt-responsive  nowrap w-100">
+                                                            <thead>
+                                                            <tr>
+                                                                <th>No.</th>
+                                                                <th>Title</th>
+                                                                <th>Call No.</th>
+                                                                <th>Borrower</th>
+                                                                <th>Expected Return Date</th>
+                                                                <th>Actual Return Date</th>
+                                                                <th>Actions</th>
+                                                            </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                @for ($i = 0; $i < count($checked_in); $i++)
+                                                                    <tr>
+                                                                        <td>{{$i+1}} <input type="hidden" id="checkin_values_{{$checked_in[$i]->circulation_id}}" value="{{json_encode($checked_in[$i])}}"></td>
+                                                                        <td>{{$checked_in[$i]->book_title}}</td>
+                                                                        <td>{{$checked_in[$i]->book_call_number}}</td>
+                                                                        <td>{{$checked_in[$i]->user_fullname}}
+                                                                            @if ($checked_in[$i]->user_borrowing == "student")
+                                                                                <span data-bs-toggle="tooltip" data-bs-placement="top" class="badge badge-pill badge-soft-success" data-bs-original-title="Student">Student</span>
+                                                                            @else
+                                                                                <span data-bs-toggle="tooltip" data-bs-placement="top" class="badge badge-pill badge-soft-success" data-bs-original-title="Staff">Staff</span>
+                                                                            @endif
+                                                                        </td>
+                                                                        <td>{{date("D dS M Y",strtotime($checked_in[$i]->expected_return_date))}}</td>
+                                                                        <td>{{date("D dS M Y",strtotime($checked_in[$i]->return_date))}}</td>
+                                                                        <td>
+                                                                            <ul class="list-unstyled hstack gap-1 mb-0">
+                                                                                <li data-bs-toggle="tooltip" data-bs-placement="top" title="View check-in details">
+                                                                                    <button class="btn btn-sm btn-outline-primary view_check_out_details" id="view_check_out_details_{{$checked_in[$i]->circulation_id}}" type="button" data-bs-toggle="modal" data-bs-target="#bs-example-modal-lg"><i class="mdi mdi-eye-outline"></i> View</button>
+                                                                                </li>
+                                                                            </ul>
+                                                                        </td>
+                                                                    </tr>
+                                                                @endfor
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="tab-pane active" id="checked_out" role="tabpanel">
+                                            <div class="card">
+                                                <div class="card-body border-bottom">
+                                                    <h4 class="card-title">Books Checked Out</h4>
+                                                    <p class="card-title-desc">This table displays books that were borrowed and have not been returned.</p>
+                                                    <div class="table-responsive">
+                                                        <table id="datatable_check_out" class="table table-bordered dt-responsive  nowrap w-100">
+                                                            <thead>
+                                                            <tr>
+                                                                <th>No.</th>
+                                                                <th>Title</th>
+                                                                <th>Call No.</th>
+                                                                <th>Borrower</th>
+                                                                <th>Expected Return Date</th>
+                                                                <th>Actions</th>
+                                                            </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                @for ($i = 0; $i < count($checked_out); $i++)
+                                                                    <tr>
+                                                                        <td>{{$i+1}}</td>
+                                                                        <td>{{$checked_out[$i]->book_title}}</td>
+                                                                        <td>{{$checked_out[$i]->book_call_number}}</td>
+                                                                        <td>{{$checked_out[$i]->user_fullname}} 
+                                                                            @if ($checked_out[$i]->user_borrowing == "student")
+                                                                                <span data-bs-toggle="tooltip" data-bs-placement="top" class="badge badge-pill badge-soft-success" data-bs-original-title="Student">Student</span>
+                                                                            @else
+                                                                                <span data-bs-toggle="tooltip" data-bs-placement="top" class="badge badge-pill badge-soft-success" data-bs-original-title="Staff">Staff</span>
+                                                                            @endif
+                                                                        </td>
+                                                                        <td>{{date("D dS M Y",strtotime($checked_out[$i]->expected_return_date))}}
+                                                                            @if ((date("Ymd")*1) > (date("Ymd",strtotime($checked_out[$i]->expected_return_date))*1))
+                                                                                <span data-bs-toggle="tooltip" data-bs-placement="top" class="badge badge-pill badge-soft-danger" data-bs-original-title="Overdue by {{getDateDifference(date("Ymd"), date("Ymd",strtotime($checked_out[$i]->expected_return_date)), 'days')}} Day(s)">Overdue</span>
+                                                                            @endif
+                                                                            @if ((date("Ymd")*1) == (date("Ymd",strtotime($checked_out[$i]->expected_return_date))*1))
+                                                                                <span data-bs-toggle="tooltip" data-bs-placement="top" class="badge badge-pill badge-soft-success" data-bs-original-title="Due Today">Due</span>
+                                                                            @endif
+                                                                        </td>
+                                                                        <td>
+                                                                            <ul class="list-unstyled hstack gap-1 mb-0">
+                                                                                <li data-bs-toggle="tooltip" data-bs-placement="top" title="View borrower details">
+                                                                                    <a href="/Circulation/View/check-out/{{$checked_out[$i]->book_id}}/{{$checked_out[$i]->circulation_id}}" class="btn btn-sm btn-soft-success"><i class="mdi mdi-eye-outline"></i> View</a>
+                                                                                </li>
+                                                                            </ul>
+                                                                        </td>
+                                                                    </tr>
+                                                                @endfor
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="tab-pane" id="circulation_stats" role="tabpanel">
+                                            <div class="card">
+                                                <div class="card-body border-bottom">
+                                                    <h4 class="card-title">Circulation History</h4>
+                                                    <ul class="verti-timeline list-unstyled">
+                                                        @if (count($circulation_data) > 0)
+                                                            @for ($i = 0; $i < 20; $i++)
+                                                                @if (count($circulation_data) == $i)
+                                                                    @break;
+                                                                @endif
+                                                                <li class="event-list">
+                                                                    <div class="event-timeline-dot">
+                                                                        <i class="bx bx-right-arrow-circle font-size-18"></i>
+                                                                    </div>
+                                                                    <div class="d-flex">
+                                                                        <div class="flex-shrink-0 me-3">
+                                                                            <h5 class="font-size-10"><span class="font-size-10 badge {{$circulation_data[$i]->status == "Check-In" ? 'bg-success' : 'bg-warning'}}">{{$circulation_data[$i]->status}}</span> <i class="bx bx-right-arrow-alt font-size-16 text-primary align-middle ms-2"></i></h5>
+                                                                        </div>
+                                                                        <div class="flex-grow-1">
+                                                                            <div>
+                                                                                {!!$circulation_data[$i]->story!!}
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </li>
+                                                            @endfor
+                                                        @else
+                                                            <li class="event-list">
+                                                                <div class="event-timeline-dot">
+                                                                    <i class="bx bx-right-arrow-circle font-size-18"></i>
+                                                                </div>
+                                                                <div class="d-flex">
+                                                                    <div class="flex-shrink-0 me-3">
+                                                                        <h5 class="font-size-10">Now <i class="bx bx-right-arrow-alt font-size-16 text-primary align-middle ms-2"></i></h5>
+                                                                    </div>
+                                                                    <div class="flex-grow-1">
+                                                                        <div>
+                                                                            This student has not borrowed any book before!
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </li>
+                                                        @endif
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-        
-                            <!-- Nav tabs -->
-                            <ul class="nav nav-tabs nav-tabs-custom nav-justified" role="tablist">
-                                <li class="nav-item">
-                                    <a class="nav-link" data-bs-toggle="tab" href="#checked_in" role="tab">
-                                        <span class="d-block d-sm-none"><i class="bx bx-log-in-circle"></i></span>
-                                        <span class="d-none d-sm-block">Books Checked In</span> 
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link active" data-bs-toggle="tab" href="#checked_out" role="tab">
-                                        <span class="d-block d-sm-none"><i class="bx bx-log-out-circle"></i></span>
-                                        <span class="d-none d-sm-block">Books Checked Out</span> 
-                                    </a>
-                                </li>
-                            </ul>
                             @php
                                 function getDateDifference($date1, $date2, $format = 'days') {
                                     $datetime1 = new DateTime($date1);
@@ -447,111 +664,6 @@
                                     }
                                 }
                             @endphp
-
-                            <!-- Tab panes -->
-                            <div class="tab-content p-3 text-muted">
-                                <div class="tab-pane" id="checked_in" role="tabpanel">
-                                    <div class="card">
-                                        <div class="card-body border-bottom">
-                                            <h4 class="card-title">Books Checked In</h4>
-                                            <p class="card-title-desc">This table displays books that were borrowed and have been returned.</p>
-                                            <div class="table-responsive">
-                                                <table id="datatable" class="table table-bordered dt-responsive  nowrap w-100">
-                                                    <thead>
-                                                    <tr>
-                                                        <th>No.</th>
-                                                        <th>Title</th>
-                                                        <th>Call No.</th>
-                                                        <th>Borrower</th>
-                                                        <th>Expected Return Date</th>
-                                                        <th>Actual Return Date</th>
-                                                        <th>Actions</th>
-                                                    </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        @for ($i = 0; $i < count($checked_in); $i++)
-                                                            <tr>
-                                                                <td>{{$i+1}} <input type="hidden" id="checkin_values_{{$checked_in[$i]->circulation_id}}" value="{{json_encode($checked_in[$i])}}"></td>
-                                                                <td>{{$checked_in[$i]->book_title}}</td>
-                                                                <td>{{$checked_in[$i]->book_call_number}}</td>
-                                                                <td>{{$checked_in[$i]->user_fullname}}
-                                                                    @if ($checked_in[$i]->user_borrowing == "student")
-                                                                        <span data-bs-toggle="tooltip" data-bs-placement="top" class="badge badge-pill badge-soft-success" data-bs-original-title="Student">Student</span>
-                                                                    @else
-                                                                        <span data-bs-toggle="tooltip" data-bs-placement="top" class="badge badge-pill badge-soft-success" data-bs-original-title="Staff">Staff</span>
-                                                                    @endif
-                                                                </td>
-                                                                <td>{{date("D dS M Y",strtotime($checked_in[$i]->expected_return_date))}}</td>
-                                                                <td>{{date("D dS M Y",strtotime($checked_in[$i]->return_date))}}</td>
-                                                                <td>
-                                                                    <ul class="list-unstyled hstack gap-1 mb-0">
-                                                                        <li data-bs-toggle="tooltip" data-bs-placement="top" title="View check-in details">
-                                                                            <button class="btn btn-sm btn-outline-primary view_check_out_details" id="view_check_out_details_{{$checked_in[$i]->circulation_id}}" type="button" data-bs-toggle="modal" data-bs-target="#bs-example-modal-lg"><i class="mdi mdi-eye-outline"></i> View</button>
-                                                                        </li>
-                                                                    </ul>
-                                                                </td>
-                                                            </tr>
-                                                        @endfor
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="tab-pane active" id="checked_out" role="tabpanel">
-                                    <div class="card">
-                                        <div class="card-body border-bottom">
-                                            <h4 class="card-title">Books Checked Out</h4>
-                                            <p class="card-title-desc">This table displays books that were borrowed and have not been returned.</p>
-                                            <div class="table-responsive">
-                                                <table id="datatable_check_out" class="table table-bordered dt-responsive  nowrap w-100">
-                                                    <thead>
-                                                    <tr>
-                                                        <th>No.</th>
-                                                        <th>Title</th>
-                                                        <th>Call No.</th>
-                                                        <th>Borrower</th>
-                                                        <th>Expected Return Date</th>
-                                                        <th>Actions</th>
-                                                    </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        @for ($i = 0; $i < count($checked_out); $i++)
-                                                            <tr>
-                                                                <td>{{$i+1}}</td>
-                                                                <td>{{$checked_out[$i]->book_title}}</td>
-                                                                <td>{{$checked_out[$i]->book_call_number}}</td>
-                                                                <td>{{$checked_out[$i]->user_fullname}} 
-                                                                    @if ($checked_out[$i]->user_borrowing == "student")
-                                                                        <span data-bs-toggle="tooltip" data-bs-placement="top" class="badge badge-pill badge-soft-success" data-bs-original-title="Student">Student</span>
-                                                                    @else
-                                                                        <span data-bs-toggle="tooltip" data-bs-placement="top" class="badge badge-pill badge-soft-success" data-bs-original-title="Staff">Staff</span>
-                                                                    @endif
-                                                                </td>
-                                                                <td>{{date("D dS M Y",strtotime($checked_out[$i]->expected_return_date))}}
-                                                                    @if ((date("Ymd")*1) > (date("Ymd",strtotime($checked_out[$i]->expected_return_date))*1))
-                                                                        <span data-bs-toggle="tooltip" data-bs-placement="top" class="badge badge-pill badge-soft-danger" data-bs-original-title="Overdue by {{getDateDifference(date("Ymd"), date("Ymd",strtotime($checked_out[$i]->expected_return_date)), 'days')}} Day(s)">Overdue</span>
-                                                                    @endif
-                                                                    @if ((date("Ymd")*1) == (date("Ymd",strtotime($checked_out[$i]->expected_return_date))*1))
-                                                                        <span data-bs-toggle="tooltip" data-bs-placement="top" class="badge badge-pill badge-soft-success" data-bs-original-title="Due Today">Due</span>
-                                                                    @endif
-                                                                </td>
-                                                                <td>
-                                                                    <ul class="list-unstyled hstack gap-1 mb-0">
-                                                                        <li data-bs-toggle="tooltip" data-bs-placement="top" title="View borrower details">
-                                                                            <a href="/Circulation/View/check-out/{{$checked_out[$i]->book_id}}/{{$checked_out[$i]->circulation_id}}" class="btn btn-sm btn-soft-success"><i class="mdi mdi-eye-outline"></i> View</a>
-                                                                        </li>
-                                                                    </ul>
-                                                                </td>
-                                                            </tr>
-                                                        @endfor
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -594,7 +706,7 @@
 
                 <div class="p-4">
                     <div class="mb-2">
-                        <img src="assets/images/layouts/layout-1.jpg" class="img-thumbnail" alt="layout images">
+                        <img src="/assets/images/layouts/layout-1.jpg" class="img-thumbnail" alt="layout images">
                     </div>
 
                     <div class="form-check form-switch mb-3">
@@ -603,7 +715,7 @@
                     </div>
     
                     <div class="mb-2">
-                        <img src="assets/images/layouts/layout-2.jpg" class="img-thumbnail" alt="layout images">
+                        <img src="/assets/images/layouts/layout-2.jpg" class="img-thumbnail" alt="layout images">
                     </div>
                     <div class="form-check form-switch mb-3">
                         <input class="form-check-input theme-choice" type="checkbox" id="dark-mode-switch">
@@ -637,6 +749,13 @@
         <script src="/assets/libs/datatables.net-buttons/js/buttons.colVis.min.js"></script>
         
         
+        <script src="/assets/libs/select2/js/select2.min.js"></script>
+        <script src="/assets/libs/bootstrap-datepicker/js/bootstrap-datepicker.min.js"></script>
+        <script src="/assets/libs/spectrum-colorpicker2/spectrum.min.js"></script>
+        <script src="/assets/libs/bootstrap-timepicker/js/bootstrap-timepicker.min.js"></script>
+        <script src="/assets/libs/bootstrap-touchspin/jquery.bootstrap-touchspin.min.js"></script>
+        <script src="/assets/libs/bootstrap-maxlength/bootstrap-maxlength.min.js"></script>
+        <script src="/assets/libs/@chenfengyuan/datepicker/datepicker.min.js"></script>
 
         {{-- validation --}}
         <script src="/assets/js/pages/form-validation.init.js"></script>
@@ -644,6 +763,9 @@
 
         <!-- Datatable init js -->
         <script src="/assets/js/pages/datatables.init.js"></script>
+
+        <!-- Alerts Live Demo js -->
+        <script src="/assets/js/pages/form-advanced.init.js"></script>
 
         <!-- Alerts Live Demo js -->
         <script src="/assets/js/circulation.js"></script>

@@ -526,7 +526,7 @@
                             </div>
                             <div class="col-sm-6">
                                 <div class="text-sm-end d-none d-sm-block">
-                                    <b>Date Updated : </b>19th August 2023 <-> 12:08AM
+                                    <b>Date Updated : </b>12th Sep 2023  11:08AM
                                 </div>
                             </div>
                         </div>
