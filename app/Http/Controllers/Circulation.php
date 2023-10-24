@@ -115,7 +115,7 @@ class Circulation extends Controller
             if ($select[$index]->return_status == 1) {
                 $data_in = new stdClass();
                 $data_in->status = 'Check-In';
-                $data_in->story = "<i><b>'".$select[$index]->book_title."'</b></i> was returned on <i><b>".date("D, dS M Y",strtotime($select[$index]->return_date))."</b></i> and the expected return date was <i><b>".date("D, dS M Y",strtotime($select[$index]->return_date))."</b></i>. It was checked in by <i><b>". ucwords(strtolower($select[$index]->checked_in_by_user))." </i></b>";
+                $data_in->story = "<i><b>'".$select[$index]->book_title."'</b></i> was returned on <i><b>".date("D, dS M Y",strtotime($select[$index]->return_date))."</b></i> and the expected return date was <i><b>".date("D, dS M Y",strtotime($select[$index]->expected_return_date))."</b></i>. It was checked in by <i><b>". ucwords(strtolower($select[$index]->checked_in_by_user))." </i></b>";
 
                 // save the data
                 array_push($circulation_data,$data_in);
@@ -262,7 +262,7 @@ class Circulation extends Controller
             if ($select[$index]->return_status == 1) {
                 $data_in = new stdClass();
                 $data_in->status = 'Check-In';
-                $data_in->story = "<i><b>'".$select[$index]->book_title."'</b></i> was returned on <i><b>".date("D, dS M Y",strtotime($select[$index]->return_date))."</b></i> and the expected return date was <i><b>".date("D, dS M Y",strtotime($select[$index]->return_date))."</b></i>. It was checked in by <i><b>". ucwords(strtolower($select[$index]->checked_in_by_user))." </i></b>";
+                $data_in->story = "<i><b>'".$select[$index]->book_title."'</b></i> was returned on <i><b>".date("D, dS M Y",strtotime($select[$index]->return_date))."</b></i> and the expected return date was <i><b>".date("D, dS M Y",strtotime($select[$index]->expected_return_date))."</b></i>. It was checked in by <i><b>". ucwords(strtolower($select[$index]->checked_in_by_user))." </i></b>";
 
                 // save the data
                 array_push($circulation_data,$data_in);
