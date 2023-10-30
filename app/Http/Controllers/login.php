@@ -12,16 +12,28 @@ class login extends Controller
     //this controller is used to manage accounts access
     function loginLibrary(Request $request){
         // return $request->input();
-        $school_code = $request->input("school_code");
+        // $school_code = $request->input("school_code");
         $username = $request->input("username");
         $user_password = $request->input("user-password");
         $remember_check = $request->input("remember-check");
 
         // set flash session to store the user credentials for the sake of those who forget
-        session()->flash("school_code",$school_code);
+        // session()->flash("school_code",$school_code);
         session()->flash("username",$username);
         session()->flash("user_password",$user_password);
         session()->flash("remember_check", $remember_check);
+
+        // confirm if the user is the right one.
+        $encrypt_password = $this->encryptCode($user_password);
+        $user_data = DB::select("SELECT * FROM `user_tbl` WHERE `username` = ? AND `password` = ?",[$username,$encrypt_password]);
+
+        if (count($user_data) == 0) {
+            session()->flash("error","Incorrect username or password try again!");
+            return redirect("/");
+        }
+
+        // set the school code
+        $school_code = $user_data[0]->school_code;
 
         // check if the school code is accepted to access the library
         $accept_access = DB::select("SELECT * FROM `school_information` WHERE `school_code` = ?",[$school_code]);
@@ -36,8 +48,8 @@ class login extends Controller
         }
 
         // confirm if the user is the right one.
-        $encrypt_password = $this->encryptCode($user_password);
-        $user_data = DB::select("SELECT * FROM `user_tbl` WHERE `school_code` = ? AND `username` = ? AND `password` = ?",[$school_code,$username,$encrypt_password]);
+        // $encrypt_password = $this->encryptCode($user_password);
+        // $user_data = DB::select("SELECT * FROM `user_tbl` WHERE `school_code` = ? AND `username` = ? AND `password` = ?",[$school_code,$username,$encrypt_password]);
         // return $user_data;
 
         // if the data returns the user data then the password is correct
@@ -113,10 +125,10 @@ class login extends Controller
 
             return redirect("/Dashboard");
         }else{
-            session()->flash("error","Incorrect credentials, check your school code, username or password for errors.");
+            session()->flash("error","Incorrect credentials, check your username or password for errors.");
 
             // destroy all the cookies
-            Cookie::queue(Cookie::forget("school_code"));
+            // Cookie::queue(Cookie::forget("school_code"));
             Cookie::queue(Cookie::forget("username"));
             Cookie::queue(Cookie::forget("user_password"));
             return redirect("/");

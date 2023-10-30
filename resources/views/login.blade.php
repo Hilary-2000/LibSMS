@@ -106,12 +106,12 @@
                                                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                                             </div>
                                         @endif
-                                        <div class="mb-3">
+                                        {{-- <div class="mb-3">
                                             <label for="school_code" class="form-label">School Code</label>
                                             <div class="autocomplete">
                                                 <input type="text" value="{{session("school_code") ? session("school_code") : ""}}" class="form-control" name="school_code"  id="school_code" placeholder="Enter school code or Type school name" required>
                                             </div>
-                                        </div>
+                                        </div> --}}
 
                                         <div class="mb-3">
                                             <label for="username" class="form-label">Username</label>
