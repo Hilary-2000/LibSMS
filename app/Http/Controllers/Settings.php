@@ -9,11 +9,8 @@ use stdClass;
 class Settings extends Controller
 {
     //handles all the setting information for the users
-    function userMgmt(){
-        if (session("school_details") == null) {
-            session()->flash("error","Your session has expired, Login to proceed!");
-            return redirect("/");
-        }
+    function userMgmt(Request $request){
+        $notifications = $request->input("notifications") != null ? $request->input('notifications') : [];
         // check if the isbn number is present in the database and return book details
         $database_name = session('school_details')->database_name;
         // SET THE DATABASE NAME AS PER THE STUDENT ADMISSION NO
@@ -27,14 +24,11 @@ class Settings extends Controller
         $user_data = DB::select("SELECT * FROM `user_tbl` WHERE (`auth` = '0' OR `auth` = '1' OR `auth` = 'Librarian') AND `school_code` = ?",[$school_code]);
         
         // edit their library priviledged
-        return view("user_mgmt",["user_data" => $user_data]);
+        return view("user_mgmt",["notifications" => $notifications,"user_data" => $user_data]);
     }
 
-    function showUserDetails($user_id){
-        if (session("school_details") == null) {
-            session()->flash("error","Your session has expired, Login to proceed!");
-            return redirect("/");
-        }
+    function showUserDetails($user_id, Request $request){
+        $notifications = $request->input("notifications") != null ? $request->input('notifications') : [];
         // check if the isbn number is present in the database and return book details
         $database_name = session('school_details')->database_name;
         // SET THE DATABASE NAME AS PER THE STUDENT ADMISSION NO
@@ -57,7 +51,7 @@ class Settings extends Controller
         // check if it has a valid image
         $user_data[0]->profile_loc = $this->isLinkValid("https://lsims.ladybirdsmis.com/sims/".$user_data[0]->profile_loc) && $user_data[0]->profile_loc != null ? $user_data[0]->profile_loc : "images/dp.png";
         // return $user_data;
-        return view("change_lib_previleges",["user_data" => $user_data[0]]);
+        return view("change_lib_previleges",["notifications" => $notifications,"user_data" => $user_data[0]]);
     }
 
     function changePrivileges(Request $request){
@@ -81,12 +75,9 @@ class Settings extends Controller
         return redirect("/Settings/User-mgmt/".$user_id);
         
     }
-    function libraryManagement(){
+    function libraryManagement(Request $request){
         // get the libraries
-        if (session("school_details") == null) {
-            session()->flash("error","Your session has expired, Login to proceed!");
-            return redirect("/");
-        }
+        $notifications = $request->input("notifications") != null ? $request->input('notifications') : [];
         // check if the isbn number is present in the database and return book details
         $database_name = session('school_details')->database_name;
         // SET THE DATABASE NAME AS PER THE STUDENT ADMISSION NO
@@ -116,7 +107,7 @@ class Settings extends Controller
 
         // return $libraries;
         // return the libraries and view
-        return view("library_management",["libraries" => $libraries]);
+        return view("library_management",["notifications" => $notifications, "libraries" => $libraries]);
     }
 
     function UpdateSettings(Request $request){

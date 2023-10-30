@@ -134,11 +134,9 @@ class login extends Controller
             return redirect("/");
         }
     }
-    function dashboard(){
-        if (!session("fullname")) {
-            session()->flash("error","Provide your credentials to Login!");
-            return redirect("/");
-        }
+    function dashboard(Request $request){
+        // return $request;
+        $notifications = $request->input("notifications") != null ? $request->input('notifications') : [];
 
         // get the dashboard details
         // GET THE BOOKS DETAILS BY GROUPING WITH THE ISBN NUMBER
@@ -195,7 +193,7 @@ class login extends Controller
         // get the latest books
         $book_data = DB::select("SELECT * FROM `library_details` ORDER BY `book_id` DESC LIMIT 15");
 
-        return view("librarian_dash",["book_data" => $book_data,"most_borrowed_books" => $most_borrowed_books, "borrowed_last_month" => $borrowed_last_month ,"borrowed_this_month" => $borrowed_this_month, "check_in_user" => $check_in_user ,"check_out_user" => $check_out_user,"book_count" => $book_count,"checked_out_today" => $checked_out_today,"checked_in_today" => $checked_in_today]);
+        return view("librarian_dash",["notifications" => $notifications, "book_data" => $book_data,"most_borrowed_books" => $most_borrowed_books, "borrowed_last_month" => $borrowed_last_month ,"borrowed_this_month" => $borrowed_this_month, "check_in_user" => $check_in_user ,"check_out_user" => $check_out_user,"book_count" => $book_count,"checked_out_today" => $checked_out_today,"checked_in_today" => $checked_in_today]);
     }
     function getSchools(){
         // get if cookies are still available so that we bypass the login process

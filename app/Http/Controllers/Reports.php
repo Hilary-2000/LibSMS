@@ -11,10 +11,7 @@ class Reports extends Controller
 {
     //handle all reports requests
     function getReports(Request $request){
-        if (session("school_details") == null) {
-            session()->flash("error","Your session has expired, Login to proceed!");
-            return redirect("/");
-        }
+        $notifications = $request->input("notifications") != null ? $request->input('notifications') : [];
         // check if the isbn number is present in the database and return book details
         $database_name = session('school_details')->database_name;
         // SET THE DATABASE NAME AS PER THE STUDENT ADMISSION NO
@@ -22,7 +19,7 @@ class Reports extends Controller
         
         // connect to mysql 2
         DB::setDefaultConnection("mysql2");
-        if (count($request->input()) > 0) {
+        if (count($request->input()) > 1) {
             // proceed and process that information
             $book_options_inside = $request->input("book_options_inside");
             $date_type_selection = $request->input("date_type_selection");
@@ -39,6 +36,7 @@ class Reports extends Controller
             // start with book information
             $table_heading = [];
             $search_heading = "Not Set";
+            // $book_data = [];
             if ($book_options_inside == "book_information") {
                 // get book details
                 $table_heading = ["No","Book Title","Author","ISBN-10","ISBN-13","Date Acquired","Call No.","Action"];
@@ -388,11 +386,11 @@ class Reports extends Controller
                 }
             }
             // return $book_data;
-            return view("reports",["book_data" => $book_data,"table_heading" => $table_heading,"search_heading" => $search_heading]);
+            return view("reports",["notifications" => $notifications,"book_data" => $book_data,"table_heading" => $table_heading,"search_heading" => $search_heading]);
         }else{
             // return "Book";
             $book_list = DB::select("SELECT * FROM `library_details` ORDER BY `book_id` DESC LIMIT 100");
-            return view("reports",["book_list" => $book_list]);
+            return view("reports",["notifications" => $notifications, "book_list" => $book_list]);
         }
     }
     function getBook($ALL_BOOKS,$book_id){

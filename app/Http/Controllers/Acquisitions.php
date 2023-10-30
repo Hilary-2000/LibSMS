@@ -11,6 +11,39 @@ use stdClass;
 date_default_timezone_set('Africa/Nairobi');
 class Acquisitions extends Controller
 {
+
+    function getNotification(){
+        // set the notifications for all the books that are overdue
+        
+        // first get all books that are overdue
+        $select = DB::select("SELECT BC.circulation_id, BC.date_checked_out ,BC.book_call_number,BC.user_checked_out, BC.book_id, BC.expected_return_date, BC.user_borrowing,
+                                CASE
+                                    WHEN BC.user_borrowing = 'student' THEN CONCAT(SD.first_name, ' ', SD.second_name,' ',SD.surname)
+                                    WHEN BC.user_borrowing = 'teacher' THEN UT.fullname
+                                    ELSE NULL
+                                END AS borrower_name,
+                                LD.book_title,LD.book_author,LD.isbn_13
+                            FROM `book_circulation` AS BC
+                            LEFT JOIN `student_data` AS SD ON BC.user_checked_out = SD.adm_no AND BC.user_borrowing = 'student'
+                            LEFT JOIN `ladybird_smis`.`user_tbl` AS UT ON BC.user_checked_out = UT.user_id AND BC.user_borrowing = 'staff'
+                            LEFT JOIN `library_details` AS LD ON BC.book_id = LD.book_id
+                            WHERE `return_status` = 0 AND `expected_return_date` < ? ",[date("YmdHis")]);
+        // return $select;
+
+        // proceed and save the notification in  the notification table
+        for ($index=0; $index < count($select); $index++) {
+            $notification_title = $select[$index]->book_title." is due for Check-In";
+            $stats_link = $select[$index]->user_borrowing == 'student' ? '/Circulation/Stats/View/Student/'.$select[$index]->user_checked_out : '/Circulation/Stats/View/Staff/'.$select[$index]->user_checked_out;
+            $notification_content = "<b>".$select[$index]->book_title."</b> of call number <i>".$select[$index]->book_call_number."</i> borrowed by <a class='text-decoration-underline text-reset' href='".$stats_link."' data-bs-toggle='tooltip' data-bs-placement='top' data-bs-original-title='Click to view borrower borrowing stats!'><i>".ucwords(strtolower($select[$index]->borrower_name))."</i></a> <span class='badge badge-pill badge-soft-success'>".$select[$index]->user_borrowing."</span> is due for checkin. Its expected return date was ".date("D dS M Y : h:i:sA",strtotime($select[$index]->expected_return_date)).". Click here to <a class='text-decoration-underline text-reset' href='/Circulation/View/check-out/".$select[$index]->book_id."/".$select[$index]->circulation_id."'>Check-In</a>.";
+            $date_created = date("YmdHis");
+            $book_id = $select[$index]->book_id;
+
+            // this insert statement will check if a record of the same book is present, if so, it won`t insert the record.
+            $insert = DB::insert("INSERT INTO `library_notifications` (`notification_title`,`notification_content`,`notification_action`,`date_created`,`book_id`)
+                                    SELECT ?, ?, '[]',?,?
+                                    WHERE NOT EXISTS (SELECT 1 FROM `library_notifications` WHERE `book_id` = ?);",[$notification_title, $notification_content, $date_created, $book_id, $book_id]);
+        }
+    }
     //handle Acquisitions
     function Acquisitions(Request $request){
         // return $request;
@@ -18,6 +51,7 @@ class Acquisitions extends Controller
             session()->flash("error","Your session has expired, Login to proceed!");
             return redirect("/");
         }
+        $notifications = $request->input("notifications") != null ? $request->input('notifications') : [];
 
         $database_name = session("school_details")->database_name;
         // SET THE DATABASE NAME AS PER THE STUDENT ADMISSION NO
@@ -25,6 +59,7 @@ class Acquisitions extends Controller
         
         // connect to mysql 2
         DB::setDefaultConnection("mysql2");
+        // return $this->getNotification();
         
         // get the list of books recorded
         $search_title = null;
@@ -85,7 +120,7 @@ class Acquisitions extends Controller
         $libraries = count($my_libraries) > 0 ? json_decode($my_libraries[0]->valued) : [];
 
         // return $select;
-        return view("acqusitions",["search_title" => $search_title,"libraries" => $libraries,"book_list" => $select,"subject_name" => $subject_name, "larger_length" => $larger_length]);
+        return view("acqusitions",["notifications" => $notifications,"search_title" => $search_title,"libraries" => $libraries,"book_list" => $select,"subject_name" => $subject_name, "larger_length" => $larger_length]);
     }
 
     function addBook(Request $request){
@@ -388,11 +423,8 @@ class Acquisitions extends Controller
     }
 
     // get the book data
-    function viewBookData($book_id){
-        if (session("school_details") == null) {
-            session()->flash("error","Your session has expired, Login to proceed!");
-            return redirect("/");
-        }
+    function viewBookData($book_id, Request $request){
+        $notifications = $request->input("notifications") != null ? $request->input('notifications') : [];
         // check if the isbn number is present in the database and return book details
         $database_name = session("school_details")->database_name;
         // SET THE DATABASE NAME AS PER THE STUDENT ADMISSION NO
@@ -482,7 +514,7 @@ class Acquisitions extends Controller
 
             // check if my libraries has anything
             $libraries = count($my_libraries) > 0 ? json_decode($my_libraries[0]->valued) : [];
-            return view("book_details",["libraries" => $libraries, "book_circulation_details" => $book_circulation_details,"book_details" => $book_details[0], "subject_name" => $subject_name]);
+            return view("book_details",["notifications" => $notifications,"libraries" => $libraries, "book_circulation_details" => $book_circulation_details,"book_details" => $book_details[0], "subject_name" => $subject_name]);
         }else {
             session()->flash("error","Book details not found, try another books!");
             return redirect("/Acquisitions");

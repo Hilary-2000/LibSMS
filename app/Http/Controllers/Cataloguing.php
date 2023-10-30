@@ -10,10 +10,7 @@ class Cataloguing extends Controller
 {
     //Manages Cataloguing
     function Cataloging(Request $request){
-        if (session("school_details") == null) {
-            session()->flash("error","Your session has expired, Login to proceed!");
-            return redirect("/");
-        }
+        $notifications = $request->input("notifications") != null ? $request->input('notifications') : [];
         // GET THE BOOKS DETAILS BY GROUPING WITH THE ISBN NUMBER
         $database_name = session("school_details")->database_name;
         // SET THE DATABASE NAME AS PER THE STUDENT ADMISSION NO
@@ -47,7 +44,7 @@ class Cataloguing extends Controller
             $select[$index] = array_merge($details[0],$select[$index]);
         }
         // return $select;
-        return view("catalogue",["search_results" => $search_results,"book_list" => $select]);
+        return view("catalogue",["notifications" => $notifications ,"search_results" => $search_results,"book_list" => $select]);
     }
     function keywordSearch($keyword){
         if (session("school_details") == null) {
@@ -83,11 +80,8 @@ class Cataloguing extends Controller
     }
 
     // get book details with the book id
-    function editBookDets($book_isbn){
-        if (session("school_details") == null) {
-            session()->flash("error","Your session has expired, Login to proceed!");
-            return redirect("/");
-        }
+    function editBookDets($book_isbn, Request $request){
+        $notifications = $request->input("notifications") != null ? $request->input('notifications') : [];
         // GET THE BOOKS DETAILS BY GROUPING WITH THE ISBN NUMBER
         $database_name = session("school_details")->database_name;
         // SET THE DATABASE NAME AS PER THE STUDENT ADMISSION NO
@@ -113,7 +107,7 @@ class Cataloguing extends Controller
             $sub_name = isset($subjects[$index]->display_name) ? $subjects[$index]->display_name : "Not Set!";
             array_push($subject_name,$sub_name);
         }
-        return view("book_catalogue_details",["book_data" => $book_data[0],"book_data_all" => $book_data,"subject_name" => $subject_name]);
+        return view("book_catalogue_details",["notifications" => $notifications ,"book_data" => $book_data[0],"book_data_all" => $book_data,"subject_name" => $subject_name]);
     }
 
     function editBooks(Request $request){

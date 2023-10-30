@@ -5,27 +5,20 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use stdClass;
+use Termwind\Components\Raw;
 
 date_default_timezone_set('Africa/Nairobi');
 class Circulation extends Controller
 {
-    function viewBookStats($book_isbn){
-        if (session("school_details") == null) {
-            session()->flash("error","Your session has expired, Login to proceed!");
-            return redirect("/");
-        }
+    function viewBookStats($book_isbn, Request $request){
+        $notifications = $request->input("notifications") != null ? $request->input('notifications') : [];
         $date = "2023/11/10";
         $message = "The book stats dashboard is coming soon. Stay tuned!";
         $redirect_link = "";
-        return view("admin.coming_soon",["date" => $date, "message" => $message, "redirect_link" => $redirect_link]);
+        return view("admin.coming_soon",["notifications" => $notifications ,"date" => $date, "message" => $message, "redirect_link" => $redirect_link]);
     }
     // circulation stats
-    function viewStudentStats($student_id){
-
-        if (session("school_details") == null) {
-            session()->flash("error","Your session has expired, Login to proceed!");
-            return redirect("/");
-        }
+    function viewStudentStats($student_id, Request $request){
         // flash session
         session()->flash("student_id", $student_id);
         // GET THE BOOKS DETAILS BY GROUPING WITH THE ISBN NUMBER
@@ -135,11 +128,12 @@ class Circulation extends Controller
         // return $circulation_data;
 
         // return view
-        return view("user_circulation_profile",["circulation_data" => $circulation_data,"total_books" => $total_books, "books_checked_in" => $books_checked_in, "books_checked_out" => $books_checked_out,"borrower_data" => $borrower_data, "checked_in" => $checked_in,"checked_out" => $checked_out]);
+        $notifications = $request->input("notifications") != null ? $request->input('notifications') : [];
+        return view("user_circulation_profile",["notifications" => $notifications, "circulation_data" => $circulation_data,"total_books" => $total_books, "books_checked_in" => $books_checked_in, "books_checked_out" => $books_checked_out,"borrower_data" => $borrower_data, "checked_in" => $checked_in,"checked_out" => $checked_out]);
     }
 
     // view staff details
-    function viewStaffStats($staff_id){
+    function viewStaffStats($staff_id, Request $request){
         if (session("school_details") == null) {
             session()->flash("error","Your session has expired, Login to proceed!");
             return redirect("/");
@@ -280,15 +274,13 @@ class Circulation extends Controller
         }
         // return $circulation_data;
         // return view
-        return view("staff_circulation_profile",["circulation_data" => $circulation_data, "total_books" => $total_books, "books_checked_in" => $books_checked_in, "books_checked_out" => $books_checked_out,"borrower_data" => $borrower_data, "checked_in" => $checked_in,"checked_out" => $checked_out]);
+        $notifications = $request->input("notifications") != null ? $request->input('notifications') : [];
+        return view("staff_circulation_profile",["notifications" => $notifications ,"circulation_data" => $circulation_data, "total_books" => $total_books, "books_checked_in" => $books_checked_in, "books_checked_out" => $books_checked_out,"borrower_data" => $borrower_data, "checked_in" => $checked_in,"checked_out" => $checked_out]);
     }
 
     // circulation stats
     function circulationStats(Request $request){
-        if (session("school_details") == null) {
-            session()->flash("error","Your session has expired, Login to proceed!");
-            return redirect("/");
-        }
+        $notifications = $request->input("notifications") != null ? $request->input('notifications') : [];
         // GET THE BOOKS DETAILS BY GROUPING WITH THE ISBN NUMBER
         $database_name = session("school_details")->database_name;
         // SET THE DATABASE NAME AS PER THE STUDENT ADMISSION NO
@@ -509,7 +501,7 @@ class Circulation extends Controller
             $school_code = session("school_details")->school_code;
             $staff_details = DB::select("SELECT * FROM `user_tbl` WHERE `school_code` = ?",[$school_code]);
 
-            return view("circulation_stats",["table_column" => $table_column,"display_data" => $display_data,"student_detail" => $student_detail,"staff_details" => $staff_details]);
+            return view("circulation_stats",["notifications" => $notifications, "table_column" => $table_column,"display_data" => $display_data,"student_detail" => $student_detail,"staff_details" => $staff_details]);
         }else{
 
             // get all students in the different classes that are there
@@ -541,15 +533,12 @@ class Circulation extends Controller
             $school_code = session("school_details")->school_code;
             $staff_details = DB::select("SELECT * FROM `user_tbl` WHERE `school_code` = ?",[$school_code]);
     
-            return view("circulation_stats",["student_detail" => $student_detail,"staff_details" => $staff_details]);
+            return view("circulation_stats",["notifications" => $notifications, "student_detail" => $student_detail,"staff_details" => $staff_details]);
         }
     }
     //this will manage book circulations
-    function circulationDashboard(){
-        if (session("school_details") == null) {
-            session()->flash("error","Your session has expired, Login to proceed!");
-            return redirect("/");
-        }
+    function circulationDashboard(Request $request){
+        $notifications = $request->input("notifications") != null ? $request->input('notifications') : [];
         // GET THE BOOKS DETAILS BY GROUPING WITH THE ISBN NUMBER
         $database_name = session("school_details")->database_name;
         // SET THE DATABASE NAME AS PER THE STUDENT ADMISSION NO
@@ -652,7 +641,8 @@ class Circulation extends Controller
 
         // return $checked_in;
         // return value
-        return view("Circulation",["checked_out" => $checked_out,"checked_in" => $checked_in]);
+        $notifications = $request->input("notifications") != null ? $request->input('notifications') : [];
+        return view("Circulation",["notifications" => $notifications ,"checked_out" => $checked_out,"checked_in" => $checked_in]);
     }
 
     // this link check outs
@@ -689,10 +679,11 @@ class Circulation extends Controller
         }
 
         // return value
-        return view("check_out",["search_title" => $search_title ,"book_list" => $books]);
+        $notifications = $request->input("notifications") != null ? $request->input('notifications') : [];
+        return view("check_out",["notifications" => $notifications, "search_title" => $search_title ,"book_list" => $books]);
     }
 
-    function checkOut($book_id){
+    function checkOut($book_id, Request $request){
         if (session("school_details") == null) {
             session()->flash("error","Your session has expired, Login to proceed!");
             return redirect("/");
@@ -752,7 +743,8 @@ class Circulation extends Controller
         // check if my libraries has anything
         $libraries = count($my_libraries) > 0 ? json_decode($my_libraries[0]->valued) : [];
         // return view
-        return view("check_out_specific_book",["libraries" => $libraries, "book_details" => $book_details[0],"student_detail" => $student_detail,"staff_details" => $staff_details]);
+        $notifications = $request->input("notifications") != null ? $request->input('notifications') : [];
+        return view("check_out_specific_book",["notifications" => $notifications,"libraries" => $libraries, "book_details" => $book_details[0],"student_detail" => $student_detail,"staff_details" => $staff_details]);
     }
 
     function confirmCheckOut(Request $request){
@@ -819,7 +811,7 @@ class Circulation extends Controller
         return redirect("/Circulation/check-out");
     }
     // view a book checked out
-    function viewCheckOut($book_id,$circulation_id){
+    function viewCheckOut($book_id,$circulation_id, Request $request){
         // circulation
         if (session("school_details") == null) {
             session()->flash("error","Your session has expired, Login to proceed!");
@@ -885,8 +877,9 @@ class Circulation extends Controller
         $book_borrow_data[0]->user_checkout_fullname = $user_fullname;
 
         // proceed and get the book details
-        // return $book_borrow_data;
-        return view("view_checkouts",["book_details" => $book_details[0],"book_borrow_data" => $book_borrow_data]);
+        // return $book_borrow_data;notifications
+        $notifications = $request->input("notifications") != null ? $request->input('notifications') : [];
+        return view("view_checkouts",["notifications" => $notifications, "book_details" => $book_details[0],"book_borrow_data" => $book_borrow_data]);
     }
     function cancelCirculationRecord($circulation_id){
         if (session("school_details") == null) {
