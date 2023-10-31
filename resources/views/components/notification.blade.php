@@ -32,24 +32,24 @@
                 <h6 class="m-0" key="t-notifications"> Notifications </h6>
             </div>
             <div class="col-auto">
-                <a href="#!" class="small" key="t-view-all"> View All ({{count($notifications)}}) </a>
+                <a href="{{url()->route("allNotifications")}}" class="small" key="t-view-all"> View All ({{count($notifications) > 99 ? "99+" : count($notifications)}}) </a>
             </div>
         </div>
     </div>
     <div data-simplebar style="max-height: 230px;">
             @if (count($notifications) > 0)
                 @for ($i = 0; $i < count($notifications); $i++)
-                    <a href="#" class="text-reset notification-item">
+                    <a href="{{url()->route("show_notifications",[$notifications[$i]->notification_id])}}" class="text-reset notification-item">
                         <div class="d-flex">
                             <div class="avatar-xs me-3">
-                                <span class="avatar-title bg-white rounded-circle font-size-16 w-100">
-                                    <i class="bx bx-badge-check text-success"></i>
+                                <span class="avatar-title bg-transparent rounded-circle font-size-16 w-100">
+                                    <i class="mdi mdi-email{{$notifications[$i]->read_status == "1" ? "-open" : ""}} text-{{$notifications[$i]->read_status == "1" ? "secondary" : "success"}}"></i>
                                 </span>
                             </div>
                             <div class="flex-grow-1">
                                 <h6 class="mb-1">{{Str::limit($notifications[$i]->notification_title, 50)}}</h6>
                                 <div class="font-size-12 text-muted">
-                                    <p class="mb-1" key="t-occidental">{{Str::limit(strip_tags($notifications[$i]->notification_content),50)}}</p>
+                                    <p class="mb-1" key="t-occidental">{{Str::limit(strip_tags($notifications[$i]->notification_content),100)}}</p>
                                     <p class="mb-0"><i class="mdi mdi-clock-outline"></i> <span key="t-hours-ago">{{getTimeAgo($notifications[$i]->date_created)}}</span></p>
                                 </div>
                             </div>
@@ -76,8 +76,8 @@
         @endif
     </div>
     <div class="p-2 border-top d-grid">
-        <a class="btn btn-sm btn-link font-size-14 text-center" href="javascript:void(0)">
-            <i class="mdi mdi-arrow-right-circle me-1"></i> <span key="t-view-more">View More..</span>
+        <a class="btn btn-sm btn-link font-size-14 text-center" href="{{url()->route("allNotifications")}}">
+            <i class="mdi mdi-arrow-right-circle me-1"></i> <span key="t-view-more">View All Notifications</span>
         </a>
     </div>
 </div>

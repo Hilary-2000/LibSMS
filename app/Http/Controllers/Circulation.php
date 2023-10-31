@@ -12,10 +12,11 @@ class Circulation extends Controller
 {
     function viewBookStats($book_isbn, Request $request){
         $notifications = $request->input("notifications") != null ? $request->input('notifications') : [];
+        $notification_count = $request->input("notification_count");
         $date = "2023/11/10";
         $message = "The book stats dashboard is coming soon. Stay tuned!";
         $redirect_link = "";
-        return view("admin.coming_soon",["notifications" => $notifications ,"date" => $date, "message" => $message, "redirect_link" => $redirect_link]);
+        return view("admin.coming_soon",["notification_count" => $notification_count,"notifications" => $notifications ,"date" => $date, "message" => $message, "redirect_link" => $redirect_link]);
     }
     // circulation stats
     function viewStudentStats($student_id, Request $request){
@@ -129,7 +130,8 @@ class Circulation extends Controller
 
         // return view
         $notifications = $request->input("notifications") != null ? $request->input('notifications') : [];
-        return view("user_circulation_profile",["notifications" => $notifications, "circulation_data" => $circulation_data,"total_books" => $total_books, "books_checked_in" => $books_checked_in, "books_checked_out" => $books_checked_out,"borrower_data" => $borrower_data, "checked_in" => $checked_in,"checked_out" => $checked_out]);
+        $notification_count = $request->input("notification_count");
+        return view("user_circulation_profile",["notification_count" => $notification_count,"notifications" => $notifications, "circulation_data" => $circulation_data,"total_books" => $total_books, "books_checked_in" => $books_checked_in, "books_checked_out" => $books_checked_out,"borrower_data" => $borrower_data, "checked_in" => $checked_in,"checked_out" => $checked_out]);
     }
 
     // view staff details
@@ -275,12 +277,14 @@ class Circulation extends Controller
         // return $circulation_data;
         // return view
         $notifications = $request->input("notifications") != null ? $request->input('notifications') : [];
-        return view("staff_circulation_profile",["notifications" => $notifications ,"circulation_data" => $circulation_data, "total_books" => $total_books, "books_checked_in" => $books_checked_in, "books_checked_out" => $books_checked_out,"borrower_data" => $borrower_data, "checked_in" => $checked_in,"checked_out" => $checked_out]);
+        $notification_count = $request->input("notification_count");
+        return view("staff_circulation_profile",["notification_count" => $notification_count,"notifications" => $notifications ,"circulation_data" => $circulation_data, "total_books" => $total_books, "books_checked_in" => $books_checked_in, "books_checked_out" => $books_checked_out,"borrower_data" => $borrower_data, "checked_in" => $checked_in,"checked_out" => $checked_out]);
     }
 
     // circulation stats
     function circulationStats(Request $request){
         $notifications = $request->input("notifications") != null ? $request->input('notifications') : [];
+        $notification_count = $request->input("notification_count");
         // GET THE BOOKS DETAILS BY GROUPING WITH THE ISBN NUMBER
         $database_name = session("school_details")->database_name;
         // SET THE DATABASE NAME AS PER THE STUDENT ADMISSION NO
@@ -501,7 +505,7 @@ class Circulation extends Controller
             $school_code = session("school_details")->school_code;
             $staff_details = DB::select("SELECT * FROM `user_tbl` WHERE `school_code` = ?",[$school_code]);
 
-            return view("circulation_stats",["notifications" => $notifications, "table_column" => $table_column,"display_data" => $display_data,"student_detail" => $student_detail,"staff_details" => $staff_details]);
+            return view("circulation_stats",["notification_count" => $notification_count,"notifications" => $notifications, "table_column" => $table_column,"display_data" => $display_data,"student_detail" => $student_detail,"staff_details" => $staff_details]);
         }else{
 
             // get all students in the different classes that are there
@@ -533,12 +537,13 @@ class Circulation extends Controller
             $school_code = session("school_details")->school_code;
             $staff_details = DB::select("SELECT * FROM `user_tbl` WHERE `school_code` = ?",[$school_code]);
     
-            return view("circulation_stats",["notifications" => $notifications, "student_detail" => $student_detail,"staff_details" => $staff_details]);
+            return view("circulation_stats",["notification_count" => $notification_count,"notifications" => $notifications, "student_detail" => $student_detail,"staff_details" => $staff_details]);
         }
     }
     //this will manage book circulations
     function circulationDashboard(Request $request){
         $notifications = $request->input("notifications") != null ? $request->input('notifications') : [];
+        $notification_count = $request->input("notification_count");
         // GET THE BOOKS DETAILS BY GROUPING WITH THE ISBN NUMBER
         $database_name = session("school_details")->database_name;
         // SET THE DATABASE NAME AS PER THE STUDENT ADMISSION NO
@@ -642,7 +647,8 @@ class Circulation extends Controller
         // return $checked_in;
         // return value
         $notifications = $request->input("notifications") != null ? $request->input('notifications') : [];
-        return view("Circulation",["notifications" => $notifications ,"checked_out" => $checked_out,"checked_in" => $checked_in]);
+        $notification_count = $request->input("notification_count");
+        return view("Circulation",["notification_count" => $notification_count,"notifications" => $notifications ,"checked_out" => $checked_out,"checked_in" => $checked_in]);
     }
 
     // this link check outs
@@ -680,7 +686,8 @@ class Circulation extends Controller
 
         // return value
         $notifications = $request->input("notifications") != null ? $request->input('notifications') : [];
-        return view("check_out",["notifications" => $notifications, "search_title" => $search_title ,"book_list" => $books]);
+        $notification_count = $request->input("notification_count");
+        return view("check_out",["notification_count" => $notification_count,"notifications" => $notifications, "search_title" => $search_title ,"book_list" => $books]);
     }
 
     function checkOut($book_id, Request $request){
@@ -744,7 +751,8 @@ class Circulation extends Controller
         $libraries = count($my_libraries) > 0 ? json_decode($my_libraries[0]->valued) : [];
         // return view
         $notifications = $request->input("notifications") != null ? $request->input('notifications') : [];
-        return view("check_out_specific_book",["notifications" => $notifications,"libraries" => $libraries, "book_details" => $book_details[0],"student_detail" => $student_detail,"staff_details" => $staff_details]);
+        $notification_count = $request->input("notification_count");
+        return view("check_out_specific_book",["notification_count" => $notification_count,"notifications" => $notifications,"libraries" => $libraries, "book_details" => $book_details[0],"student_detail" => $student_detail,"staff_details" => $staff_details]);
     }
 
     function confirmCheckOut(Request $request){
@@ -879,7 +887,8 @@ class Circulation extends Controller
         // proceed and get the book details
         // return $book_borrow_data;notifications
         $notifications = $request->input("notifications") != null ? $request->input('notifications') : [];
-        return view("view_checkouts",["notifications" => $notifications, "book_details" => $book_details[0],"book_borrow_data" => $book_borrow_data]);
+        $notification_count = $request->input("notification_count");
+        return view("view_checkouts",["notification_count" => $notification_count,"notifications" => $notifications, "book_details" => $book_details[0],"book_borrow_data" => $book_borrow_data]);
     }
     function cancelCirculationRecord($circulation_id){
         if (session("school_details") == null) {
@@ -975,6 +984,10 @@ class Circulation extends Controller
         $update = DB::update("UPDATE `book_circulation` SET `checked_in_by` = ?, `return_status` = ?, `return_date` = ? WHERE `circulation_id` = ?",[$user_id,$return_status,$return_date,$circulation_id]);
         
         session()->flash("success","Book has been checked-in successfully!");
+
+        // delete the due records on the notification table
+        // remove by notification type
+        $delete = DB::delete("DELETE FROM `library_notifications` WHERE `book_id` = ? AND `notification_type` = '1'",[$circulation_record[0]->book_id]);
 
         // circulations
         if (session('student_id')) {

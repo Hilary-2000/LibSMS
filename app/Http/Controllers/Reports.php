@@ -7,11 +7,13 @@ use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\DB;
 use stdClass;
 
+date_default_timezone_set('Africa/Nairobi');
 class Reports extends Controller
 {
     //handle all reports requests
     function getReports(Request $request){
         $notifications = $request->input("notifications") != null ? $request->input('notifications') : [];
+        $notification_count = $request->input("notification_count");
         // check if the isbn number is present in the database and return book details
         $database_name = session('school_details')->database_name;
         // SET THE DATABASE NAME AS PER THE STUDENT ADMISSION NO
@@ -19,7 +21,7 @@ class Reports extends Controller
         
         // connect to mysql 2
         DB::setDefaultConnection("mysql2");
-        if (count($request->input()) > 1) {
+        if (count($request->input()) > 2) {
             // proceed and process that information
             $book_options_inside = $request->input("book_options_inside");
             $date_type_selection = $request->input("date_type_selection");
@@ -386,11 +388,11 @@ class Reports extends Controller
                 }
             }
             // return $book_data;
-            return view("reports",["notifications" => $notifications,"book_data" => $book_data,"table_heading" => $table_heading,"search_heading" => $search_heading]);
+            return view("reports",["notification_count" => $notification_count, "notifications" => $notifications,"book_data" => $book_data,"table_heading" => $table_heading,"search_heading" => $search_heading]);
         }else{
             // return "Book";
             $book_list = DB::select("SELECT * FROM `library_details` ORDER BY `book_id` DESC LIMIT 100");
-            return view("reports",["notifications" => $notifications, "book_list" => $book_list]);
+            return view("reports",["notification_count" => $notification_count, "notifications" => $notifications, "book_list" => $book_list]);
         }
     }
     function getBook($ALL_BOOKS,$book_id){

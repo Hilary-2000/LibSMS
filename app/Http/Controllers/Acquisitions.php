@@ -52,6 +52,7 @@ class Acquisitions extends Controller
             return redirect("/");
         }
         $notifications = $request->input("notifications") != null ? $request->input('notifications') : [];
+        $notification_count = $request->input("notification_count");
 
         $database_name = session("school_details")->database_name;
         // SET THE DATABASE NAME AS PER THE STUDENT ADMISSION NO
@@ -120,7 +121,7 @@ class Acquisitions extends Controller
         $libraries = count($my_libraries) > 0 ? json_decode($my_libraries[0]->valued) : [];
 
         // return $select;
-        return view("acqusitions",["notifications" => $notifications,"search_title" => $search_title,"libraries" => $libraries,"book_list" => $select,"subject_name" => $subject_name, "larger_length" => $larger_length]);
+        return view("acqusitions",["notification_count" => $notification_count, "notifications" => $notifications,"search_title" => $search_title,"libraries" => $libraries,"book_list" => $select,"subject_name" => $subject_name, "larger_length" => $larger_length]);
     }
 
     function addBook(Request $request){
@@ -425,6 +426,7 @@ class Acquisitions extends Controller
     // get the book data
     function viewBookData($book_id, Request $request){
         $notifications = $request->input("notifications") != null ? $request->input('notifications') : [];
+        $notification_count = $request->input("notification_count");
         // check if the isbn number is present in the database and return book details
         $database_name = session("school_details")->database_name;
         // SET THE DATABASE NAME AS PER THE STUDENT ADMISSION NO
@@ -514,7 +516,7 @@ class Acquisitions extends Controller
 
             // check if my libraries has anything
             $libraries = count($my_libraries) > 0 ? json_decode($my_libraries[0]->valued) : [];
-            return view("book_details",["notifications" => $notifications,"libraries" => $libraries, "book_circulation_details" => $book_circulation_details,"book_details" => $book_details[0], "subject_name" => $subject_name]);
+            return view("book_details",["notification_count" => $notification_count, "notifications" => $notifications,"libraries" => $libraries, "book_circulation_details" => $book_circulation_details,"book_details" => $book_details[0], "subject_name" => $subject_name]);
         }else {
             session()->flash("error","Book details not found, try another books!");
             return redirect("/Acquisitions");

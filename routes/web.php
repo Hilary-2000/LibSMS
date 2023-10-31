@@ -4,6 +4,7 @@ use App\Http\Controllers\Acquisitions;
 use App\Http\Controllers\Cataloguing;
 use App\Http\Controllers\Circulation;
 use App\Http\Controllers\login;
+use App\Http\Controllers\Notification;
 use App\Http\Controllers\Reports;
 use App\Http\Controllers\Settings;
 use Illuminate\Support\Facades\Route;
@@ -69,6 +70,10 @@ Route::get("/Settings/Library-mgmt",[Settings::class,"libraryManagement"])->midd
 Route::post("/Setting/Library-mgmt/Update",[Settings::class,"UpdateSettings"]);
 Route::post("/Setting/Library-mgmt/New",[Settings::class,"NewLibrary"]);
 Route::get("/Settings/Lib-Management/Delete/{record_id}",[Settings::class,"deleteLibrary"])->middleware("notifications");
+
+// notifications
+Route::get("/Notification",[Notification::class,"getNotifications"])->middleware("notifications")->name("allNotifications");
+Route::get("/Notification/View/{notification_id}",[Notification::class,"showNotifications"])->middleware("notifications")->name("show_notifications");
 
 // LOGOUT
 Route::get("/Logout",[login::class,"Logout"])->middleware("notifications");

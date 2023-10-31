@@ -4,7 +4,7 @@
     <head>
         
         <meta charset="utf-8" />
-        <title>Change Library privileges | {{ucwords(strtolower(session("fullname")))}} </title>
+        <title>View Notification | {{ucwords(strtolower(session("fullname")))}} </title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta content="Ladybird Lbrary Management System" name="description" />
         <meta content="Ladybird Softech Co." name="author" />
@@ -33,6 +33,46 @@
         <link href="/assets/libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css" rel="stylesheet" type="text/css" />
 
     </head>
+
+    {{-- autocomplete style for school listing --}}
+    <style>
+        /*the container must be positioned relative:*/
+        .autocomplete {
+            position: relative;
+            display: inline-block;
+            width: 100%
+        }
+
+        .autocomplete-items {
+            position: absolute;
+            border: 1px solid #d4d4d4;
+            border-bottom: none;
+            border-top: none;
+            z-index: 99;
+            /*position the autocomplete items to be the same width as the container:*/
+            top: 100%;
+            left: 0;
+            right: 0;
+        }
+
+        .autocomplete-items div {
+            padding: 10px;
+            cursor: pointer;
+            background-color: #fff;
+            border-bottom: 1px solid #d4d4d4;
+        }
+
+        /*when hovering an item:*/
+        .autocomplete-items div:hover {
+            background-color: #e9e9e9;
+        }
+
+        /*when navigating through the items using the arrow keys:*/
+        .autocomplete-active {
+            background-color: DodgerBlue !important;
+            color: #ffffff;
+        }
+    </style>
 
     <body data-sidebar="dark">
 
@@ -150,11 +190,21 @@
             <!-- ========== Left Sidebar Start ========== -->
             <div class="vertical-menu">
                 <div data-simplebar class="h-100">
-
                     <!--- Sidemenu -->
                     <div id="sidebar-menu">
                         @php
                             $lib_priv = json_decode(session()->get("user_details")->library_previleges,true);
+                            function isPresent($array,$needle){
+                                if ($array == null) {
+                                    return false;
+                                }
+                                for ($index=0; $index < count($array); $index++) { 
+                                    if ($array[$index] == $needle) {
+                                        return true;
+                                    }
+                                }
+                                return false;
+                            }
                         @endphp
                         <!-- Left Menu Start -->
                         <ul class="metismenu list-unstyled" id="side-menu">
@@ -229,14 +279,13 @@
                         <!-- start page title -->
                         <div class="row">
                             <div class="col-12">
-                                <a href="/Settings/User-mgmt" class="btn btn-sm btn-soft-primary my-3"><i class="mdi mdi-arrow-left"></i> Back</a>
                                 <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                                    <h4 class="mb-sm-0 font-size-18">User Management</h4>
+                                    <h4 class="mb-sm-0 font-size-18">View Notification</h4>
 
                                     <div class="page-title-right">
                                         <ol class="breadcrumb m-0">
-                                            <li class="breadcrumb-item">Patron List</li>
-                                            <li class="breadcrumb-item active">User Management</li>
+                                            <li class="breadcrumb-item "><a href="{{url()->route("allNotifications")}}" class="href">Notifications</a></li>
+                                            <li class="breadcrumb-item active">View</li>
                                         </ol>
                                     </div>
 
@@ -244,148 +293,70 @@
                             </div>
                         </div>
                         <!-- end page title -->
+                        
+                        
                         <div class="row">
-                            <div class="col-lg-5">
+                            <div class="col-lg-12">
                                 <div class="card">
-                                    <div class="card-body border-bottom">
-                                        <div class="d-flex align-items-center">
-                                            <h5 class="mb-0 card-title flex-grow-1">User Details</h5>
-                                            <div class="flex-shrink-0">
-                                            </div>
-                                        </div>
-                                        <div class="container text-center">
-                                            <img class="img-thumbnail rounded-circle avatar-xl mt-4" src="https://lsims.ladybirdsmis.com/sims/{{$user_data->profile_loc}}" alt="Profile Picture" height="200">
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-md-12">
-                                                <div class="mb-3">
-                                                    <label class="form-label"><b>User Fullname</b></label>
-                                                    <p>{{ucwords(strtolower($user_data->fullname))}}</p>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-12">
-                                                <div class="mb-3">
-                                                    <label class="form-label"><b>User Role</b></label>
-                                                    <p>{{ucwords(strtolower($user_data->auth == 1 ? "Headteacher" : ($user_data->auth == 0 ? "Administrator" : $user_data->auth)))}}</p>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-12">
-                                                <div class="mb-3">
-                                                    <label class="form-label"><b>User Gender</b></label>
-                                                    <p>{{ucwords(strtolower(($user_data->gender == "M" ? "Male" : "Female")))}}</p>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-12">
-                                                <div class="mb-3">
-                                                    <label class="form-label"><b>Phone number</b></label>
-                                                    <p>{{ucwords(strtolower($user_data->phone_number))}}</p>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-12">
-                                                <div class="mb-3">
-                                                    <label class="form-label"><b>Email</b></label>
-                                                    <p>{{ucwords(strtolower($user_data->email))}}</p>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-12">
-                                                <div class="mb-3">
-                                                    <label class="form-label"><b>User Address</b></label>
-                                                    <p>{{ucwords(strtolower($user_data->address))}}</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-7">
-                                <div class="card">
-                                    <div class="card-body border-bottom">
-                                        @if (session("success"))
-                                            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                                                <i class="mdi mdi-check-all me-2"></i>
-                                                {{session("success")}}
-                                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                            </div>
-                                        @endif
-                                        @if (session("error"))
-                                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                                <i class="mdi mdi-check-all me-2"></i>
-                                                {{session("error")}}
-                                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                            </div>
-                                        @endif
-                                        {{-- add the option for scanning --}}
-                                        <div class="d-flex align-items-center">
-                                            <h5 class="mb-0 card-title flex-grow-1">Librarian Privileges</h5>
-                                            <div class="flex-shrink-0">
-                                            </div>
-                                        </div>
-                                        @php
-                                            $library_previleges = json_decode($user_data->library_previleges,true);
-                                            function isPresent($array,$needle){
-                                                if ($array == null) {
-                                                    return false;
-                                                }
-                                                for ($index=0; $index < count($array); $index++) { 
-                                                    if ($array[$index] == $needle) {
-                                                        return true;
-                                                    }
-                                                }
-                                                return false;
-                                            }
-                                        @endphp
-                                        <div class="table-responsive">
-                                            <p class="card-title-desc">Check the options you want the user to access!</p>
-                                            <table id="" class="table table-bordered dt-responsive  nowrap w-100">
-                                                <thead>
-                                                <tr>
-                                                    <th>No.</th>
-                                                    <th>Privileges</th>
-                                                    <th>Allowed <input class="form-check-input " id="input_fields" type="checkbox" value="Acquisition"></th>
-                                                </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr>
-                                                        <td>1.</td>
-                                                        <td>Acquisitions</td>
-                                                        <td><input class="form-check-input input_fields" {{isPresent($library_previleges,"Acquisition") ? "checked" : ""}} type="checkbox" value="Acquisition"></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>2.</td>
-                                                        <td>Cataloging</td>
-                                                        <td><input class="form-check-input input_fields" {{isPresent($library_previleges,"Cataloging") ? "checked" : ""}} type="checkbox" value="Cataloging"></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>3.</td>
-                                                        <td>Circulation</td>
-                                                        <td><input class="form-check-input input_fields" {{isPresent($library_previleges,"Circulation") ? "checked" : ""}} type="checkbox" value="Circulation"></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>4.</td>
-                                                        <td>Report</td>
-                                                        <td><input class="form-check-input input_fields" {{isPresent($library_previleges,"Report") ? "checked" : ""}} type="checkbox" value="Report"></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>5.</td>
-                                                        <td>Settings</td>
-                                                        <td><input class="form-check-input input_fields" {{isPresent($library_previleges,"Settings") ? "checked" : ""}} type="checkbox" value="Settings"></td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                            <form action="/settings/store_privileges" method="POST">
-                                                @csrf
-                                                <input type="hidden" name="user_id" value="{{$user_data->user_id}}">
-                                                <input type="hidden" name="store_privileges" id="store_privileges" value="{{$user_data->library_previleges}}">
-                                                <button type="submit" class="btn btn-sm btn-outline-primary w-100"><i class=""></i> Save</button>
-                                            </form>
-                                        </div>
-                                    </div>
                                     <div class="card-body">
-                                    </div>
-                                </div><!--end card-->
-                            </div><!--end col-->
+                                        <a href="{{url()->previous()}}" class="btn btn-primary btn-sm"><i class="mdi mdi-arrow-left"></i> back</a>
+                                        <div class="pt-3">
+                                            <div class="row justify-content-center">
+                                                <div class="col-xl-8">
+                                                    <div>
+                                                        <div class="text-center">
+                                                            <div class="mb-4">
+                                                                <a href="javascript: void(0);" class="badge bg-light font-size-12">
+                                                                    <i class="bx bx-purchase-tag-alt align-middle text-muted me-1"></i> {{$notification->notification_type == "1" ? "Due for Check-In" : "Not defined"}}
+                                                                </a>
+                                                            </div>
+                                                            <h4>{{$notification->notification_title}}</h4>
+                                                            <p class="text-muted mb-4"><i class="mdi mdi-calendar me-1"></i> {{date("D dS, M Y",strtotime($notification->date_created))}}</p>
+                                                        </div>
 
-                        </div><!--end row-->
+                                                        <hr>
+                                                        <div class="text-center">
+                                                            <div class="row">
+                                                                <div class="col-sm-4">
+                                                                    <div>
+                                                                        <p class="text-muted mb-2">Category</p>
+                                                                        <h5 class="font-size-15">{{$notification->notification_type == "1" ? "Due for Check-In" : "Not defined"}}</h5>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-sm-4">
+                                                                    <div class="mt-4 mt-sm-0">
+                                                                        <p class="text-muted mb-2">Date Created</p>
+                                                                        <h5 class="font-size-15">{{date("D dS, M Y",strtotime($notification->date_created))}}</h5>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-sm-4">
+                                                                    <div class="mt-4 mt-sm-0">
+                                                                        <p class="text-muted mb-2">Time Created</p>
+                                                                        <h5 class="font-size-15">{{date("h:iA",strtotime($notification->date_created))}}</h5>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <hr>
+
+                                                        <div class="mt-4">
+                                                            <p class="text-left text-primary font-size-5 text-decoration-underline">Notification content</p>
+                                                            <div class="text-muted font-size-14">
+                                                                <p>{!!$notification->notification_content!!}</p>
+                                                            </div>
+                                                        </div>
+                                                        
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- end card body -->
+                                </div>
+                                <!-- end card -->
+                            </div>
+                            <!-- end col -->
+                        </div>
                         
 
                     </div> <!-- container-fluid -->
@@ -476,15 +447,14 @@
         {{-- validation --}}
         <script src="/assets/js/pages/form-validation.init.js"></script>
         <script src="/assets/libs/parsleyjs/parsley.min.js"></script>
-        <script src="/assets/libs/parsleyjs/parsley.min.js"></script>
-
-        {{-- librarian --}}
-        <script src="/assets/js/librarian_priveleges.js"></script>
 
         <!-- Datatable init js -->
-        <script src="/assets/js/pages/datatables.init.js"></script>
+        <script src="/assets/js/pages/datatables.init.js"></script> 
         <!-- Alerts Live Demo js -->
-        <script src="/assets/js/pages/alerts.init.js"></script>
+        <script src="/assets/js/pages/alerts.init.js"></script> 
+
+        {{-- Acqusition --}}
+        <script src="/assets/js/notifications.js"></script>
 
         <script src="/assets/js/app.js"></script>
     </body>

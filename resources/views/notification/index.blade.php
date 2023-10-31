@@ -4,7 +4,7 @@
     <head>
         
         <meta charset="utf-8" />
-        <title>Change Library privileges | {{ucwords(strtolower(session("fullname")))}} </title>
+        <title>Notification | {{ucwords(strtolower(session("fullname")))}} </title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta content="Ladybird Lbrary Management System" name="description" />
         <meta content="Ladybird Softech Co." name="author" />
@@ -12,27 +12,67 @@
         <!-- App favicon -->
         <link rel="shortcut icon" href="/images/ladybird_dark.png">
 
-        <link href="/assets/libs/bootstrap-datepicker/css/bootstrap-datepicker.min.css" rel="stylesheet" type="text/css">
+        <link href="assets/libs/bootstrap-datepicker/css/bootstrap-datepicker.min.css" rel="stylesheet" type="text/css">
 
-        <link href="/assets/libs/select2/css/select2.min.css" rel="stylesheet" type="text/css" />
+        <link href="assets/libs/select2/css/select2.min.css" rel="stylesheet" type="text/css" />
 
         <!-- Bootstrap Css -->
-        <link href="/assets/css/bootstrap.min.css" id="bootstrap-style" rel="stylesheet" type="text/css" />
+        <link href="assets/css/bootstrap.min.css" id="bootstrap-style" rel="stylesheet" type="text/css" />
         <!-- Icons Css -->
-        <link href="/assets/css/icons.min.css" rel="stylesheet" type="text/css" />
+        <link href="assets/css/icons.min.css" rel="stylesheet" type="text/css" />
         <!-- App Css-->
-        <link href="/assets/css/app.min.css" id="app-style" rel="stylesheet" type="text/css" />
+        <link href="assets/css/app.min.css" id="app-style" rel="stylesheet" type="text/css" />
         <!-- App js -->
-        <script src="/assets/js/plugin.js"></script>
+        <script src="assets/js/plugin.js"></script>
 
         <!-- DataTables -->
-        <link href="/assets/libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
-        <link href="/assets/libs/datatables.net-buttons-bs4/css/buttons.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+        <link href="assets/libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+        <link href="assets/libs/datatables.net-buttons-bs4/css/buttons.bootstrap4.min.css" rel="stylesheet" type="text/css" />
 
         <!-- Responsive datatable examples -->
-        <link href="/assets/libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+        <link href="assets/libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css" rel="stylesheet" type="text/css" />
 
     </head>
+
+    {{-- autocomplete style for school listing --}}
+    <style>
+        /*the container must be positioned relative:*/
+        .autocomplete {
+            position: relative;
+            display: inline-block;
+            width: 100%
+        }
+
+        .autocomplete-items {
+            position: absolute;
+            border: 1px solid #d4d4d4;
+            border-bottom: none;
+            border-top: none;
+            z-index: 99;
+            /*position the autocomplete items to be the same width as the container:*/
+            top: 100%;
+            left: 0;
+            right: 0;
+        }
+
+        .autocomplete-items div {
+            padding: 10px;
+            cursor: pointer;
+            background-color: #fff;
+            border-bottom: 1px solid #d4d4d4;
+        }
+
+        /*when hovering an item:*/
+        .autocomplete-items div:hover {
+            background-color: #e9e9e9;
+        }
+
+        /*when navigating through the items using the arrow keys:*/
+        .autocomplete-active {
+            background-color: DodgerBlue !important;
+            color: #ffffff;
+        }
+    </style>
 
     <body data-sidebar="dark">
 
@@ -60,19 +100,19 @@
                         <div class="navbar-brand-box">
                             <a href="." class="logo logo-dark">
                                 <span class="logo-sm">
-                                    <img src="/assets/images/logo.svg" alt="" height="22">
+                                    <img src="assets/images/logo.svg" alt="" height="22">
                                 </span>
                                 <span class="logo-lg">
-                                    <img src="/assets/images/logo-dark.png" alt="" height="17">
+                                    <img src="assets/images/logo-dark.png" alt="" height="17">
                                 </span>
                             </a>
 
                             <a href="." class="logo logo-light">
                                 <span class="logo-sm">
-                                    <img src="/images/ladybird_dark-removebg.png" alt="" height="40">
+                                    <img src="images/ladybird_dark-removebg.png" alt="" height="40">
                                 </span>
                                 <span class="logo-lg">
-                                    <img src="/images/ladybird_dark-removebg.png" alt="" height="100">
+                                    <img src="images/ladybird_dark-removebg.png" alt="" height="100">
                                 </span>
                             </a>
                         </div>
@@ -150,11 +190,21 @@
             <!-- ========== Left Sidebar Start ========== -->
             <div class="vertical-menu">
                 <div data-simplebar class="h-100">
-
                     <!--- Sidemenu -->
                     <div id="sidebar-menu">
                         @php
                             $lib_priv = json_decode(session()->get("user_details")->library_previleges,true);
+                            function isPresent($array,$needle){
+                                if ($array == null) {
+                                    return false;
+                                }
+                                for ($index=0; $index < count($array); $index++) { 
+                                    if ($array[$index] == $needle) {
+                                        return true;
+                                    }
+                                }
+                                return false;
+                            }
                         @endphp
                         <!-- Left Menu Start -->
                         <ul class="metismenu list-unstyled" id="side-menu">
@@ -229,14 +279,12 @@
                         <!-- start page title -->
                         <div class="row">
                             <div class="col-12">
-                                <a href="/Settings/User-mgmt" class="btn btn-sm btn-soft-primary my-3"><i class="mdi mdi-arrow-left"></i> Back</a>
                                 <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                                    <h4 class="mb-sm-0 font-size-18">User Management</h4>
+                                    <h4 class="mb-sm-0 font-size-18">Notifications</h4>
 
                                     <div class="page-title-right">
                                         <ol class="breadcrumb m-0">
-                                            <li class="breadcrumb-item">Patron List</li>
-                                            <li class="breadcrumb-item active">User Management</li>
+                                            <li class="breadcrumb-item active">Notifications</li>
                                         </ol>
                                     </div>
 
@@ -244,60 +292,10 @@
                             </div>
                         </div>
                         <!-- end page title -->
+                        
+
                         <div class="row">
-                            <div class="col-lg-5">
-                                <div class="card">
-                                    <div class="card-body border-bottom">
-                                        <div class="d-flex align-items-center">
-                                            <h5 class="mb-0 card-title flex-grow-1">User Details</h5>
-                                            <div class="flex-shrink-0">
-                                            </div>
-                                        </div>
-                                        <div class="container text-center">
-                                            <img class="img-thumbnail rounded-circle avatar-xl mt-4" src="https://lsims.ladybirdsmis.com/sims/{{$user_data->profile_loc}}" alt="Profile Picture" height="200">
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-md-12">
-                                                <div class="mb-3">
-                                                    <label class="form-label"><b>User Fullname</b></label>
-                                                    <p>{{ucwords(strtolower($user_data->fullname))}}</p>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-12">
-                                                <div class="mb-3">
-                                                    <label class="form-label"><b>User Role</b></label>
-                                                    <p>{{ucwords(strtolower($user_data->auth == 1 ? "Headteacher" : ($user_data->auth == 0 ? "Administrator" : $user_data->auth)))}}</p>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-12">
-                                                <div class="mb-3">
-                                                    <label class="form-label"><b>User Gender</b></label>
-                                                    <p>{{ucwords(strtolower(($user_data->gender == "M" ? "Male" : "Female")))}}</p>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-12">
-                                                <div class="mb-3">
-                                                    <label class="form-label"><b>Phone number</b></label>
-                                                    <p>{{ucwords(strtolower($user_data->phone_number))}}</p>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-12">
-                                                <div class="mb-3">
-                                                    <label class="form-label"><b>Email</b></label>
-                                                    <p>{{ucwords(strtolower($user_data->email))}}</p>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-12">
-                                                <div class="mb-3">
-                                                    <label class="form-label"><b>User Address</b></label>
-                                                    <p>{{ucwords(strtolower($user_data->address))}}</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-7">
+                            <div class="col-lg-12">
                                 <div class="card">
                                     <div class="card-body border-bottom">
                                         @if (session("success"))
@@ -314,73 +312,91 @@
                                                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                                             </div>
                                         @endif
+                                        <input type="hidden" id="main_keylogger_listener">
                                         {{-- add the option for scanning --}}
                                         <div class="d-flex align-items-center">
-                                            <h5 class="mb-0 card-title flex-grow-1">Librarian Privileges</h5>
+                                            <h5 class="mb-0 card-title flex-grow-1">Notifications</h5>
                                             <div class="flex-shrink-0">
+                                                {{-- <button type="button" id="show_windows" class="btn btn-primary waves-effect waves-light" data-bs-toggle="modal" data-bs-target="#exampleModalScrollable"><i class="bx bx-plus"></i> Add a Book</button> --}}
                                             </div>
                                         </div>
-                                        @php
-                                            $library_previleges = json_decode($user_data->library_previleges,true);
-                                            function isPresent($array,$needle){
-                                                if ($array == null) {
-                                                    return false;
-                                                }
-                                                for ($index=0; $index < count($array); $index++) { 
-                                                    if ($array[$index] == $needle) {
-                                                        return true;
-                                                    }
-                                                }
-                                                return false;
-                                            }
-                                        @endphp
+                                        <div class="mt-3">
+                                            {{-- <p><b>Note:</b></p>
+                                            <ul>
+                                            </ul> --}}
+                                            {{-- <div class="d-flex gap-2 flex-wrap mb-3">
+                                                <button class="btn btn-outline-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+                                                    Advanced Search
+                                                </button>
+                                            </div>
+                                            <div class="collapse {{$search_title != null ? 'show' : ''}}" id="collapseExample">
+                                                <div class="card border border-3 shadow-none card-body text-muted mb-0">
+                                                    <div class="form-group">
+                                                        <div class="d-none">
+                                                            <div style="max-width:20px;max-height:20px;" class="spinner-grow text-primary m-1 d-none" id="book_isbn_loader_in" role="status">
+                                                                <span class="sr-only">Loading...</span>
+                                                            </div>
+                                                        </div>
+                                                        @if ($search_title != null)
+                                                            <a href="{{url()->route("allNotifications")}}" class="btn btn-soft-primary btn-sm mb-3">Reset</a><br>
+                                                        @endif
+                                                        <label for="keyword_search" class="form-control-label">Advanced Keyword Search</label>
+                                                        <form class="row" method="GET" action="{{url()->route("allNotifications")}}">
+                                                            <div class="col-lg-9">
+                                                                <div class="autocomplete">
+                                                                    <input type="text" value="{{$search_title != null ? $search_title : ''}}" name="keyword_search" id="keyword_search" class="form-control" placeholder="Enter keyword here..." required>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-lg-3">
+                                                                <button id="submit_advance_search" class="btn btn-light" type="submit"><i class="mdi mdi-search-outline"></i>Advanced Search</button>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div> --}}
+                                        </div>
+                                    </div>
+
+                                    <div class="card-body">
+                                        <h6 class="text-center"><u>Notification Table</u></h6>
                                         <div class="table-responsive">
-                                            <p class="card-title-desc">Check the options you want the user to access!</p>
-                                            <table id="" class="table table-bordered dt-responsive  nowrap w-100">
+                                            <table id="datatable" class="table table-bordered dt-responsive  nowrap w-100">
                                                 <thead>
                                                 <tr>
                                                     <th>No.</th>
-                                                    <th>Privileges</th>
-                                                    <th>Allowed <input class="form-check-input " id="input_fields" type="checkbox" value="Acquisition"></th>
+                                                    <th>Title</th>
+                                                    <th class="d-none">Hidden Content</th>
+                                                    <th>Notification Content</th>
+                                                    <th>Date</th>
+                                                    <th>Actions</th>
                                                 </tr>
                                                 </thead>
                                                 <tbody>
-                                                    <tr>
-                                                        <td>1.</td>
-                                                        <td>Acquisitions</td>
-                                                        <td><input class="form-check-input input_fields" {{isPresent($library_previleges,"Acquisition") ? "checked" : ""}} type="checkbox" value="Acquisition"></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>2.</td>
-                                                        <td>Cataloging</td>
-                                                        <td><input class="form-check-input input_fields" {{isPresent($library_previleges,"Cataloging") ? "checked" : ""}} type="checkbox" value="Cataloging"></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>3.</td>
-                                                        <td>Circulation</td>
-                                                        <td><input class="form-check-input input_fields" {{isPresent($library_previleges,"Circulation") ? "checked" : ""}} type="checkbox" value="Circulation"></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>4.</td>
-                                                        <td>Report</td>
-                                                        <td><input class="form-check-input input_fields" {{isPresent($library_previleges,"Report") ? "checked" : ""}} type="checkbox" value="Report"></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>5.</td>
-                                                        <td>Settings</td>
-                                                        <td><input class="form-check-input input_fields" {{isPresent($library_previleges,"Settings") ? "checked" : ""}} type="checkbox" value="Settings"></td>
-                                                    </tr>
+                                                    @for ($i = 0; $i < count($all_notifications); $i++)
+                                                        <tr>
+                                                            <td>{{$i+1}} <i data-bs-toggle='tooltip' data-bs-placement='top' data-bs-original-title='{{$all_notifications[$i]->read_status == 1 ? "Read!":"Not-Read!"}}' class="mdi mdi-email{{$all_notifications[$i]->read_status == 1 ? "-open":""}} text-{{$all_notifications[$i]->read_status == 1 ? "secondary":"success"}} font-size-18"></i></td>
+                                                            <td data-bs-toggle="tooltip" data-bs-placement="top" title="{{$all_notifications[$i]->notification_title}}">{{Str::limit($all_notifications[$i]->notification_title,50)}}</td>
+                                                            <td class="d-none">{{strip_tags($all_notifications[$i]->notification_content)}}</td>
+                                                            <td data-bs-toggle="tooltip" data-bs-placement="top" title="{{strip_tags($all_notifications[$i]->notification_content)}}">{{Str::limit(strip_tags($all_notifications[$i]->notification_content),50)}}</td>
+                                                            <td>{{date("D dS M Y : h:iA",strtotime($all_notifications[$i]->date_created))}}</td>
+                                                            <td>
+                                                                <ul class="list-unstyled hstack gap-1 mb-0">
+                                                                    <li data-bs-toggle="tooltip" data-bs-placement="top" title="Click to read!">
+                                                                        <a href="{{url()->route("show_notifications",[$all_notifications[$i]->notification_id])}}" class="btn btn-sm btn-soft-primary"><i class="mdi mdi-eye-outline"></i> Read</a>
+                                                                    </li>
+                                                                </ul>
+                                                            </td>
+                                                        </tr>
+                                                    @endfor
                                                 </tbody>
                                             </table>
-                                            <form action="/settings/store_privileges" method="POST">
-                                                @csrf
-                                                <input type="hidden" name="user_id" value="{{$user_data->user_id}}">
-                                                <input type="hidden" name="store_privileges" id="store_privileges" value="{{$user_data->library_previleges}}">
-                                                <button type="submit" class="btn btn-sm btn-outline-primary w-100"><i class=""></i> Save</button>
-                                            </form>
                                         </div>
-                                    </div>
-                                    <div class="card-body">
+                                        <style>
+                                            .w-5{
+                                                display: none;
+                                            }
+                                        </style>
+                                        {{-- <span>{{$book_list->links()}}</span> --}}
                                     </div>
                                 </div><!--end card-->
                             </div><!--end col-->
@@ -430,7 +446,7 @@
 
                 <div class="p-4">
                     <div class="mb-2">
-                        <img src="/assets/images/layouts/layout-1.jpg" class="img-thumbnail" alt="layout images">
+                        <img src="assets/images/layouts/layout-1.jpg" class="img-thumbnail" alt="layout images">
                     </div>
 
                     <div class="form-check form-switch mb-3">
@@ -439,7 +455,7 @@
                     </div>
     
                     <div class="mb-2">
-                        <img src="/assets/images/layouts/layout-2.jpg" class="img-thumbnail" alt="layout images">
+                        <img src="assets/images/layouts/layout-2.jpg" class="img-thumbnail" alt="layout images">
                     </div>
                     <div class="form-check form-switch mb-3">
                         <input class="form-check-input theme-choice" type="checkbox" id="dark-mode-switch">
@@ -476,15 +492,14 @@
         {{-- validation --}}
         <script src="/assets/js/pages/form-validation.init.js"></script>
         <script src="/assets/libs/parsleyjs/parsley.min.js"></script>
-        <script src="/assets/libs/parsleyjs/parsley.min.js"></script>
-
-        {{-- librarian --}}
-        <script src="/assets/js/librarian_priveleges.js"></script>
 
         <!-- Datatable init js -->
-        <script src="/assets/js/pages/datatables.init.js"></script>
+        <script src="assets/js/pages/datatables.init.js"></script> 
         <!-- Alerts Live Demo js -->
-        <script src="/assets/js/pages/alerts.init.js"></script>
+        <script src="assets/js/pages/alerts.init.js"></script> 
+
+        {{-- Acqusition --}}
+        <script src="/assets/js/notifications.js"></script>
 
         <script src="/assets/js/app.js"></script>
     </body>

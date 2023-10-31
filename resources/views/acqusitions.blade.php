@@ -100,19 +100,19 @@
                         <div class="navbar-brand-box">
                             <a href="." class="logo logo-dark">
                                 <span class="logo-sm">
-                                    <img src="assets/images/logo.svg" alt="" height="22">
+                                    <img src="/images/ladybird_dark-removebg.png" alt="" height="40">
                                 </span>
                                 <span class="logo-lg">
-                                    <img src="assets/images/logo-dark.png" alt="" height="17">
+                                    <img src="/images/ladybird_dark-removebg.png" alt="" height="100">
                                 </span>
                             </a>
 
                             <a href="." class="logo logo-light">
                                 <span class="logo-sm">
-                                    <img src="images/ladybird_dark-removebg.png" alt="" height="40">
+                                    <img src="/images/ladybird_dark-removebg.png" alt="" height="40">
                                 </span>
                                 <span class="logo-lg">
-                                    <img src="images/ladybird_dark-removebg.png" alt="" height="100">
+                                    <img src="/images/ladybird_dark-removebg.png" alt="" height="100">
                                 </span>
                             </a>
                         </div>
@@ -154,8 +154,8 @@
                         <div class="dropdown d-inline-block">
                             <button type="button" class="btn header-item noti-icon waves-effect" id="page-header-notifications-dropdown"
                             data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <i class="bx bx-bell"></i>
-                                <span class="badge bg-danger rounded-pill">{{count($notifications) > 99 ? "99+" : count($notifications)}}</span>
+                                <i class="bx bx-bell {{$notification_count > 0 ? 'bx-tada' : ''}}"></i>
+                                <span class="badge bg-danger rounded-pill">{{$notification_count > 99 ? "99+" : $notification_count}}</span>
                             </button>
 
                             {{-- notification details --}}
@@ -260,6 +260,24 @@
                                     </ul>
                                 </li>
                             @endif
+                            {{-- <div class="navbar-brand-box" style="bottom: 0;position: absolute;">
+                                <a href="https://ladybirdsmis.com" target="_blank" class="logo logo-dark">
+                                    <span class="logo-sm">
+                                        <img src="/assets/images/logo.svg" alt="" height="22">
+                                    </span>
+                                    <span class="logo-lg">
+                                        <img src="/assets/images/logo-dark.png" alt="" height="17">
+                                    </span>
+                                </a>
+                                <a href="https://ladybirdsmis.com" target="_blank" class="logo logo-light">
+                                    <span class="logo-sm">
+                                        <img src="/images/ladybird_dark-removebg.png" alt="" height="40">
+                                    </span>
+                                    <span class="logo-lg">
+                                        <img src="/images/ladybird_dark-removebg.png" alt="" height="100">
+                                    </span>
+                                </a>
+                            </div> --}}
                     </div>
                     <!-- Sidebar -->
                 </div>
@@ -704,7 +722,7 @@
                             </div>
                             <div class="col-sm-6">
                                 <div class="text-sm-end d-none d-sm-block">
-                                    <b>Date Updated : </b>12th Sep 2023 11:08AM
+                                    <b>Date Updated : </b>1st Nov 2023 : 01:21AM
                                 </div>
                             </div>
                         </div>

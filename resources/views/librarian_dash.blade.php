@@ -102,8 +102,8 @@
                         <div class="dropdown d-inline-block">
                             <button type="button" class="btn header-item noti-icon waves-effect" id="page-header-notifications-dropdown"
                             data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <i class="bx bx-bell"></i>
-                                <span class="badge bg-danger rounded-pill">{{count($notifications) > 99 ? "99+" : count($notifications)}}</span>
+                                <i class="bx bx-bell {{$notification_count > 0 ? 'bx-tada' : ''}}"></i>
+                                <span class="badge bg-danger rounded-pill">{{$notification_count > 99 ? "99+" : $notification_count}}</span>
                             </button>
 
                             {{-- notification details --}}
@@ -698,7 +698,7 @@
                             </div>
                             <div class="col-sm-6">
                                 <div class="text-sm-end d-none d-sm-block">
-                                    <b>Date Updated : </b>12th Sep 2023  11:08AM
+                                    <b>Date Updated : </b>1st Nov 2023 : 01:21AM
                                 </div>
                             </div>
                         </div>

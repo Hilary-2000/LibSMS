@@ -6,11 +6,13 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use stdClass;
 
+date_default_timezone_set('Africa/Nairobi');
 class Settings extends Controller
 {
     //handles all the setting information for the users
     function userMgmt(Request $request){
         $notifications = $request->input("notifications") != null ? $request->input('notifications') : [];
+        $notification_count = $request->input("notification_count");
         // check if the isbn number is present in the database and return book details
         $database_name = session('school_details')->database_name;
         // SET THE DATABASE NAME AS PER THE STUDENT ADMISSION NO
@@ -24,15 +26,17 @@ class Settings extends Controller
         $user_data = DB::select("SELECT * FROM `user_tbl` WHERE (`auth` = '0' OR `auth` = '1' OR `auth` = 'Librarian') AND `school_code` = ?",[$school_code]);
         
         // edit their library priviledged
-        return view("user_mgmt",["notifications" => $notifications,"user_data" => $user_data]);
+        return view("user_mgmt",["notification_count" => $notification_count,"notifications" => $notifications,"user_data" => $user_data]);
     }
 
     function showUserDetails($user_id, Request $request){
         $notifications = $request->input("notifications") != null ? $request->input('notifications') : [];
+        $notification_count = $request->input("notification_count");
         // check if the isbn number is present in the database and return book details
         $database_name = session('school_details')->database_name;
         // SET THE DATABASE NAME AS PER THE STUDENT ADMISSION NO
         config(['database.connections.mysql2.database' => $database_name]);
+        DB::setDefaultConnection("mysql");
 
         // get the user detail
         $school_code = session()->get("school_details")->school_code;
@@ -51,7 +55,7 @@ class Settings extends Controller
         // check if it has a valid image
         $user_data[0]->profile_loc = $this->isLinkValid("https://lsims.ladybirdsmis.com/sims/".$user_data[0]->profile_loc) && $user_data[0]->profile_loc != null ? $user_data[0]->profile_loc : "images/dp.png";
         // return $user_data;
-        return view("change_lib_previleges",["notifications" => $notifications,"user_data" => $user_data[0]]);
+        return view("change_lib_previleges",["notification_count" => $notification_count, "notifications" => $notifications,"user_data" => $user_data[0]]);
     }
 
     function changePrivileges(Request $request){
@@ -78,6 +82,7 @@ class Settings extends Controller
     function libraryManagement(Request $request){
         // get the libraries
         $notifications = $request->input("notifications") != null ? $request->input('notifications') : [];
+        $notification_count = $request->input("notification_count");
         // check if the isbn number is present in the database and return book details
         $database_name = session('school_details')->database_name;
         // SET THE DATABASE NAME AS PER THE STUDENT ADMISSION NO
@@ -107,7 +112,7 @@ class Settings extends Controller
 
         // return $libraries;
         // return the libraries and view
-        return view("library_management",["notifications" => $notifications, "libraries" => $libraries]);
+        return view("library_management",["notification_count" => $notification_count, "notifications" => $notifications, "libraries" => $libraries]);
     }
 
     function UpdateSettings(Request $request){

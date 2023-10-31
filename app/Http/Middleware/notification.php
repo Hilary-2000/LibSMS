@@ -22,7 +22,7 @@ class notification
         $select = DB::select("SELECT BC.circulation_id, BC.date_checked_out ,BC.book_call_number,BC.user_checked_out, BC.book_id, BC.expected_return_date, BC.user_borrowing,
                                 CASE
                                     WHEN BC.user_borrowing = 'student' THEN CONCAT(SD.first_name, ' ', SD.second_name,' ',SD.surname)
-                                    WHEN BC.user_borrowing = 'teacher' THEN UT.fullname
+                                    WHEN BC.user_borrowing = 'staff' THEN UT.fullname
                                     ELSE NULL
                                 END AS borrower_name,
                                 LD.book_title,LD.book_author,LD.isbn_13
@@ -35,9 +35,9 @@ class notification
 
         // proceed and save the notification in  the notification table
         for ($index=0; $index < count($select); $index++) {
-            $notification_title = "\"".$select[$index]->book_title."\" is due for Check-In";
+            $notification_title = "Book \"".$select[$index]->book_title."\" is due for Check-In";
             $stats_link = $select[$index]->user_borrowing == 'student' ? '/Circulation/Stats/View/Student/'.$select[$index]->user_checked_out : '/Circulation/Stats/View/Staff/'.$select[$index]->user_checked_out;
-            $notification_content = "<b>\"".$select[$index]->book_title."\"</b> of call number <i>".$select[$index]->book_call_number."</i> borrowed by <a class='text-decoration-underline text-reset' href='".$stats_link."' data-bs-toggle='tooltip' data-bs-placement='top' data-bs-original-title='Click to view borrower borrowing stats!'><i>".ucwords(strtolower($select[$index]->borrower_name))."</i></a> <span class='badge badge-pill badge-soft-success'>".$select[$index]->user_borrowing."</span> is due for checkin. Its expected return date was ".date("D dS M Y : h:i:sA",strtotime($select[$index]->expected_return_date)).". Click here to <a class='text-decoration-underline text-reset' href='/Circulation/View/check-out/".$select[$index]->book_id."/".$select[$index]->circulation_id."'>Check-In</a>.";
+            $notification_content = "The book <b>\"".$select[$index]->book_title."\"</b> with a call number of <a class='text-decoration-underline text-reset' href='/Acquisitions/Book-details/".$select[$index]->book_id."' data-bs-toggle='tooltip' data-bs-placement='top' data-bs-original-title='Click to view book details!'>".$select[$index]->book_call_number."</a>, borrowed by <a class='text-decoration-underline text-reset' href='".$stats_link."' data-bs-toggle='tooltip' data-bs-placement='top' data-bs-original-title='Click to view borrower borrowing stats!'>".ucwords(strtolower($select[$index]->borrower_name))."</a> a ".$select[$index]->user_borrowing." is due for check-in. Its expected return date was <b>".date("D dS M Y : h:i:sA",strtotime($select[$index]->expected_return_date))."</b>. Click here to <a class='text-decoration-underline text-reset' href='/Circulation/View/check-out/".$select[$index]->book_id."/".$select[$index]->circulation_id."'>Check-In</a>.";
             $date_created = date("YmdHis");
             $book_id = $select[$index]->book_id;
 
@@ -48,11 +48,38 @@ class notification
         }
 
         // get the notifications
-        $like_statement = '*"user_id":"'.session('user_id').'","read":"1","delete":"1"*';
-        $notifications = DB::select("SELECT * FROM `library_notifications` WHERE `notification_action` NOT LIKE ? ORDER BY `date_created` DESC",[$like_statement]);
+        $like_statement = '%"user_id":"'.session('user_id').'","read":"1","delete":"1"%';
+        $notifications = DB::select("SELECT * FROM `library_notifications` WHERE `notification_action` NOT LIKE ? ORDER BY `date_created` DESC LIMIT 10",[$like_statement]);
+        $like_statement = '%{"user_id":'.session('user_id').',"read":1,"delete":0}%';
+        $notification_count = DB::select("SELECT * FROM `library_notifications` WHERE `notification_action` LIKE ?;",[$like_statement]);
         
         // return notifications
-        return $notifications;
+        // loop through the notifications and add a read value
+        $user_id = session("user_id");
+        for ($index=0; $index < count($notifications); $index++) { 
+            // get the user details
+            $notification_action = $this->isJson($notifications[$index]->notification_action) ? json_decode($notifications[$index]->notification_action) : [];
+
+            // get the user id status
+            $read = 0;
+            for ($index1=0; $index1 < count($notification_action); $index1++) { 
+                if ($notification_action[$index1]->user_id == $user_id) {
+                    $read = $notification_action[$index1]->read;
+                    break;
+                }
+            }
+            $notifications[$index]->read_status = $read;
+        }
+
+        $notification_count = count($notifications) - count($notification_count);
+        return [$notifications,$notification_count];
+    }
+    function isJson($string) {
+        // Try to decode the string as JSON
+        $json = json_decode($string);
+    
+        // Check if the decoding was successful and the result is not null
+        return $json !== null;
     }
     /**
      * Handle an incoming request.
@@ -72,7 +99,7 @@ class notification
         $notifications = $this->getNotification();
 
         // merge the notifications
-        $request->merge(['notifications' => $notifications]);
+        $request->merge(['notifications' => $notifications[0],'notification_count' => $notifications[1]]);
 
         // return $notifications
         return $next($request);
