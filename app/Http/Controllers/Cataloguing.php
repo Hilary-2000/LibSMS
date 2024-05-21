@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\DB;
 date_default_timezone_set('Africa/Nairobi');
 class Cataloguing extends Controller
 {
-    //Manages Cataloguing
+    //Manages Cataloguings
     function Cataloging(Request $request){
         $notifications = $request->input("notifications") != null ? $request->input('notifications') : [];
         $notification_count = $request->input("notification_count");
@@ -47,6 +47,7 @@ class Cataloguing extends Controller
         // return $select;
         return view("catalogue",["notification_count" => $notification_count,"notifications" => $notifications ,"search_results" => $search_results,"book_list" => $select]);
     }
+    
     function keywordSearch($keyword){
         if (session("school_details") == null) {
             session()->flash("error","Your session has expired, Login to proceed!");
