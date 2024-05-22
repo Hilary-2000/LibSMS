@@ -68,23 +68,7 @@ class Acquisitions extends Controller
             // keyword
             $keyword = $request->input("keyword_search");
             $search_title = $keyword;
-            $select = DB::select("SELECT * FROM `library_details` WHERE `book_title` LIKE \"%".$keyword."%\" OR `book_author` LIKE \"%".$keyword."%\" OR `book_publishers` LIKE \"%".$keyword."%\" OR `isbn_13` LIKE \"%".$keyword."%\" OR `isbn_10` LIKE \"%".$keyword."%\" OR `shelf_no_location` LIKE \"%".$keyword."%\" OR `call_no` LIKE \"%".$keyword."%\" OR `keywords` LIKE \"%".$keyword."%\" LIMIT 100");
-            
-            // using paginate
-            // $library_details = LibraryDetail::where(function($query) use ($keyword) {
-            //     $query->where('book_title', 'like', '%'.$keyword.'%')
-            //           ->orWhere('book_author', 'like', '%'.$keyword.'%')
-            //           ->orWhere('book_publishers', 'like', '%'.$keyword.'%')
-            //           ->orWhere('isbn_13', 'like', '%'.$keyword.'%')
-            //           ->orWhere('isbn_10', 'like', '%'.$keyword.'%')
-            //           ->orWhere('shelf_no_location', 'like', '%'.$keyword.'%')
-            //           ->orWhere('call_no', 'like', '%'.$keyword.'%')
-            //           ->orWhere('keywords', 'like', '%'.$keyword.'%');
-            // })
-            // ->paginate(20);
-            
-            // $select = $library_details;
-            // return $library_details;
+            $select = DB::select("SELECT * FROM `library_details` WHERE `book_title` LIKE \"%".$keyword."%\" OR `book_author` LIKE \"%".$keyword."%\" OR `book_publishers` LIKE \"%".$keyword."%\" OR `isbn_13` LIKE \"%".$keyword."%\" OR `isbn_10` LIKE \"%".$keyword."%\" OR `shelf_no_location` LIKE \"%".$keyword."%\" OR `call_no` LIKE \"%".$keyword."%\" OR `keywords` LIKE \"%".$keyword."%\" ORDER BY `book_id` DESC LIMIT 100");
         }else {
             $select = DB::select("SELECT * FROM `library_details` ORDER BY `book_id` DESC LIMIT 100");
 
@@ -436,7 +420,7 @@ class Acquisitions extends Controller
         DB::setDefaultConnection("mysql2");
 
         // get the book data
-        $book_details = DB::select("SELECT * FROM `library_details` WHERE `book_id` = ?",[$book_id]);
+        $book_details = DB::select("SELECT *, (SELECT CONCAT(`first_name`,' ', `second_name`, ' ', `surname`) FROM `student_data` WHERE `adm_no` = `who_lost_it`)  AS 'lost_by', (SELECT CONCAT(`first_name`,' ', `second_name`, ' ', `surname`) FROM `student_data` WHERE `adm_no` = `who_reported_it`)  AS 'reported_by'  FROM `library_details` WHERE `book_id` = ?",[$book_id]);
         
         // if books are present then we proceed to get more details
         if (count($book_details) > 0) {
@@ -510,17 +494,104 @@ class Acquisitions extends Controller
 
             // connect to mysql 2
             DB::setDefaultConnection("mysql2");
+            
+            // get all classes
+            $classes = DB::select("SELECT * FROM `settings` WHERE `sett` = 'class'");
+            $class = [];
+            if (count($classes) > 0) {
+                $valued = explode(",",$classes[0]->valued);
+                $class = $valued;
+            }
+    
+            // list all classes
+            $student_detail = [];
+            for ($index=0; $index < count($class); $index++) { 
+                $student_data = DB::select("SELECT * FROM `student_data` WHERE `stud_class` = ?",[$class[$index]]);
+                $stud_dets = new stdClass();
+                $stud_dets->class_name = $this->myClassName($class[$index]);
+                $stud_dets->student_data = $student_data;
+    
+                // array push
+                array_push($student_detail, $stud_dets);
+            }
             // get libraries
             $libraries = [];
             $my_libraries = DB::select("SELECT * FROM `settings` WHERE `sett` = 'libraries'");
 
             // check if my libraries has anything
             $libraries = count($my_libraries) > 0 ? json_decode($my_libraries[0]->valued) : [];
-            return view("book_details",["notification_count" => $notification_count, "notifications" => $notifications,"libraries" => $libraries, "book_circulation_details" => $book_circulation_details,"book_details" => $book_details[0], "subject_name" => $subject_name]);
+            
+            return view("book_details",["notification_count" => $notification_count, "student_detail" => $student_detail, "notifications" => $notifications,"libraries" => $libraries, "book_circulation_details" => $book_circulation_details,"book_details" => $book_details[0], "subject_name" => $subject_name]);
         }else {
             session()->flash("error","Book details not found, try another books!");
             return redirect("/Acquisitions");
         }
+    }
+
+    // mark as found
+    function mark_as_found($book_id){
+        // check if the isbn number is present in the database and return book details
+        $database_name = session("school_details")->database_name;
+
+        // SET THE DATABASE NAME AS PER THE STUDENT ADMISSION NO
+        config(['database.connections.mysql2.database' => $database_name]);
+
+        // get the book details
+        DB::setDefaultConnection("mysql2");
+
+        // get all classes
+        $classes = DB::select("SELECT * FROM `library_details` WHERE `book_id` = ? ", [$book_id]);
+
+        if (count($classes) > 0) {
+            // update the library details table
+            $update = "UPDATE `library_details` SET `lost_status` = '0' WHERE `book_id` = ?";
+            DB::update($update, [$book_id]);
+            session()->flash("success", "Book lost status updated!");
+            return redirect(url()->previous());
+        }else{
+            session()->flash("error", "Book cannot be found!");
+            return redirect(url()->previous());
+        }
+    }
+
+    function confirm_lost($book_id, Request $request){
+        // check if the isbn number is present in the database and return book details
+        $database_name = session("school_details")->database_name;
+
+        // SET THE DATABASE NAME AS PER THE STUDENT ADMISSION NO
+        config(['database.connections.mysql2.database' => $database_name]);
+
+        // get the book details
+        DB::setDefaultConnection("mysql2");
+        $params = $request->input();
+        $params['when_was_it_lost'] = date("Ymd", strtotime($params['when_was_it_lost']));
+        $params['when_was_it_reported'] = date("Ymd", strtotime($params['when_was_it_reported']));
+        
+        // get all classes
+        $classes = DB::select("SELECT * FROM `library_details` WHERE `book_id` = ? ", [$book_id]);
+
+        if (count($classes) > 0) {
+            // update the library details table
+            $update = "UPDATE `library_details` SET `lost_status` = ?, `date_lost` = ?, `date_reported` = ?, `who_lost_it` = ?, `who_reported_it` = ? WHERE `book_id` = ?";
+            DB::update($update, ["1", $params['when_was_it_lost'], $params['when_was_it_reported'], $params['who_lost_it'], $params['who_reported_it'], $book_id]);
+            session()->flash("success", "Book lost status updated!");
+            return redirect(url()->previous());
+        }else{
+            session()->flash("error", "Book cannot be found!");
+            return redirect(url()->previous());
+        }
+
+    }
+    function myClassName($data){
+        if($data == "-i"){
+            return "Alumni";
+        }
+        if (strlen($data)>1) {
+            return $data;
+        }else {
+            return "Grade ".$data;
+        }
+        return $data;
     }
     function getDateDifference($date1, $date2, $format = 'days') {
         $datetime1 = new DateTime($date1);

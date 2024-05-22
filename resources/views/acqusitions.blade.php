@@ -669,9 +669,17 @@
                                                             <td>{{$i+1}}</td>
                                                             <td>{{elongateData($larger_length,$book_list[$i]->book_title)}}
                                                                 @if ($book_list[$i]->availability_status == 1)
-                                                                    <span data-bs-toggle="tooltip" data-bs-placement="top" title="Available" class="badge bg-success">in</span> 
+                                                                    @if ($book_list[$i]->lost_status == 0)
+                                                                        <span data-bs-toggle="tooltip" data-bs-placement="top" title="Available" class="badge bg-success">in</span> 
+                                                                    @else
+                                                                        <span data-bs-toggle="tooltip" data-bs-placement="top" title="Lost" class="badge bg-danger">lost</span> 
+                                                                    @endif
                                                                 @else
-                                                                    <span data-bs-toggle="tooltip" data-bs-placement="top" title="Borrowed" class="badge bg-danger">Out</span> 
+                                                                    @if ($book_list[$i]->lost_status == 0)
+                                                                        <span data-bs-toggle="tooltip" data-bs-placement="top" title="Borrowed" class="badge bg-danger">Out</span> 
+                                                                    @else
+                                                                        <span data-bs-toggle="tooltip" data-bs-placement="top" title="Lost" class="badge bg-danger">lost</span> 
+                                                                    @endif
                                                                 @endif
                                                             </td>
                                                             <td>{{elongateData($larger_length,$book_list[$i]->book_author)}}</td>
@@ -686,9 +694,11 @@
                                                                         <a href="/Acquisitions/Book-details/{{$book_list[$i]->book_id}}" class="btn btn-sm btn-soft-primary"><i class="mdi mdi-eye-outline"></i></a>
                                                                     </li>
                                                                     @if ($book_list[$i]->availability_status == 1)
-                                                                        <li data-bs-toggle="tooltip" data-bs-placement="top" title="Check-Out">
-                                                                            <a href="/Circulation/check-out/{{$book_list[$i]->book_id}}" class="btn btn-sm btn-soft-warning"><i class="bx bx-log-out-circle"></i></a>
-                                                                        </li>
+                                                                        @if ($book_list[$i]->lost_status == 0)
+                                                                            <li data-bs-toggle="tooltip" data-bs-placement="top" title="Check-Out">
+                                                                                <a href="/Circulation/check-out/{{$book_list[$i]->book_id}}" class="btn btn-sm btn-soft-warning"><i class="bx bx-log-out-circle"></i></a>
+                                                                            </li>
+                                                                        @endif
                                                                     @endif
                                                                 </ul>
                                                             </td>

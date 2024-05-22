@@ -671,9 +671,9 @@ class Circulation extends Controller
         if (count($request->input()) > 0) {
             $keyword = $request->input("keyword_search");
             $search_title = $keyword;
-            $books = DB::select("SELECT * FROM `library_details` WHERE `availability_status` = '1' AND (`book_title` LIKE \"%".$keyword."%\" OR `book_author` LIKE \"%".$keyword."%\" OR `book_publishers` LIKE \"%".$keyword."%\" OR `isbn_13` LIKE \"%".$keyword."%\" OR `isbn_10` LIKE \"%".$keyword."%\" OR `shelf_no_location` LIKE \"%".$keyword."%\" OR `call_no` LIKE \"%".$keyword."%\" OR `shelf_no_location` LIKE \"%".$keyword."%\" OR `keywords` LIKE \"%".$keyword."%\") ORDER BY `book_id` DESC LIMIT 100;");
+            $books = DB::select("SELECT * FROM `library_details` WHERE `lost_status` = '0' AND `availability_status` = '1' AND (`book_title` LIKE \"%".$keyword."%\" OR `book_author` LIKE \"%".$keyword."%\" OR `book_publishers` LIKE \"%".$keyword."%\" OR `isbn_13` LIKE \"%".$keyword."%\" OR `isbn_10` LIKE \"%".$keyword."%\" OR `shelf_no_location` LIKE \"%".$keyword."%\" OR `call_no` LIKE \"%".$keyword."%\" OR `shelf_no_location` LIKE \"%".$keyword."%\" OR `keywords` LIKE \"%".$keyword."%\") ORDER BY `book_id` DESC LIMIT 100;");
         }else {
-            $books = DB::select("SELECT * FROM `library_details` WHERE `availability_status` = '1' ORDER BY `book_id` DESC LIMIT 100");
+            $books = DB::select("SELECT * FROM `library_details` WHERE `lost_status` = '0' AND `availability_status` = '1' ORDER BY `book_id` DESC LIMIT 100");
         }
         for ($index=0; $index < count($books); $index++) { 
             // get record where the book was borrowed

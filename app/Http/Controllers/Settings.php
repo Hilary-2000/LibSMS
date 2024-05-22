@@ -66,7 +66,7 @@ class Settings extends Controller
         // check if the isbn number is present in the database and return book details
         $database_name = session('school_details')->database_name;
         // SET THE DATABASE NAME AS PER THE STUDENT ADMISSION NO
-        config(['database.connections.mysql2.database' => $database_name]);
+        // config(['database.connections.mysql2.database' => $database_name]);
 
         // get the user detail
         $school_code = session()->get("school_details")->school_code;
@@ -74,7 +74,7 @@ class Settings extends Controller
         $user_id = $request->input("user_id");
         $store_privileges = $request->input("store_privileges");
 
-        DB::update("UPDATE `user_tbl` SET `library_previleges` = ? WHERE `user_id` = ? AND `school_code` = ?",[$store_privileges,$user_id,$school_code]);
+        DB::connection("mysql")->update("UPDATE `user_tbl` SET `library_previleges` = ? WHERE `user_id` = ? AND `school_code` = ?",[$store_privileges,$user_id,$school_code]);
         session()->flash("success","Privileges have been updated successfully!");
         return redirect("/Settings/User-mgmt/".$user_id);
         

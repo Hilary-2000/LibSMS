@@ -289,6 +289,12 @@
                                         
                                         {{-- <p class="card-title-desc">Example of custom tabs</p> --}}
                                         <button class="btn btn-outline-danger btn-sm" id="delete_trash" data-bs-toggle="modal" data-bs-target="#staticBackdrop"><i class="bx bx-trash"></i> Delete</button>
+                                        <button class="btn btn-outline-warning btn-sm {{$book_details->lost_status == "1" ? 'd-none' : ''}}" id="mark_lost" data-bs-toggle="modal" data-bs-target="#mark_as_lost_window"><i class="bx bx-no-entry"></i> Mark as Lost</button>
+                                        <button class="btn btn-outline-success btn-sm {{$book_details->lost_status == "0" ? 'd-none' : ''}}" id="mark_found" data-bs-toggle="modal" data-bs-target="#mark_as_found_window"><i class="bx bx-no-entry"></i> Mark as Found</button>
+                                        <div class="border border-primary rounded bg-light text-black my-2 p-2 {{$book_details->lost_status == "0" ? 'd-none' : ''}}">
+                                            <p><b>Note:</b></p>
+                                            This book was lost on : "{{date("D dS M Y", strtotime($book_details->date_lost))}}" by "{{ucwords(strtolower($book_details->lost_by))}}" and was reported on "{{date("D dS M Y", strtotime($book_details->date_recorded))}}" by "{{ucwords(strtolower($book_details->reported_by))}}"
+                                        </div>
                                         
                                         <!-- Static Backdrop Modal -->
                                         <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="staticBackdropLabel" aria-hidden="true">
@@ -304,6 +310,88 @@
                                                     <div class="modal-footer">
                                                         <button type="button" class="btn btn-light" data-bs-dismiss="modal">No</button>
                                                         <a href="/Acquisitions/Delete-book/{{$book_details->book_id}}" class="btn btn-outline-danger"> Yes Delete</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Static Backdrop Modal -->
+                                        <div class="modal fade" id="mark_as_found_window" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered" role="document">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="staticBackdropLabel">Mark Book as Found</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <p>Are you sure you want to mark <b>{{$book_details->book_title}}</b> Call No: <b>{{$book_details->call_no}}</b> as found?</p>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">No</button>
+                                                        <a href="/Acquisitions/found-book/{{$book_details->book_id}}" class="btn btn-outline-danger"> Yes Confirm</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Static Backdrop Modal -->
+                                        <div class="modal fade" id="mark_as_lost_window" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered" role="document">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="staticBackdropLabel">Mark as Lost</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <form action="{{url()->route("confirm_lost", $book_details->book_id)}}" method="post">
+                                                            @csrf
+                                                            <div class="col-md-12">
+                                                                <div class="mb-3">
+                                                                    <label for="who_lost_it" class="form-label">Who lost it?</label>
+                                                                    <select name="who_lost_it" id="who_lost_it" class="select2 form-control">
+                                                                        <option>Select an option</option>
+                                                                        @for ($i = 0; $i < count($student_detail); $i++)
+                                                                            <optgroup label="{{$student_detail[$i]->class_name}}">
+                                                                                @for ($index = 0; $index < count($student_detail[$i]->student_data); $index++)
+                                                                                    <option value="{{$student_detail[$i]->student_data[$index]->adm_no}}">{{ucwords(strtolower($student_detail[$i]->student_data[$index]->first_name." ".$student_detail[$i]->student_data[$index]->second_name." ".$student_detail[$i]->student_data[$index]->surname))." {".$student_detail[$i]->student_data[$index]->adm_no."}"}}</option>
+                                                                                @endfor
+                                                                            </optgroup>
+                                                                        @endfor
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-control-group w-100">
+                                                                <label for="when_was_it_lost" class="form-label">When was it lost?</label>
+                                                                <input type="date" value="<?=date("Y-m-d")?>" class="form-control" name="when_was_it_lost" id="when_was_it_lost">
+                                                            </div>
+                                                            <div class="corm-control-group w-100">
+                                                                <label for="who_reported_it" class="form-label">Who reported it?</label>
+                                                                <select name="who_reported_it" id="who_reported_it" class="select2 form-control">
+                                                                    <option>Select an option</option>
+                                                                    @for ($i = 0; $i < count($student_detail); $i++)
+                                                                        <optgroup label="{{$student_detail[$i]->class_name}}">
+                                                                            @for ($index = 0; $index < count($student_detail[$i]->student_data); $index++)
+                                                                                <option value="{{$student_detail[$i]->student_data[$index]->adm_no}}">{{ucwords(strtolower($student_detail[$i]->student_data[$index]->first_name." ".$student_detail[$i]->student_data[$index]->second_name." ".$student_detail[$i]->student_data[$index]->surname))." {".$student_detail[$i]->student_data[$index]->adm_no."}"}}</option>
+                                                                            @endfor
+                                                                        </optgroup>
+                                                                    @endfor
+                                                                </select>
+                                                            </div>
+                                                            <div class="form-control-group w-100">
+                                                                <label for="when_was_it_reported" class="form-label">When was it reported?</label>
+                                                                <input type="date" value="<?=date("Y-m-d")?>" name="when_was_it_reported" class="form-control" id="when_was_it_reported" required>
+                                                                <div class="valid-feedback">
+                                                                    Looks good!
+                                                                </div>
+                                                                <div class="invalid-feedback">
+                                                                    Book title is required.
+                                                                </div>
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-light" data-bs-dismiss="modal">No</button>
+                                                                <button type="submit" class="btn btn-outline-success"> <i class="fas fa-check"></i> Confirm</button>
+                                                            </div>
+                                                        </form>
                                                     </div>
                                                 </div>
                                             </div>
@@ -754,68 +842,6 @@
                                                         </li>
                                                     @endif
                                                 </ul>
-                                                {{-- <ul class="verti-timeline list-unstyled">
-                                                    <li class="event-list">
-                                                        <div class="event-timeline-dot">
-                                                            <i class="bx bx-right-arrow-circle font-size-18"></i>
-                                                        </div>
-                                                        <div class="d-flex">
-                                                            <div class="flex-shrink-0 me-3">
-                                                                <h5 class="font-size-14">22 Nov <i class="bx bx-right-arrow-alt font-size-16 text-primary align-middle ms-2"></i></h5>
-                                                            </div>
-                                                            <div class="flex-grow-1">
-                                                                <div>
-                                                                    Responded to need “Volunteer Activities
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </li>
-                                                    <li class="event-list">
-                                                        <div class="event-timeline-dot">
-                                                            <i class="bx bx-right-arrow-circle font-size-18"></i>
-                                                        </div>
-                                                        <div class="d-flex">
-                                                            <div class="flex-shrink-0 me-3">
-                                                                <h5 class="font-size-14">17 Nov <i class="bx bx-right-arrow-alt font-size-16 text-primary align-middle ms-2"></i></h5>
-                                                            </div>
-                                                            <div class="flex-grow-1">
-                                                                <div>
-                                                                    Everyone realizes why a new common language would be desirable... <a href="javascript: void(0);">Read more</a>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </li>
-                                                    <li class="event-list active">
-                                                        <div class="event-timeline-dot">
-                                                            <i class="bx bxs-right-arrow-circle font-size-18 bx-fade-right"></i>
-                                                        </div>
-                                                        <div class="d-flex">
-                                                            <div class="flex-shrink-0 me-3">
-                                                                <h5 class="font-size-14">15 Nov <i class="bx bx-right-arrow-alt font-size-16 text-primary align-middle ms-2"></i></h5>
-                                                            </div>
-                                                            <div class="flex-grow-1">
-                                                                <div>
-                                                                    Joined the group “Boardsmanship Forum”
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </li>
-                                                    <li class="event-list">
-                                                        <div class="event-timeline-dot">
-                                                            <i class="bx bx-right-arrow-circle font-size-18"></i>
-                                                        </div>
-                                                        <div class="d-flex">
-                                                            <div class="flex-shrink-0 me-3">
-                                                                <h5 class="font-size-14">12 Nov <i class="bx bx-right-arrow-alt font-size-16 text-primary align-middle ms-2"></i></h5>
-                                                            </div>
-                                                            <div class="flex-grow-1">
-                                                                <div>
-                                                                    Responded to need “In-Kind Opportunity”
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </li>
-                                                </ul> --}}
                                             </div>
                                         </div>
                                     </div>
@@ -888,7 +914,6 @@
 
         <!-- Right bar overlay-->
         <div class="rightbar-overlay"></div>
-
         
         <!-- JAVASCRIPT -->
         <script src="/assets/libs/jquery/jquery.min.js"></script>
@@ -896,6 +921,23 @@
         <script src="/assets/libs/metismenu/metisMenu.min.js"></script>
         <script src="/assets/libs/simplebar/simplebar.min.js"></script>
         <script src="/assets/libs/node-waves/waves.min.js"></script>
+
+        {{-- validation --}}
+        <script src="/assets/libs/parsleyjs/parsley.min.js"></script>
+        <script src="/assets/js/pages/form-validation.init.js"></script>
+
+        <!-- JAVASCRIPT -->
+
+        <script src="/assets/libs/select2/js/select2.min.js"></script>
+        <script src="/assets/libs/bootstrap-datepicker/js/bootstrap-datepicker.min.js"></script>
+        <script src="/assets/libs/spectrum-colorpicker2/spectrum.min.js"></script>
+        <script src="/assets/libs/bootstrap-timepicker/js/bootstrap-timepicker.min.js"></script>
+        <script src="/assets/libs/bootstrap-touchspin/jquery.bootstrap-touchspin.min.js"></script>
+        <script src="/assets/libs/bootstrap-maxlength/bootstrap-maxlength.min.js"></script>
+        <script src="/assets/libs/@chenfengyuan/datepicker/datepicker.min.js"></script>
+
+        <!-- form advanced init -->
+        {{-- <script src="/assets/js/pages/form-advanced.init.js"></script> --}}
 
         {{-- Acqusition --}}
         <script src="/assets/js/book_details.js"></script>

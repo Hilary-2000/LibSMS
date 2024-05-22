@@ -37,6 +37,8 @@ Route::get("/Acquisitions/getBookDetails",[Acquisitions::class,"getBookDetails"]
 Route::get("/Acquisitions/Book-details/{book_id}",[Acquisitions::class,"viewBookData"])->middleware("notifications");
 Route::get("/Acquisitions/Delete-book/{book_id}",[Acquisitions::class,"deleteBook"])->middleware("notifications");
 Route::get("/Acquisitions/keyword_search/{keyword}",[Acquisitions::class,"KeywordSearch"])->middleware("notifications");
+Route::post("/Acquisitions/confirm-lost/{book_id}", [Acquisitions::class, "confirm_lost"])->name("confirm_lost");
+Route::get("/Acquisitions/found-book/{book_id}", [Acquisitions::class, "mark_as_found"]);
 
 // Cataloguing
 Route::get("/Cataloging",[Cataloguing::class,"Cataloging"])->middleware("notifications");
