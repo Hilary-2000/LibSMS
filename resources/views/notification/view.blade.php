@@ -371,7 +371,7 @@
                             </div>
                             <div class="col-sm-6">
                                 <div class="text-sm-end d-none d-sm-block">
-                                    <b>Date Updated : </b>1st Nov 2023 : 01:21AM
+                                    <b>Date Updated : </b>24rd Oct 2024 : 12:21AM
                                 </div>
                             </div>
                         </div>
