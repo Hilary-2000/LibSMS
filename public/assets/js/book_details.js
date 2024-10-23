@@ -70,40 +70,59 @@ function sendAjaxRequest() {
                 
                 // save the data
                 var isbn_data = responseData;
-                console.log(isbn_data);
                 
                 if (isbn_data != undefined && isbn_data != null) {
-                    var book_data = isbn_data['items'][0];
-                    // infor URL
-                    cObj("according_to").href = book_data['volumeInfo']['previewLink'] != undefined ? book_data['volumeInfo']['previewLink'] : ".";
-    
-                    // Book weight
-                    cObj("book_weight").innerText = "N/A";
-    
-                    // Book physical format
-                    cObj("physical_format").innerText = book_data['volumeInfo']['printType'] != undefined ? book_data['volumeInfo']['printType'] : "N/A";
-    
-                    // Book edition name publishedDate
-                    cObj("date_created").innerText = book_data['volumeInfo']['publishedDate'] != undefined ? book_data['volumeInfo']['publishedDate'] : "N/A";
-    
-                    // Book last modified
-                    cObj("last_modified").innerText = book_data['volumeInfo']['publishedDate'] != undefined ? book_data['volumeInfo']['publishedDate'] : "N/A";
-    
-                    var authors = "<ul>";
-                    if (book_data['volumeInfo']['authors'] != undefined) {
-                        for (let index = 0; index < book_data['volumeInfo']['authors'].length; index++) {
-                            const element = book_data['volumeInfo']['authors'][index];
-                            authors+="<li>"+element+"</li>";
+                    if(isbn_data['totalItems'] > 0){
+                        var book_data = isbn_data['items'][0];
+                        // infor URL
+                        cObj("according_to").href = book_data['volumeInfo']['previewLink'] != undefined ? book_data['volumeInfo']['previewLink'] : ".";
+        
+                        // Book weight
+                        cObj("book_weight").innerText = "N/A";
+        
+                        // Book physical format
+                        cObj("physical_format").innerText = book_data['volumeInfo']['printType'] != undefined ? book_data['volumeInfo']['printType'] : "N/A";
+        
+                        // Book edition name publishedDate
+                        cObj("date_created").innerText = book_data['volumeInfo']['publishedDate'] != undefined ? book_data['volumeInfo']['publishedDate'] : "N/A";
+        
+                        // Book last modified
+                        cObj("last_modified").innerText = book_data['volumeInfo']['publishedDate'] != undefined ? book_data['volumeInfo']['publishedDate'] : "N/A";
+        
+                        var authors = "<ul>";
+                        if (book_data['volumeInfo']['authors'] != undefined) {
+                            for (let index = 0; index < book_data['volumeInfo']['authors'].length; index++) {
+                                const element = book_data['volumeInfo']['authors'][index];
+                                authors+="<li>"+element+"</li>";
+                            }
                         }
+                        authors += "</ul>";
+                        // Book last modified
+                        cObj("book_authors").innerHTML = authors;
+        
+                        // edition name 
+                        cObj("edition_name").innerHTML = book_data['volumeInfo']['contentVersion'] != undefined ? book_data['volumeInfo']['contentVersion'] : "N/A";;
+                        
+                        // alert("Book not found!","danger",cObj("liveAlertPlaceholder"));
+                    }else{
+                        // infor URL
+                        cObj("according_to").href = ".";
+        
+                        // Book weight
+                        cObj("book_weight").innerText = "N/A";
+        
+                        // Book physical format
+                        cObj("physical_format").innerText = "N/A";
+        
+                        // Book edition name
+                        cObj("date_created").innerText = "N/A";
+        
+                        // Book last modified
+                        cObj("last_modified").innerText = "N/A";
+        
+                        // edition name
+                        cObj("edition_name").innerHTML = "N/A";
                     }
-                    authors += "</ul>";
-                    // Book last modified
-                    cObj("book_authors").innerHTML = authors;
-    
-                    // edition name 
-                    cObj("edition_name").innerHTML = book_data['volumeInfo']['contentVersion'] != undefined ? book_data['volumeInfo']['contentVersion'] : "N/A";;
-                    
-                    // alert("Book not found!","danger",cObj("liveAlertPlaceholder"));
                 }else{
                     // infor URL
                     cObj("according_to").href = ".";
@@ -119,10 +138,6 @@ function sendAjaxRequest() {
     
                     // Book last modified
                     cObj("last_modified").innerText = "N/A";
-    
-                    var my_subjects = "N/A";
-                    // Book last modified
-                    cObj("book_subjects").innerHTML = my_subjects;
     
                     // edition name
                     cObj("edition_name").innerHTML = "N/A";
