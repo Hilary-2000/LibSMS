@@ -767,11 +767,11 @@
                                                     </div>
                                                     <div class="col-md-4">
                                                         <div class="mb-3">
-                                                            <label class="form-label"><b>Subject</b>
+                                                            <label class="form-label"><b>Book Authors</b>
                                                                 <div style="max-width:20px;max-height:20px;" class="spinner-grow text-primary m-1 d-none more_infor_spinners" role="status">
                                                                     <span class="sr-only">Loading...</span>
                                                                 </div></label>
-                                                            <div id="book_subjects"></div>
+                                                            <div id="book_authors"></div>
                                                         </div>
                                                     </div>
                                                 </div>

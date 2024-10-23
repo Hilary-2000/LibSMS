@@ -58,8 +58,9 @@ function sendAjaxRequest() {
         // initialize the loader
         classRemoveClass("more_infor_spinners","d-none");
     
-        // Configure the request
-        xhr.open("GET", "https://openlibrary.org/api/books?bibkeys=ISBN:"+isbn_no+"&jscmd=details&format=json", true);
+        // Configure the request https://www.googleapis.com/books/v1/volumes?q=isbn:
+        // xhr.open("GET", "https://openlibrary.org/api/books?bibkeys=ISBN:"+isbn_no+"&jscmd=details&format=json", true);
+        xhr.open("GET", "https://www.googleapis.com/books/v1/volumes?q=isbn:"+isbn_no, true);
     
         // Set up the event handler for when the request is complete
         xhr.onload = function () {
@@ -68,36 +69,39 @@ function sendAjaxRequest() {
                 const responseData = JSON.parse(xhr.responseText);
                 
                 // save the data
-                var isbn_data = responseData['ISBN:'+isbn_no+''];
+                var isbn_data = responseData;
+                console.log(isbn_data);
+                
                 if (isbn_data != undefined && isbn_data != null) {
+                    var book_data = isbn_data['items'][0];
                     // infor URL
-                    cObj("according_to").href = isbn_data['info_url'] != undefined ? isbn_data['info_url'] : ".";
+                    cObj("according_to").href = book_data['volumeInfo']['previewLink'] != undefined ? book_data['volumeInfo']['previewLink'] : ".";
     
                     // Book weight
-                    cObj("book_weight").innerText = isbn_data['details']['weight'] != undefined ? isbn_data['details']['weight'] : "N/A";
+                    cObj("book_weight").innerText = "N/A";
     
                     // Book physical format
-                    cObj("physical_format").innerText = isbn_data['details']['physical_format'] != undefined ? isbn_data['details']['physical_format'] : "N/A";
+                    cObj("physical_format").innerText = book_data['volumeInfo']['printType'] != undefined ? book_data['volumeInfo']['printType'] : "N/A";
     
-                    // Book edition name
-                    cObj("date_created").innerText = isbn_data['details']['created'] != undefined ? isbn_data['details']['created']['value'] : "N/A";
+                    // Book edition name publishedDate
+                    cObj("date_created").innerText = book_data['volumeInfo']['publishedDate'] != undefined ? book_data['volumeInfo']['publishedDate'] : "N/A";
     
                     // Book last modified
-                    cObj("last_modified").innerText = isbn_data['details']['last_modified']['value'] != undefined ? isbn_data['details']['last_modified']['value'] : "N/A";
+                    cObj("last_modified").innerText = book_data['volumeInfo']['publishedDate'] != undefined ? book_data['volumeInfo']['publishedDate'] : "N/A";
     
-                    var my_subjects = "<ul>";
-                    if (isbn_data['details']['subjects'] != undefined) {
-                        for (let index = 0; index < isbn_data['details']['subjects'].length; index++) {
-                            const element = isbn_data['details']['subjects'][index];
-                            my_subjects+="<li>"+element+"</li>";
+                    var authors = "<ul>";
+                    if (book_data['volumeInfo']['authors'] != undefined) {
+                        for (let index = 0; index < book_data['volumeInfo']['authors'].length; index++) {
+                            const element = book_data['volumeInfo']['authors'][index];
+                            authors+="<li>"+element+"</li>";
                         }
                     }
-                    my_subjects += "</ul>";
+                    authors += "</ul>";
                     // Book last modified
-                    cObj("book_subjects").innerHTML = my_subjects;
+                    cObj("book_authors").innerHTML = authors;
     
-                    // edition name
-                    cObj("edition_name").innerHTML = isbn_data['details']['edition_name'] != undefined ? isbn_data['details']['edition_name'] : "N/A";;
+                    // edition name 
+                    cObj("edition_name").innerHTML = book_data['volumeInfo']['contentVersion'] != undefined ? book_data['volumeInfo']['contentVersion'] : "N/A";;
                     
                     // alert("Book not found!","danger",cObj("liveAlertPlaceholder"));
                 }else{

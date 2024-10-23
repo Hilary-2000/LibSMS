@@ -428,14 +428,14 @@
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                                            <button type="submit" class="btn btn-sm btn-soft-success btn-block my-2 w-100"><i class="bx bx-rotate-left"></i> Change Date</button>
+                                                            <button type="submit" class="btn btn-sm btn-outline-success btn-block my-2 w-100"><i class="bx bx-rotate-left"></i> Change Date</button>
                                                         </form>
                                                     </div>
                                                     <hr>
                                                     <div class="col-md-12">
                                                         <div class="mb-3 row justify-content-between">
                                                             <div class="col-auto">
-                                                                <button class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#confirm_checkin"><i class="bx bxs-trash"></i> Confirm Check-In</button>
+                                                                <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#confirm_checkin"><i class="bx bxs-trash"></i> Confirm Check-In</button>
                                                             </div>
                                                             <div class="col-auto">
                                                                 <button class="btn btn-soft-danger" data-bs-toggle="modal" data-bs-target="#staticBackdrop"><i class="bx bxs-trash"></i> Cancel Check-out</button>

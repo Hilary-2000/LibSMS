@@ -203,7 +203,10 @@ class Acquisitions extends Controller
         
         // get ISBN no
         $isbn_number = $request->input("isbn_number");
-        $api_url = "https://openlibrary.org/api/books?bibkeys=ISBN:".$isbn_number."&jscmd=details&format=json";
+        
+        // retured open library because of their site going down
+        // $api_url = "https://openlibrary.org/api/books?bibkeys=ISBN:".$isbn_number."&jscmd=details&format=json";
+        $api_url = "https://www.googleapis.com/books/v1/volumes?q=isbn:".$isbn_number;
 
         // check if the isbn number is present in the database and return book details
         $database_name = session("school_details")->database_name;
@@ -265,102 +268,65 @@ class Acquisitions extends Controller
             if (strlen($response) > 0) {
                 if (!$this->isJsonDataPresent($response)) {
                     // Assuming the API returns JSON data, you can decode it into a PHP array
-                    $data = json_decode($response, true)['ISBN:'.$isbn_number.''];
+                    $data = json_decode($response, true);
+                    if($data['totalItems'] > 0){
+                        $book_return_data = $data['items'][0];
     
-                    // store the book details
-                    $return_book_details->book_title = isset($data['details']['title']) ? $data['details']['title'] : "";
-    
-                    // get book authors
-                    $book_authors = "";
-                    if (isset($data['details']['authors'])) {
-                        if(count($data['details']['authors'])){
-                            for ($index=0; $index < count($data['details']['authors']); $index++) { 
-                                $element = $data['details']['authors'][$index];
-                                $book_authors.=$element['name'].", ";
+                        // store the book details
+                        $return_book_details->book_title = isset($book_return_data['volumeInfo']['title']) ? $book_return_data['volumeInfo']['title'] : "";
+        
+                        // get book authors
+                        $book_authors = "";
+                        if (isset($book_return_data['volumeInfo']['authors'])) {
+                            if(count($book_return_data['volumeInfo']['authors'])){
+                                for ($index=0; $index < count($book_return_data['volumeInfo']['authors']); $index++) { 
+                                    $element = $book_return_data['volumeInfo']['authors'][$index];
+                                    $book_authors.=$element.", ";
+                                }
                             }
                         }
-                    }
-                    $book_authors = strlen(trim($book_authors)) > 0 ? substr($book_authors,0,strlen($book_authors)-2) : "";
-                    $return_book_details->book_author = $book_authors;
-                    $return_book_details->isbn_10 = isset($data['details']['isbn_10']) ? $data['details']['isbn_10'][0] : "";
-                    $return_book_details->isbn_13 = isset($data['details']['isbn_13']) ? $data['details']['isbn_13'][0] : "";
-                    $return_book_details->pages = isset($data['details']['number_of_pages']) ? $data['details']['number_of_pages'] : "";
-                    $return_book_details->category = "";
-    
-                    // get the book publishers
-                    $book_publishers = "";
-                    if (isset($data['details']['publishers'])) {
-                        if(count($data['details']['publishers'])){
-                            for ($index=0; $index < count($data['details']['publishers']); $index++) { 
-                                $element = $data['details']['publishers'][$index];
-                                $book_publishers.=$element.", ";
+                        $book_authors = strlen(trim($book_authors)) > 0 ? substr($book_authors,0,strlen($book_authors)-2) : "";
+                        
+                        // get the isbn
+                        $return_book_details->isbn_10 = "";
+                        $return_book_details->isbn_13 = "";
+
+                        foreach ($book_return_data['volumeInfo']['industryIdentifiers'] as $industry_identifiers) {
+                            if($industry_identifiers['type'] == "ISBN_10"){
+                                $return_book_details->isbn_10 = $industry_identifiers['identifier'];
+                            }
+                            
+                            if($industry_identifiers['type'] == "ISBN_13"){
+                                $return_book_details->isbn_13 = $industry_identifiers['identifier'];
                             }
                         }
-                    }
-                    $book_publishers = strlen(trim($book_publishers)) > 0 ? substr($book_publishers,0,strlen($book_publishers)-2) : "";
-    
-                    // get the details
-                    $return_book_details->publishers = $book_publishers;
-                    $return_book_details->date_published = isset($data['details']['publish_date']) ? date("Y-m-d",strtotime($data['details']['publish_date'])) : "";
-                    $return_book_details->call_no = "";
-                    $return_book_details->book_location = "";
-                    $return_book_details->book_description = isset($data['details']['description']['value']) ? $data['details']['description']['value'] : "";
-                    $return_book_details->cover_url = isset($data['thumbnail_url']) ? $data['thumbnail_url'] : "";
-                    $return_book_details->physical_dimensions = isset($data['details']['physical_dimensions']) ? $data['details']['physical_dimensions'] : "";
-    
-                    // language
-                    $book_lang = "English";
-                    if (isset($data['details']['languages'])) {
-                        if (count($data['details']['languages']) > 0) {
-                            $my_language = substr($data['details']['languages'][0]['key'],-3);
-                            if ($my_language == "eng") {
-                                $book_lang = "English";
-                            }elseif($my_language == "ger"){
-                                $book_lang = "German";
-                            }elseif($my_language == "fre"){
-                                $book_lang = "French";
-                            }elseif($my_language == "swa"){
-                                $book_lang = "Swahili";
-                            }elseif($my_language == "cze"){
-                                $book_lang = "Czech";
-                            }elseif($my_language == "spa"){
-                                $book_lang = "Spanish";
-                            }elseif($my_language == "est"){
-                                $book_lang = "Estonian";
-                            }elseif($my_language == "chi"){
-                                $book_lang = "Chinese";
-                            }elseif($my_language == "rus"){
-                                $book_lang = "Russian";
-                            }elseif($my_language == "ita"){
-                                $book_lang = "Italian";
-                            }elseif($my_language == "jpn"){
-                                $book_lang = "Japanese";
-                            }elseif($my_language == "por"){
-                                $book_lang = "Portuguese";
-                            }elseif($my_language == "ara"){
-                                $book_lang = "Arabic";
-                            }elseif($my_language == "kor"){
-                                $book_lang = "Korean";
-                            }elseif($my_language == "pol"){
-                                $book_lang = "Polish";
-                            }elseif($my_language == "heb"){
-                                $book_lang = "Hebrew";
-                            }elseif($my_language == "cmn"){
-                                $book_lang = "Mandarin";
-                            }elseif($my_language == "guj"){
-                                $book_lang = "Gujarati";
-                            }elseif($my_language == "heb"){
-                                $book_lang = "Hebrew";
-                            }else {
-                                $book_lang = $my_language;
-                            }
+                        $return_book_details->book_author = $book_authors;
+                        $return_book_details->pages = isset($book_return_data['volumeInfo']['pageCount']) ? $book_return_data['volumeInfo']['pageCount'] : "";
+                        
+                        $book_category = "";
+                        foreach ($book_return_data['volumeInfo']['categories'] as $category) {
+                            $book_category .= $category.", ";
                         }
+                        $book_category = strlen(trim($book_category)) > 0 ? substr($book_category,0,strlen($book_category)-2) : "";
+                        $return_book_details->category = $book_category;
+        
+                        // get the book publishers
+                        $book_publishers = isset($book_return_data["volumeInfo"]['publisher']) ? $book_return_data["volumeInfo"]['publisher'] : "";
+        
+                        // get the details
+                        $return_book_details->publishers = $book_publishers;
+                        $return_book_details->date_published = isset($book_return_data["volumeInfo"]['publishedDate']) ? date("Y",strtotime($book_return_data["volumeInfo"]['publishedDate'])) : "";
+                        $return_book_details->call_no = "";
+                        $return_book_details->book_location = "";
+                        $return_book_details->book_description = isset($book_return_data["volumeInfo"]['description']) ? $book_return_data["volumeInfo"]['description'] : "";
+                        $return_book_details->cover_url = isset($book_return_data["volumeInfo"]['imageLinks']['smallThumbnail']) ? $book_return_data["volumeInfo"]['imageLinks']['smallThumbnail'] : "";
+                        $return_book_details->physical_dimensions = "";
+                        $return_book_details->language = $book_return_data['volumeInfo']['language'];
+                        $return_book_details->revisions = isset($book_return_data['volumeInfo']['contentVersion']) ? $book_return_data['volumeInfo']['contentVersion'] : 0;
+                        $return_book_details->present = false;
+                        $return_book_details->found = true;
+                        $return_book_details->last_call_no = "N/A";
                     }
-                    $return_book_details->language = $book_lang;
-                    $return_book_details->revisions = isset($data['details']['revision']) ? $data['details']['revision'] : 0;
-                    $return_book_details->present = false;
-                    $return_book_details->found = true;
-                    $return_book_details->last_call_no = "N/A";
                 }else {
                     $return_book_details->book_title = "";
                     $return_book_details->book_author = "";
@@ -733,15 +699,5 @@ class Acquisitions extends Controller
 
         // no book details
         return $book_details;
-    }
-
-    function isLinkValid($url) {
-        $ch = curl_init($url);
-        curl_setopt($ch, CURLOPT_NOBODY, true);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-        curl_exec($ch);
-        $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
-        return $http_code == 200;
     }
 }
