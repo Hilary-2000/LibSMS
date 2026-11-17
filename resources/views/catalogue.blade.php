@@ -4,6 +4,7 @@
     <head>
         
         <meta charset="utf-8" />
+        @include('partials.theme_init')
         <title>Cataloguing | {{ucwords(strtolower(session("fullname")))}} </title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta content="Ladybird Lbrary Management System" name="description" />
@@ -163,7 +164,7 @@
                                             <ul>
                                                 <li>In this section you will be able to modify your books location and call numbers, this is called <b>Cataloguing</b></li>
                                                 <li>The table below displays the books present in the library but groups those that share the same title and ISBN <b>eg Rich Dad, Poor Dad - 10 books</b></li>
-                                                <li>This table below will display the first <b>100 records</b> to increase page perfomance.</li>
+                                                <li>All titles are listed, {{ request('per_page', 25) }} per page. Use the search bar on the table to find a title quickly.</li>
                                                 <li>For more results use the advanced search!</li>
                                             </ul>
                                             <div class="d-flex gap-2 flex-wrap mb-3">
@@ -198,11 +199,7 @@
                                             </div>
                                         </div>
                                         <hr>
-                                        <h6 class="text-center"><u>Catalogue Table
-                                            @if ($search_results != null)
-                                                <span>: Results for "{{$search_results}}"</span>
-                                            @endif
-                                            </u></h6>
+                                        @include('partials.table_header', ['title' => 'Catalogue', 'icon' => 'bx-book', 'table' => 'datatable', 'action' => '/Cataloging', 'search' => $search_results, 'pager' => $pager, 'noun' => 'title'])
                                         <div class="table-responsive">
                                             <table id="datatable" data-server-paginated="1" class="table table-bordered dt-responsive  nowrap w-100">
                                                 <thead>

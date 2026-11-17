@@ -13,26 +13,24 @@
 
                 <!-- Settings -->
                 <hr class="mt-0" />
-                <h6 class="text-center mb-0">Choose Layouts</h6>
+                <h6 class="text-center mb-0">Appearance</h6>
 
-                <div class="p-4">
-                    <div class="mb-2">
-                        <img src="/assets/images/layouts/layout-1.jpg" class="img-thumbnail" alt="layout images">
-                    </div>
-
-                    <div class="form-check form-switch mb-3">
-                        <input class="form-check-input theme-choice" type="checkbox" id="light-mode-switch" checked>
-                        <label class="form-check-label" for="light-mode-switch">Light Mode</label>
-                    </div>
-    
-                    <div class="mb-2">
-                        <img src="/assets/images/layouts/layout-2.jpg" class="img-thumbnail" alt="layout images">
-                    </div>
-                    <div class="form-check form-switch mb-3">
-                        <input class="form-check-input theme-choice" type="checkbox" id="dark-mode-switch">
-                        <label class="form-check-label" for="dark-mode-switch">Dark Mode</label>
-                    </div>
+                {{-- same choices as the switch in the top bar (theme.js keeps them in sync) --}}
+                <div class="p-4 d-grid gap-3">
+                    <button type="button" class="btn btn-outline-secondary text-start p-2 theme-panel-option" data-theme-set="light">
+                        <img src="/assets/images/layouts/layout-1.jpg" class="img-thumbnail mb-2" alt="Light theme preview">
+                        <span class="d-block"><i class="bx bx-sun me-1"></i> Light</span>
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary text-start p-2 theme-panel-option" data-theme-set="dark">
+                        <img src="/assets/images/layouts/layout-2.jpg" class="img-thumbnail mb-2" alt="Dark theme preview">
+                        <span class="d-block"><i class="bx bx-moon me-1"></i> Dark</span>
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary text-start p-2 theme-panel-option" data-theme-set="system">
+                        <span class="d-block"><i class="bx bx-desktop me-1"></i> Same as device</span>
+                        <small class="text-muted">Follows your computer or phone's light/dark setting</small>
+                    </button>
                 </div>
+                <style>.theme-panel-option[aria-pressed="true"] { border-color: var(--bs-primary); box-shadow: 0 0 0 2px var(--bs-primary); }</style>
             </div> <!-- end slimscroll-menu-->
         </div>
         <!-- /Right-bar -->

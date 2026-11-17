@@ -199,6 +199,16 @@ class LibraryFeaturesTest extends TestCase
 
         $this->go()->get("/Acquisitions/Stock-take/$take?tab=missing&per_page=100")->assertOk()->assertSee("Missing Book")->assertDontSee("Shelf Book");
         $this->go()->get("/Acquisitions/Stock-take/$take?tab=misplaced")->assertOk()->assertSee("Other Library Book");
+        // stop for now and come back: progress is kept and the stock-take is listed as in progress
+        $this->go()->get("/Acquisitions/Stock-take/$take/Later")->assertRedirect("/Acquisitions/Stock-take")->assertSessionHas("success");
+        if (getenv("SNAPSHOT_DIR")) {
+            file_put_contents(getenv("SNAPSHOT_DIR")."/stocktake_open.html", $this->go()->get("/Acquisitions/Stock-take/$take")->getContent());
+            file_put_contents(getenv("SNAPSHOT_DIR")."/stocktake_list.html", $this->go()->get("/Acquisitions/Stock-take")->getContent());
+        }
+        $this->go()->get("/Acquisitions/Stock-take")->assertOk()->assertSee("In progress")->assertSee("Test take")->assertSee("/Acquisitions/Stock-take/$take", false);
+        $this->assertSame("success", $json(BookCode::encode($missing))["level"], "scanning resumes after Continue later");
+        $this->school()->table("library_stocktake_scans")->where("stocktake_id", $take)->where("book_id", (string) $missing)->delete();
+
         $this->go()->post("/Acquisitions/Stock-take/$take/Close");
         $this->assertSame("closed", $this->school()->table("library_stocktakes")->where("stocktake_id", $take)->value("status"));
         $this->assertSame("danger", $json(BookCode::encode($missing))["level"], "closed stock-take accepts no scans");
@@ -233,5 +243,104 @@ class LibraryFeaturesTest extends TestCase
         $this->assertCount(12, $charts["checked_out"]);
         $this->go()->get("/Dashboard")->assertOk()->assertSee('id="chart_activity"', false)->assertSee("View as table");
         $this->go()->get("/Reports")->assertOk()->assertSee("report-export", false)->assertSee("pdfmake.min.js", false)->assertSee("jszip.min.js", false);
+    }
+
+    public function test_statistics_numbers_export_and_report(): void
+    {
+        $this->login();
+        [$a, $b] = $this->school()->table("student_data")
+            ->where(function ($q) { $q->whereNull("deleted")->orWhere("deleted", 0); })
+            ->where("stud_class", "not like", "-%")->limit(2)->pluck("adm_no")->all();
+        $day = fn ($d) => date("YmdHis", strtotime("$d days 10:00"));
+        $loan = function ($book, $who, $type, $out, $due, $returned = null) use ($day) {
+            $this->school()->table("book_circulation")->insert([
+                "book_id" => (string) $book, "book_isbn" => "", "user_checked_out" => $who, "user_borrowing" => $type,
+                "date_checked_out" => $day($out), "expected_return_date" => date("Ymd000000", strtotime("$due days")),
+                "return_status" => $returned === null ? 0 : 1, "return_date" => $returned === null ? "NULL" : $day($returned), "checked_out_by" => "1",
+            ]);
+        };
+        // remove the demo history from the counts: everything below is inside the last 20 days
+        $b1 = $this->book(["book_title" => "Stats Book One"]);
+        $b2 = $this->book(["book_title" => "Stats Book Two"]);
+        $b3 = $this->book(["book_title" => "Stats Book Three"]);
+        $loan($b1, $a, "student", -20, -13, -14);   // on time
+        $loan($b2, $a, "student", -18, -11, -6);    // late (5 days)
+        $loan($b3, $a, "student", -15, -8, -2);     // late (6 days)
+        $loan($b1, $b, "student", -10, -3);         // still out, overdue
+        $loan($b2, "1", "staff", -5, +9);           // due later: not counted for lateness
+
+        $from = date("Y-m-d", strtotime("-20 days"));
+        $to = date("Y-m-d");
+        $page = $this->go()->get("/Circulation/Stats?period=custom&from=$from&to=$to")->assertOk();
+        if (getenv("SNAPSHOT_DIR")) {
+            file_put_contents(getenv("SNAPSHOT_DIR")."/stats_seeded.html", $page->getContent());
+        }
+        $page->assertSee("Who's reading", false)->assertSee("Late returns")->assertSee("When the library is busy")->assertSee("Repeat late returners");
+
+        $stats = (new \App\Services\CirculationInsights())->all("custom", $from, $to);
+        // demo history before these 20 days does not count; only our 5 loans (+ anything else made in the window)
+        $this->assertGreaterThanOrEqual(5, $stats["tiles"]["loans"]);
+        $mine = collect($stats["repeat_late"])->firstWhere("id", $a);
+        $this->assertNotNull($mine, "student with 2 late returns is a repeat late returner");
+        $this->assertSame(2, $mine["late"]);
+        $this->assertEquals(5.5, $mine["avg_days"]);
+        $this->assertSame($a, $stats["top_readers"][0]["adm_no"]);
+        $this->assertSame(3, $stats["top_readers"][0]["loans"]);
+        $this->assertGreaterThanOrEqual(1, $stats["borrower_types"]["staff"]);
+        $cells = array_sum(array_map(fn ($d) => array_sum(array_column($d["data"], "y")), $stats["busy"]["series"]));
+        $this->assertGreaterThanOrEqual(5 + 3, $cells, "check-outs and returns appear in the busy-hours grid");
+        $this->assertNotEmpty(array_filter($stats["weekly_due"]["late"]));
+
+        $xlsx = $this->go()->get("/Circulation/Stats/Export?period=custom&from=$from&to=$to")->assertOk();
+        $this->assertStringContainsString("spreadsheetml", $xlsx->headers->get("Content-Type"));
+        $this->assertStringStartsWith("PK", $xlsx->streamedContent(), "a real .xlsx (zip) file");
+
+        $this->go()->get("/Circulation/Stats/Report?period=this_term")->assertOk()->assertSee("Library report")->assertSee("Top readers");
+        foreach (["this_term", "last_term", "this_year"] as $period) {
+            $this->go()->get("/Circulation/Stats?period=$period")->assertOk();
+        }
+    }
+
+    public function test_whats_new_opens_once_per_user_and_stays_in_the_top_bar(): void
+    {
+        $this->login();
+        $first = $this->go()->get("/Dashboard")->assertOk();
+        $first->assertSee('id="whatsNewModal"', false)->assertSee('data-auto-open="1"', false)
+            ->assertSee("What's new", false)->assertSee(config("whats_new.title"))->assertSee("data-whats-new-dot>new", false);
+
+        $this->go()->postJson("/Whats-new/Seen")->assertOk()->assertJson(["ok" => true]);
+        $this->assertSame(1, $this->school()->table("library_whats_new_seen")->where("user_id", "990300")->where("version", config("whats_new.version"))->count());
+
+        // still reachable from the top bar, but no longer opens by itself (also after a new login)
+        $this->go()->get("/Circulation")->assertOk()->assertSee('data-auto-open="0"', false)->assertDontSee("data-whats-new-dot>new", false);
+        $this->flushSession();
+        $this->go()->post("/process_login", ["username" => "feature_tester", "user-password" => "Feat-123"]);
+        $this->go()->get("/Dashboard")->assertOk()->assertSee('data-auto-open="0"', false);
+
+        // a new release is shown once more
+        config(["whats_new.version" => "next-release"]);
+        $this->flushSession();
+        $this->go()->post("/process_login", ["username" => "feature_tester", "user-password" => "Feat-123"]);
+        $this->go()->get("/Dashboard")->assertOk()->assertSee('data-auto-open="1"', false);
+    }
+
+    public function test_theme_choice_follows_the_person_to_any_computer(): void
+    {
+        $this->login();
+        // no choice saved yet: pages fall back to this browser's choice
+        $this->go()->get("/Dashboard")->assertOk()->assertSee("account = null", false)->assertSee("\\/Preferences\\/Theme", false);
+
+        $this->go()->postJson("/Preferences/Theme", ["mode" => "dark"])->assertOk()->assertJson(["mode" => "dark"]);
+        $this->go()->postJson("/Preferences/Theme", ["mode" => "purple"])->assertStatus(422);
+        $this->assertSame("dark", $this->school()->table("library_user_prefs")->where("user_id", "990300")->where("pref_key", "theme")->value("pref_value"));
+
+        // "another computer": a brand-new session, log in again -> their dark theme is applied
+        $this->flushSession();
+        $this->go()->post("/process_login", ["username" => "feature_tester", "user-password" => "Feat-123"]);
+        $this->go()->get("/Circulation")->assertOk()->assertSee('account = "dark"', false);
+
+        // the login page (nobody signed in) never saves to an account
+        $this->go()->get("/Logout");
+        $this->go()->get("/")->assertOk()->assertSee("window.LIBRARY_THEME_SAVE = null", false);
     }
 }

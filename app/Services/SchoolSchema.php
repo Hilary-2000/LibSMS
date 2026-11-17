@@ -66,6 +66,23 @@ CREATE TABLE IF NOT EXISTS `library_stocktakes` (
   PRIMARY KEY (`stocktake_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
 SQL,
+        "library_user_prefs" => <<<'SQL'
+CREATE TABLE IF NOT EXISTS `library_user_prefs` (
+  `user_id` varchar(200) NOT NULL,
+  `pref_key` varchar(100) NOT NULL COMMENT 'e.g. theme',
+  `pref_value` varchar(500) DEFAULT NULL,
+  `date_updated` varchar(100) NOT NULL,
+  PRIMARY KEY (`user_id`,`pref_key`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
+SQL,
+        "library_whats_new_seen" => <<<'SQL'
+CREATE TABLE IF NOT EXISTS `library_whats_new_seen` (
+  `user_id` varchar(200) NOT NULL,
+  `version` varchar(50) NOT NULL COMMENT 'config/whats_new.php version the user has seen',
+  `date_seen` varchar(100) NOT NULL,
+  PRIMARY KEY (`user_id`,`version`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
+SQL,
         "library_stocktake_scans" => <<<'SQL'
 CREATE TABLE IF NOT EXISTS `library_stocktake_scans` (
   `scan_id` int(11) NOT NULL AUTO_INCREMENT,

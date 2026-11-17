@@ -3,6 +3,25 @@
 @section('page_title', 'Stock-take')
 
 @section('content')
+@if (count($open) > 0)
+    <div class="card border border-primary">
+        <div class="card-body">
+            <h5 class="card-title mb-1"><i class="bx bx-loader-circle text-primary"></i> In progress</h5>
+            <p class="text-muted small">Every scan is saved as it happens. Carry on where you stopped &mdash; from this or any other computer.</p>
+            @foreach ($open as $o)
+                @php $pct = $o->summary['expected'] > 0 ? min(100, round(100 * $o->summary['found'] / $o->summary['expected'])) : 0; @endphp
+                <div class="d-flex flex-wrap align-items-center gap-3 py-2 {{ !$loop->last ? 'border-bottom' : '' }}">
+                    <div class="flex-grow-1" style="min-width: 260px">
+                        <div class="fw-semibold">{{ $o->title }} <span class="text-muted small fw-normal">&middot; {{ $o->library_location === null ? 'All libraries' : ($libraries[$o->library_location] ?? $o->library_location) }}</span></div>
+                        <div class="progress my-1" style="height: 8px" role="progressbar" aria-label="Progress of {{ $o->title }}" aria-valuenow="{{ $pct }}" aria-valuemin="0" aria-valuemax="100"><div class="progress-bar" style="width: {{ $pct }}%"></div></div>
+                        <div class="small text-muted">{{ number_format($o->summary['found']) }} of {{ number_format($o->summary['expected']) }} books found ({{ $pct }}%) &middot; started {{ date("d M", strtotime($o->date_started)) }} &middot; last scan {{ $o->last_scan ? date("D d M, H:i", strtotime($o->last_scan)) : 'none yet' }}</div>
+                    </div>
+                    <a class="btn btn-primary" href="/Acquisitions/Stock-take/{{ $o->stocktake_id }}"><i class="bx bx-play"></i> Continue</a>
+                </div>
+            @endforeach
+        </div>
+    </div>
+@endif
 <div class="row">
     <div class="col-lg-4">
         <div class="card">
@@ -32,7 +51,7 @@
     <div class="col-lg-8">
         <div class="card">
             <div class="card-body">
-                <h5 class="card-title">Previous stock-takes</h5>
+                <h5 class="card-title">All stock-takes</h5>
                 <div class="table-responsive">
                     <table class="table table-bordered align-middle mb-0">
                         <thead class="table-light"><tr><th>Name</th><th>Library</th><th>Started</th><th>Books scanned</th><th>Status</th><th></th></tr></thead>
@@ -43,7 +62,7 @@
                                     <td>{{ $s->library_location === null ? 'All libraries' : ($libraries[$s->library_location] ?? $s->library_location) }}</td>
                                     <td>{{ date("D dS M Y H:i", strtotime($s->date_started)) }}</td>
                                     <td>{{ number_format($s->scanned) }}</td>
-                                    <td><span class="badge {{ $s->status === 'open' ? 'bg-warning text-dark' : 'bg-secondary' }}">{{ $s->status }}</span></td>
+                                    <td><span class="badge {{ $s->status === 'open' ? 'bg-warning text-dark' : 'bg-secondary' }}">{{ $s->status === 'open' ? 'in progress' : 'finished' }}</span></td>
                                     <td><a class="btn btn-sm btn-soft-primary" href="/Acquisitions/Stock-take/{{ $s->stocktake_id }}">{{ $s->status === 'open' ? 'Continue' : 'Results' }}</a></td>
                                 </tr>
                             @empty

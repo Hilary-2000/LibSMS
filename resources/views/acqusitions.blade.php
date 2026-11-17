@@ -4,6 +4,7 @@
     <head>
         
         <meta charset="utf-8" />
+        @include('partials.theme_init')
         <title>Acquisitions | {{ucwords(strtolower(session("fullname")))}} </title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta content="Ladybird Lbrary Management System" name="description" />
@@ -158,9 +159,9 @@
                                         <div class="mt-3">
                                             <p><b>Note:</b></p>
                                             <ul>
-                                                <li>This table will only display the first 100 books to increase page perfomance.</li>
-                                                <li>For more results use the advanced search below!</li>
-                                                <li>To view all your book navigate to the report section.</li>
+                                                <li>All books are listed, {{ request('per_page', 25) }} per page &mdash; use the page numbers under the table to move between pages.</li>
+                                                <li>Use the search bar on the table first: typing filters the current page, pressing Enter searches every book. <b>Advanced Search</b> below does the same full search.</li>
+                                                <li>For printable or exportable lists (Excel / PDF), use the <b>Reports</b> section.</li>
                                             </ul>
                                             <div class="d-flex gap-2 flex-wrap mb-3">
                                                 <button class="btn btn-outline-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
@@ -445,11 +446,7 @@
                                     </div><!-- /.modal -->
 
                                     <div class="card-body">
-                                        <h6 class="text-center"><u>Book Table
-                                            @if ($search_title != null)
-                                                : Result for "{{$search_title}}"
-                                            @endif
-                                            </u></h6>
+                                        @include('partials.table_header', ['title' => 'Book Table', 'icon' => 'bx-book', 'table' => 'datatable', 'action' => '/Acquisitions', 'search' => $search_title, 'pager' => $pager, 'noun' => 'book'])
                                         @php
                                             if (!function_exists('elongateData')) { function elongateData($larger_length,$data){
                                                 // get the length of the string

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Services\AuditLog;
+use App\Services\UserPrefs;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\DB;
@@ -100,6 +101,8 @@ class login extends Controller
             Cookie::queue(Cookie::make(self::REMEMBER_COOKIE, $this->rememberToken($user->user_id), self::REMEMBER_MINUTES, null, null, null, true));
         }
         AuditLog::record("Logged in", null, $remember ? ["method" => "remember-me or form, remember on"] : null);
+        // their own colour theme, on whichever computer they log in from
+        UserPrefs::loadIntoSession();
 
         return redirect("/Dashboard");
     }

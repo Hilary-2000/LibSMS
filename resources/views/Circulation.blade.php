@@ -4,6 +4,7 @@
     <head>
         
         <meta charset="utf-8" />
+        @include('partials.theme_init')
         <title>Book Circulation | {{ucwords(strtolower(session("fullname")))}} </title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta content="Ladybird Lbrary Management System" name="description" />
@@ -98,10 +99,6 @@
                                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                                         </div>
                                     @endif
-                                    <p class="card-title-desc">Click the button below to check out a book borrowed.</p>
-                                    <a href="/Circulation/check-out" class="btn btn-secondary"><i class="bx bxs-log-out-circle"></i> Check Out</a>
-                                    <a href="/Circulation/Stats" class="btn btn-secondary"><i class="bx bx-stats"></i> Statistics <span class="badge bg-success">new</span></a>
-                                    <a href="/Circulation/Reservations" class="btn btn-secondary"><i class="bx bx-time-five"></i> Reservations</a>
                                     @include('partials.scan_box', ['back' => '/Circulation'])
                                     
                                     <!--  Large modal example -->
@@ -180,7 +177,11 @@
                                                             </div>
                                                         </div>
                                                         <div class="col-md-12">
-                                                            <button id="cancel_check_in_link" class="btn btn-sm btn-soft-danger w-100" data-bs-target="#confirm_cancel_checkin" data-bs-toggle="modal" data-bs-dismiss="modal"> Cancel Check-In</button>
+                                                            {{-- grey Close next to the red action, so closing the window is never mistaken for cancelling the check-in --}}
+                                                            <div class="d-flex gap-2">
+                                                                <button type="button" class="btn btn-sm btn-secondary w-50" data-bs-dismiss="modal"><i class="bx bx-x"></i> Close</button>
+                                                                <button type="button" id="cancel_check_in_link" class="btn btn-sm btn-soft-danger w-50" data-bs-target="#confirm_cancel_checkin" data-bs-toggle="modal" data-bs-dismiss="modal"><i class="bx bx-undo"></i> Cancel Check-In</button>
+                                                            </div>
                                                             {{-- <a href="#" ><i class="bx bx-pencil"></i> Cancel Check-In</a> --}}
                                                         </div>
                                                     </div>
@@ -196,14 +197,17 @@
                                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                 </div>
                                                 <div class="modal-body">
-                                                    <p><b>Note</b> <br>
-                                                        This action is irreversible. <br>The system will assume that "<b id="this_book"></b>" of Call No: <b id="this_book_call_no"></b> is not checked in.
-                                                    </p>
+                                                    <p class="mb-2">Cancel the check-in of "<b id="this_book"></b>" (Call No: <b id="this_book_call_no"></b>)?</p>
+                                                    <div class="alert alert-warning py-2 small mb-0">
+                                                        <b>What this does:</b> use it only when a book was checked in <u>by mistake</u> (it was not actually returned).
+                                                        The loan is reopened: the book shows as <b>still borrowed</b> by the same person, with the same due date, and is no longer available to lend.
+                                                        It is refused if the book has already been lent to someone else since.
+                                                    </div>
                                                 </div>
                                                 <div class="modal-footer">
                                                     <!-- Toogle to first dialog, `data-bs-dismiss` attribute can be omitted - clicking on link will close dialog anyway -->
-                                                    <button class="btn btn-soft-success" data-bs-target="#bs-example-modal-lg" data-bs-toggle="modal" data-bs-dismiss="modal">Cancel</button>
-                                                    <form method="POST" action="#" id="confirm_cancel_check_in_form" class="d-inline">@csrf<button type="submit" id="confirm_cancel_check_in" class="btn btn-soft-danger">Yes Cancel</button></form>
+                                                    <button class="btn btn-secondary" data-bs-target="#bs-example-modal-lg" data-bs-toggle="modal" data-bs-dismiss="modal"><i class="bx bx-arrow-back"></i> No, go back</button>
+                                                    <form method="POST" action="#" id="confirm_cancel_check_in_form" class="d-inline">@csrf<button type="submit" id="confirm_cancel_check_in" class="btn btn-soft-danger">Yes, cancel the check-in</button></form>
                                                 </div>
                                             </div>
                                         </div>

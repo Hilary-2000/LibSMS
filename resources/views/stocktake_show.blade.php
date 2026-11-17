@@ -11,13 +11,16 @@
                 <div class="text-muted small">{{ $location_name }} &middot; started {{ date("D dS M Y H:i", strtotime($take->date_started)) }}
                     @if ($take->status === 'closed') &middot; closed {{ date("D dS M Y H:i", strtotime($take->date_closed)) }} @endif</div>
             </div>
-            <div class="d-flex gap-2">
-                <a href="/Acquisitions/Stock-take" class="btn btn-sm btn-light">All stock-takes</a>
+            <div class="d-flex gap-2 flex-wrap">
                 @if ($take->status === 'open')
-                    <form method="POST" action="/Acquisitions/Stock-take/{{ $take->stocktake_id }}/Close" onsubmit="return confirm('Close this stock-take? No more scans can be added.')">
+                    {{-- every scan is saved immediately, so leaving loses nothing --}}
+                    <a href="/Acquisitions/Stock-take/{{ $take->stocktake_id }}/Later" class="btn btn-sm btn-primary"><i class="bx bx-pause"></i> Continue later</a>
+                    <form method="POST" action="/Acquisitions/Stock-take/{{ $take->stocktake_id }}/Close" onsubmit="return confirm('Finish this stock-take?\n\nOnly do this when every shelf has been scanned: the results become final and no more scans can be added.\n\nTo stop for now and carry on later, choose Continue later instead.')">
                         @csrf
-                        <button class="btn btn-sm btn-outline-danger" type="submit"><i class="bx bx-stop"></i> Close stock-take</button>
+                        <button class="btn btn-sm btn-outline-danger" type="submit"><i class="bx bx-stop"></i> Finish stock-take</button>
                     </form>
+                @else
+                    <a href="/Acquisitions/Stock-take" class="btn btn-sm btn-light">All stock-takes</a>
                 @endif
             </div>
         </div>
@@ -33,6 +36,25 @@
             </form>
             <div id="scan_feed" class="mt-2" style="max-width: 720px" aria-live="polite"></div>
         @endif
+
+        @php $pct = $summary['expected'] > 0 ? min(100, round(100 * $summary['found'] / $summary['expected'])) : 0; @endphp
+        <div class="mt-3" style="max-width: 720px">
+            <div class="d-flex justify-content-between small mb-1">
+                <span><b data-summary-pct>{{ $pct }}%</b> of the books expected on the shelves have been found</span>
+                <span class="text-muted">
+                    @if ($take->status === 'open')
+                        Saved automatically &middot; last scan:
+                        <span data-last-scan>{{ $take->last_scan ? date("D d M, H:i", strtotime($take->last_scan)) : 'none yet' }}</span>
+                    @endif
+                </span>
+            </div>
+            <div class="progress" style="height: 10px" role="progressbar" aria-label="Stock-take progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ $pct }}">
+                <div class="progress-bar" id="st_progress" style="width: {{ $pct }}%"></div>
+            </div>
+            @if ($take->status === 'open')
+                <div class="small text-muted mt-1">Several people can scan at the same time from different computers. You can stop at any point and choose <b>Continue later</b>.</div>
+            @endif
+        </div>
 
         <div class="row g-2 mt-3" id="st_summary">
             @php
@@ -148,6 +170,11 @@
                 feed.prepend(row);
                 while (feed.children.length > 8) feed.removeChild(feed.lastChild);
                 if (res.summary) {
+                    var pct = res.summary.expected > 0 ? Math.min(100, Math.round(100 * res.summary.found / res.summary.expected)) : 0;
+                    document.getElementById("st_progress").style.width = pct + "%";
+                    document.querySelector("[data-summary-pct]").textContent = pct + "%";
+                    var ls = document.querySelector("[data-last-scan]");
+                    if (ls) ls.textContent = "just now";
                     Object.keys(res.summary).forEach(function (k) {
                         var el = document.querySelector('[data-summary="' + k + '"]');
                         if (el) el.textContent = Number(res.summary[k]).toLocaleString();

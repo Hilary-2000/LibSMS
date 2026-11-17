@@ -4,6 +4,7 @@
     <head>
         
         <meta charset="utf-8" />
+        @include('partials.theme_init')
         <title>View Book Checked-out | {{ucwords(strtolower(session("fullname")))}} </title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta content="Ladybird Lbrary Management System" name="description" />
@@ -139,16 +140,20 @@
                                             <div class="modal-dialog modal-dialog-centered" role="document">
                                                 <div class="modal-content">
                                                     <div class="modal-header">
-                                                        <h5 class="modal-title" id="staticBackdropLabel">Delete Book</h5>
+                                                        <h5 class="modal-title" id="staticBackdropLabel">Cancel Check-Out</h5>
                                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                     </div>
                                                     <div class="modal-body">
-                                                        <p>This action is irreversible? <br>Are you sure you want to cancel check-out for <b>{{$book_details->book_title}}</b> Call No: <b>{{$book_details->call_no}}</b> borrowed by <b>{{$book_borrow_data[0]->borrower_fullname}}</b>?</p>
-                                                        <p><b>Note:</b><br> When this action is performed the system will assume that the book was not checked out!</p>
+                                                        <p class="mb-2">Cancel the check-out of <b>{{$book_details->book_title}}</b> (Call No: <b>{{$book_details->call_no}}</b>) to <b>{{$book_borrow_data[0]->borrower_fullname}}</b>?</p>
+                                                        <div class="alert alert-warning py-2 small mb-0">
+                                                            <b>What this does:</b> use it only when the book was lent <u>by mistake</u>. The loan is deleted as if it never happened and the book goes back on the shelf as available.
+                                                            <br>It is <b>not</b> how you record a return &mdash; when the borrower brings the book back, use <b>Check-In</b> instead so the loan stays in their history.
+                                                            This cannot be undone.
+                                                        </div>
                                                     </div>
                                                     <div class="modal-footer">
                                                         <button type="button" class="btn btn-light" data-bs-dismiss="modal">No</button>
-                                                        <form method="POST" action="/Circulation/Cancel/check-out/{{$book_borrow_data[0]->circulation_id}}" class="d-inline">@csrf<button type="submit" class="btn btn-outline-danger"> Yes Cancel</button></form>
+                                                        <form method="POST" action="/Circulation/Cancel/check-out/{{$book_borrow_data[0]->circulation_id}}" class="d-inline">@csrf<button type="submit" class="btn btn-outline-danger"><i class="bx bx-undo"></i> Yes, cancel the check-out</button></form>
                                                     </div>
                                                 </div>
                                             </div>
@@ -161,7 +166,18 @@
                                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                     </div>
                                                     <div class="modal-body">
-                                                        <p>Confirm check-In for <b>{{$book_details->book_title}}</b> Call No: <b>{{$book_details->call_no}}</b> borrowed by <b>{{$book_borrow_data[0]->borrower_fullname}}</b>?</p>
+                                                        @php
+                                                            $due_day = date("Ymd", strtotime($book_borrow_data[0]->expected_return_date));
+                                                            $days_late = $due_day < date("Ymd") ? (int) round((strtotime(date("Y-m-d")) - strtotime(date("Y-m-d", strtotime($book_borrow_data[0]->expected_return_date)))) / 86400) : 0;
+                                                        @endphp
+                                                        <p class="mb-2">Check in <b>{{$book_details->book_title}}</b> (Call No: <b>{{$book_details->call_no}}</b>) borrowed by <b>{{$book_borrow_data[0]->borrower_fullname}}</b>?</p>
+                                                        <div class="alert alert-info py-2 small mb-0">
+                                                            <b>What this does:</b> records that the book has been <b>returned to the library today</b>. It becomes available for others to borrow, the loan moves to the borrowing history, and any overdue reminder for it is cleared.
+                                                            If someone has reserved this book, the copy will be kept aside for them.
+                                                            <div class="mt-1">Due back: <b>{{ date("D dS M Y", strtotime($book_borrow_data[0]->expected_return_date)) }}</b>
+                                                                @if ($days_late > 0) &mdash; returned <b class="text-danger">{{ $days_late }} day{{ $days_late == 1 ? '' : 's' }} late</b>@else &mdash; on time @endif
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                     <div class="modal-footer">
                                                         <button type="button" class="btn btn-light" data-bs-dismiss="modal">No</button>
@@ -270,10 +286,10 @@
                                                     <div class="col-md-12">
                                                         <div class="mb-3 row justify-content-between">
                                                             <div class="col-auto">
-                                                                <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#confirm_checkin"><i class="bx bxs-trash"></i> Confirm Check-In</button>
+                                                                <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#confirm_checkin"><i class="bx bx-log-in-circle"></i> Confirm Check-In</button>
                                                             </div>
                                                             <div class="col-auto">
-                                                                <button class="btn btn-soft-danger" data-bs-toggle="modal" data-bs-target="#staticBackdrop"><i class="bx bxs-trash"></i> Cancel Check-out</button>
+                                                                <button class="btn btn-soft-danger" data-bs-toggle="modal" data-bs-target="#staticBackdrop"><i class="bx bx-undo"></i> Cancel Check-out</button>
                                                             </div>
                                                         </div>
                                                     </div>

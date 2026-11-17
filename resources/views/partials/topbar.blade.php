@@ -51,6 +51,22 @@
                             </div>
                         </div>
 
+                        {{-- What's new (opens by itself once after each release) --}}
+                        <div class="dropdown d-inline-block">
+                            <button type="button" class="btn header-item noti-icon waves-effect d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#whatsNewModal" title="What's new">
+                                <i class="bx bx-gift"></i>
+                                <span class="d-none d-md-inline ms-1 font-size-13 fw-medium">What's new</span>
+                                @if (\App\Services\WhatsNew::unseen())
+                                    <span class="badge bg-danger rounded-pill" data-whats-new-dot>new</span>
+                                @endif
+                            </button>
+                        </div>
+
+                        {{-- Light / Dark / System --}}
+                        <div class="d-flex align-items-center ms-1 me-1">
+                            @include('partials.theme_switch')
+                        </div>
+
                         <div class="dropdown d-none d-lg-inline-block ms-1">
                             <button type="button" class="btn header-item noti-icon waves-effect" data-bs-toggle="fullscreen">
                                 <i class="bx bx-fullscreen"></i>
@@ -92,3 +108,4 @@
                     </div>
                 </div>
             </header>
+@include('partials.whats_new')

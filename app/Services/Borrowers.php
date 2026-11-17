@@ -43,7 +43,8 @@ class Borrowers
 
     public static function className($data): string
     {
-        if ($data == "-i") {
+        // "-i", "-1", "-2"... are former students (alumni / left)
+        if (str_starts_with((string) $data, "-")) {
             return "Alumni";
         }
         return strlen((string) $data) > 1 ? (string) $data : "Grade ".$data;

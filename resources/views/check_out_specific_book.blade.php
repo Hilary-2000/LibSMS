@@ -4,6 +4,7 @@
     <head>
         
         <meta charset="utf-8" />
+        @include('partials.theme_init')
         <title>Confirm Book Checkout | {{ucwords(strtolower(session("fullname")))}} </title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta content="Ladybird Lbrary Management System" name="description" />
@@ -203,7 +204,7 @@
                                                         </div>
                                                         <div class="col-md-12">
                                                             <div class="mb-3">
-                                                                <label for="checkout_comment" class="form-label">Expected return date</label>
+                                                                <label for="checkout_comment" class="form-label">Comment (optional)</label>
                                                                 <textarea name="checkout_comment" id="checkout_comment" cols="30" rows="5" class="form-control" placeholder="Write your comment here!"></textarea>
                                                                 <div class="valid-feedback">
                                                                     Looks good!
@@ -215,9 +216,34 @@
                                                         </div>
                                                     </div>
                                                     <div class="mt-4">
-                                                        <button type="submit" class="btn btn-soft-primary btn-hover w-100 rounded"><i class="bx bx-save"></i> Checkout</button>
+                                                        {{-- opens the confirmation below; the form is only submitted from there --}}
+                                                        <button type="button" id="open_checkout_confirm" class="btn btn-soft-primary btn-hover w-100 rounded"><i class="bx bx-save"></i> Checkout</button>
                                                     </div>
                                                 </form>
+                                                <div class="modal fade" id="confirm_checkout" data-bs-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="confirm_checkout_label" aria-hidden="true">
+                                                    <div class="modal-dialog modal-dialog-centered" role="document">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title" id="confirm_checkout_label">Confirm Check-Out</h5>
+                                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                <p class="mb-2">Lend <b>{{ $book_details->book_title }}</b> (Call No: <b>{{ $book_details->call_no }}</b>) to <b id="cc_borrower">&hellip;</b>?</p>
+                                                                <div class="alert alert-danger py-2 small d-none" id="cc_missing">Select the student or staff member who is borrowing the book first.</div>
+                                                                <div class="alert alert-info py-2 small mb-0">
+                                                                    <b>What this does:</b> records that this book is <b>leaving the library</b> with the borrower today.
+                                                                    It will show as <b>checked out</b> and cannot be lent to anyone else until it is checked in.
+                                                                    If it is not back by the due date, it is listed as <b>overdue</b> and librarians get a reminder.
+                                                                    <div class="mt-1">Due back: <b id="cc_due">&hellip;</b> <span id="cc_days" class="text-muted"></span></div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-light" data-bs-dismiss="modal">No</button>
+                                                                <button type="button" class="btn btn-outline-success" id="cc_confirm"><i class="bx bx-log-out-circle"></i> Yes, check it out</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
                                             <div class="tab-pane" id="home1" role="tabpanel">
                                                 <div class="row">
@@ -360,6 +386,41 @@
         <script src="/assets/js/pages/form-advanced.init.js"></script>
         <script src="/assets/js/confirm_checkout.js"></script>
 
+        <script>
+            // Check-out confirmation: show who borrows the book and until when, then submit the form.
+            (function () {
+                var form = document.querySelector('form[action="/Circulation/Confirm/check-out"]');
+                var openBtn = document.getElementById("open_checkout_confirm");
+                if (!form || !openBtn) return;
+                var modal = new bootstrap.Modal(document.getElementById("confirm_checkout"));
+                function selectedText(id) {
+                    var sel = document.getElementById(id);
+                    if (!sel || sel.selectedIndex < 0) return null;
+                    var opt = sel.options[sel.selectedIndex];
+                    return opt && opt.value && opt.value !== "Select an option" ? opt.text.trim() : null;
+                }
+                openBtn.addEventListener("click", function () {
+                    if (!form.reportValidity()) return;
+                    var type = document.getElementById("book_borrower").value;
+                    var who = type === "staff" ? selectedText("staff_borrower") : selectedText("student_borrower");
+                    document.getElementById("cc_borrower").textContent = who ? who + " (" + type + ")" : "nobody selected";
+                    document.getElementById("cc_missing").classList.toggle("d-none", !!who);
+                    document.getElementById("cc_confirm").disabled = !who;
+
+                    var due = document.getElementById("expected_return_date").value; // yyyy-mm-dd
+                    var d = new Date(due + "T00:00:00");
+                    document.getElementById("cc_due").textContent = isNaN(d) ? due : d.toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short", year: "numeric" });
+                    var today = new Date(); today.setHours(0, 0, 0, 0);
+                    var days = Math.round((d - today) / 86400000);
+                    document.getElementById("cc_days").textContent = isNaN(days) ? "" : days === 0 ? "(today)" : "(in " + days + " day" + (days === 1 ? "" : "s") + ")";
+                    modal.show();
+                });
+                document.getElementById("cc_confirm").addEventListener("click", function () {
+                    this.disabled = true; // no double check-outs from a double click
+                    if (form.requestSubmit) { form.requestSubmit(); } else { form.submit(); }
+                });
+            })();
+        </script>
         <script src="/assets/js/app.js"></script>
     </body>
 </html>

@@ -4,6 +4,7 @@
     <head>
         
         <meta charset="utf-8" />
+        @include('partials.theme_init')
         <title>Dashboard | {{ucwords(strtolower(session("fullname")))}} </title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta content="Ladybird Lbrary Management System" name="description"/>
@@ -627,10 +628,23 @@
             // Dashboard charts. Colours: validated categorical palette (blue, orange, aqua) - see app/Services/DashboardCharts.php for the data.
             (function () {
                 var C = @json($charts);
-                var SERIES = ["#2a78d6", "#eb6834", "#1baf7a"];
-                var INK = "#52514e", GRID = "#e9e9e7";
+                // light and dark steps of the same validated palette (dark checked against Skote's dark card #2a3042)
+                var charts = [];
+                function palette() {
+                    var dark = document.documentElement.getAttribute("data-bs-theme") === "dark";
+                    return dark
+                        ? { series: ["#3987e5", "#d95926", "#199e70"], ink: "#c3cbe4", grid: "#32394e", surface: "#2a3042", mode: "dark" }
+                        : { series: ["#2a78d6", "#eb6834", "#1baf7a"], ink: "#52514e", grid: "#e9e9e7", surface: "#fcfcfb", mode: "light" };
+                }
+                function renderAll() {
+                charts.forEach(function (c) { c.destroy(); });
+                charts = [];
+                var P = palette();
+                var SERIES = P.series, INK = P.ink, GRID = P.grid, SURF = P.surface;
                 var base = {
-                    chart: { toolbar: { show: false }, fontFamily: "inherit", foreColor: INK, animations: { enabled: false } },
+                    theme: { mode: P.mode },
+                    tooltip: { theme: P.mode },
+                    chart: { toolbar: { show: false }, fontFamily: "inherit", foreColor: INK, background: "transparent", animations: { enabled: false } },
                     grid: { borderColor: GRID, strokeDashArray: 3 },
                     dataLabels: { enabled: false },
                     legend: { position: "top", horizontalAlign: "left", markers: { radius: 12 } },
@@ -638,7 +652,10 @@
                 };
                 function draw(el, opts) {
                     var node = document.querySelector(el);
-                    if (node) new ApexCharts(node, Object.assign({}, base, opts)).render();
+                    if (!node) return;
+                    var chart = new ApexCharts(node, Object.assign({}, base, opts));
+                    chart.render();
+                    charts.push(chart);
                 }
                 draw("#chart_activity", {
                     chart: Object.assign({}, base.chart, { type: "line", height: 320 }),
@@ -649,18 +666,18 @@
                     ],
                     colors: SERIES,
                     stroke: { width: 2, curve: "straight" },
-                    markers: { size: 4, strokeWidth: 2, strokeColors: "#fcfcfb", hover: { size: 6 } },
+                    markers: { size: 4, strokeWidth: 2, strokeColors: SURF, hover: { size: 6 } },
                     xaxis: { categories: C.months, axisBorder: { color: GRID }, axisTicks: { show: false } },
                     // all-zero data makes ApexCharts print "Infinity" on the axis: give it a small fixed range
-                    yaxis: { min: 0, max: Math.max.apply(null, C.checked_out.concat(C.returned, C.late)) > 0 ? undefined : 4, tickAmount: 4, forceNiceScale: true, labels: { formatter: function (v) { return Math.round(v); } } },
-                    tooltip: { shared: true, intersect: false }
+                    yaxis: { min: 0, max: Math.max.apply(null, C.checked_out.concat(C.returned, C.late)) < 4 ? 4 : undefined, tickAmount: 4, forceNiceScale: true, labels: { formatter: function (v) { return Math.round(v); } } },
+                    tooltip: { shared: true, intersect: false, theme: P.mode }
                 });
                 draw("#chart_types", {
                     chart: Object.assign({}, base.chart, { type: "donut", height: 280 }),
                     series: C.borrower_types.values,
                     labels: C.borrower_types.labels,
                     colors: SERIES.slice(0, 2),
-                    stroke: { width: 2, colors: ["#fcfcfb"] },
+                    stroke: { width: 2, colors: [SURF] },
                     legend: { position: "bottom" },
                     dataLabels: { enabled: true, formatter: function (v) { return Math.round(v) + "%"; }, dropShadow: { enabled: false } },
                     plotOptions: { pie: { donut: { size: "62%", labels: { show: true, total: { show: true, label: "Check-outs", color: INK } } } } }
@@ -670,9 +687,11 @@
                     series: [{ name: "Times borrowed", data: C.top_books.values }],
                     colors: [SERIES[0]],
                     plotOptions: { bar: { horizontal: true, borderRadius: 4, borderRadiusApplication: "end", barHeight: "60%" } },
-                    xaxis: { categories: C.top_books.labels, labels: { formatter: function (v) { return Math.round(v); } } },
+                    xaxis: { categories: C.top_books.labels, max: Math.max.apply(null, C.top_books.values.concat([0])) < 4 ? 4 : undefined, tickAmount: 4, labels: { formatter: function (v) { return Math.round(v); } } },
+                    yaxis: { labels: { maxWidth: 240 } },
+                    grid: { borderColor: GRID, strokeDashArray: 3, padding: { left: 18 } },
                     legend: { show: false },
-                    stroke: { width: 2, colors: ["#fcfcfb"] }
+                    stroke: { width: 2, colors: [SURF] }
                 });
                 draw("#chart_classes", {
                     chart: Object.assign({}, base.chart, { type: "bar", height: 320 }),
@@ -680,10 +699,14 @@
                     colors: [SERIES[0]],
                     plotOptions: { bar: { borderRadius: 4, borderRadiusApplication: "end", columnWidth: "55%" } },
                     xaxis: { categories: C.classes.labels, axisBorder: { color: GRID }, axisTicks: { show: false } },
-                    yaxis: { min: 0, max: Math.max.apply(null, C.classes.values.concat([0])) > 0 ? undefined : 4, tickAmount: 4, labels: { formatter: function (v) { return Math.round(v); } } },
+                    yaxis: { min: 0, max: Math.max.apply(null, C.classes.values.concat([0])) < 4 ? 4 : undefined, tickAmount: 4, labels: { formatter: function (v) { return Math.round(v); } } },
                     legend: { show: false },
-                    stroke: { width: 2, colors: ["#fcfcfb"] }
+                    stroke: { width: 2, colors: [SURF] }
                 });
+                }
+                renderAll();
+                // the Light / Dark / System switch fires this when the theme changes
+                document.addEventListener("library:themechange", renderAll);
             })();
         </script>
 

@@ -14,6 +14,7 @@
 <html lang="en">
     <head>
         <meta charset="utf-8" />
+        @include('partials.theme_init')
         <title>@yield('title') | {{ ucwords(strtolower(session("fullname"))) }}</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta content="Ladybird Library Management System" name="description" />

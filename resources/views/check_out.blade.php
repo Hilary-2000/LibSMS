@@ -4,6 +4,7 @@
     <head>
         
         <meta charset="utf-8" />
+        @include('partials.theme_init')
         <title>Check Out | {{ucwords(strtolower(session("fullname")))}} </title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta content="Ladybird Lbrary Management System" name="description" />
@@ -142,9 +143,9 @@
                                     <div class="my-3">
                                         <p><b>Note:</b></p>
                                         <ul>
-                                            <li>This table will only display the first 100 books to increase page perfomance.</li>
-                                            <li>For more results use the advanced search below!</li>
-                                            <li>To view all your book navigate to the report section but be aware that <b>If you have more than 500 books</b>, the system perfomace will be determined by the resources (memory size) <b>your PC has</b>. This may lead to your pc hanging!.</li>
+                                            <li>All books on the shelf are listed, {{ request('per_page', 25) }} per page &mdash; use the page numbers under the table to move between pages.</li>
+                                            <li>Use the search bar on the table first: typing filters the current page, pressing Enter searches every book. <b>Advanced Search</b> below does the same full search.</li>
+                                            <li>Scan a book's label in the scan box to go straight to its check-out.</li>
                                         </ul>
                                         <div class="d-flex gap-2 flex-wrap mb-3">
                                             <button class="btn btn-outline-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
@@ -162,7 +163,6 @@
                                                     @if ($search_title != null)
                                                         <a href="/Circulation/check-out" class="btn btn-soft-primary btn-sm mb-3">Reset</a><br>
                                                     @endif
-                                                    @include('partials.scan_box', ['back' => '/Circulation/check-out'])
                                                     <label for="keyword_search" class="form-control-label">Advanced Keyword Search</label>
                                                     <form class="row" method="GET" action="/Circulation/check-out">
                                                         <div class="col-lg-9">
@@ -179,11 +179,8 @@
                                         </div>
                                     </div> 
                                     <hr>
-                                    <h6 class="text-center my-1"><u>Books Table
-                                        @if ($search_title != null)
-                                            : Results for : {{$search_title}}
-                                        @endif
-                                        </u></h6>
+                                    @include('partials.scan_box', ['back' => '/Circulation/check-out'])
+                                    @include('partials.table_header', ['title' => 'Books available to lend', 'icon' => 'bx-book-open', 'table' => 'datatable', 'action' => '/Circulation/check-out', 'search' => $search_title, 'pager' => $pager, 'noun' => 'book'])
                                     <div class="table-responsive">
                                         <table id="datatable" data-server-paginated="1" class="table table-bordered dt-responsive  nowrap w-100">
                                             <thead>

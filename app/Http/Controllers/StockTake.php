@@ -43,8 +43,15 @@ class StockTake extends Controller
             "SELECT s.*, (SELECT COUNT(DISTINCT `book_id`) FROM `library_stocktake_scans` x WHERE x.`stocktake_id` = s.`stocktake_id` AND x.`book_id` IS NOT NULL) AS scanned
              FROM `library_stocktakes` s ORDER BY s.`stocktake_id` DESC", [], "page", $db
         );
+        // in-progress stock-takes are shown first, with how far they got
+        $open = [];
+        foreach ($db->select("SELECT * FROM `library_stocktakes` WHERE `status` = 'open' ORDER BY `stocktake_id` DESC") as $take) {
+            $take->summary = $this->summary($db, $take);
+            $take->last_scan = $db->selectOne("SELECT MAX(`date_scanned`) AS d FROM `library_stocktake_scans` WHERE `stocktake_id` = ?", [$take->stocktake_id])->d;
+            $open[] = $take;
+        }
         return view("stocktake_index", $this->layoutData($request, [
-            "sessions" => $sessions, "pager" => $pager, "libraries" => $this->libraries($db),
+            "sessions" => $sessions, "pager" => $pager, "libraries" => $this->libraries($db), "open" => $open,
         ]));
     }
 
@@ -120,6 +127,7 @@ class StockTake extends Controller
             [$rows, $pager] = RawPaginator::paginate($queries[$tab][0], $queries[$tab][1], "page", $db);
         }
         $libraries = $this->libraries($db);
+        $take->last_scan = $db->selectOne("SELECT MAX(`date_scanned`) AS d FROM `library_stocktake_scans` WHERE `stocktake_id` = ?", [$take->stocktake_id])->d;
         return view("stocktake_show", $this->layoutData($request, [
             "take" => $take, "summary" => $this->summary($db, $take), "tab" => $tab, "rows" => $rows, "pager" => $pager,
             "libraries" => $libraries,
@@ -178,12 +186,25 @@ class StockTake extends Controller
         return redirect("/Acquisitions/Stock-take/".(int) $stocktake_id);
     }
 
+    /** "Continue later": nothing to save (each scan is stored as it happens) - confirm progress and go back to the list. */
+    function pause($stocktake_id)
+    {
+        $db = $this->db();
+        $take = $db->selectOne("SELECT * FROM `library_stocktakes` WHERE `stocktake_id` = ?", [(int) $stocktake_id]);
+        if ($take) {
+            $sum = $this->summary($db, $take);
+            session()->flash("success", "\"".$take->title."\" saved: ".number_format($sum["found"])." of ".number_format($sum["expected"])
+                ." books found so far. Pick it up any time with Continue below - from this or any other computer.");
+        }
+        return redirect("/Acquisitions/Stock-take");
+    }
+
     function close($stocktake_id)
     {
         $db = $this->db();
         $db->update("UPDATE `library_stocktakes` SET `status` = 'closed', `date_closed` = ?, `closed_by` = ? WHERE `stocktake_id` = ? AND `status` = 'open'",
             [date("YmdHis"), session("user_id"), (int) $stocktake_id]);
-        session()->flash("success", "Stock-take closed. The results stay available below.");
+        session()->flash("success", "Stock-take finished. The results below are final and stay available under Stock-take.");
         return redirect("/Acquisitions/Stock-take/".(int) $stocktake_id);
     }
 }

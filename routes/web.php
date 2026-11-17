@@ -3,9 +3,12 @@
 use App\Http\Controllers\Acquisitions;
 use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\BookLabels;
+use App\Http\Controllers\CirculationStats;
 use App\Http\Controllers\ImportBooks;
 use App\Http\Controllers\ReservationsController;
 use App\Http\Controllers\StockTake;
+use App\Http\Controllers\UserPrefsController;
+use App\Http\Controllers\WhatsNewController;
 use App\Http\Controllers\Cataloguing;
 use App\Http\Controllers\Circulation;
 use App\Http\Controllers\login;
@@ -45,6 +48,12 @@ Route::get("/Logout",[login::class,"Logout"]);
 Route::middleware("library")->group(function () {
     Route::get("/Dashboard",[login::class,"dashboard"])->middleware("notifications");
 
+    // "What's new" window: remember that this user has seen it
+    Route::post("/Whats-new/Seen",[WhatsNewController::class,"seen"]);
+
+    // the Light / Dark / System choice follows the person, not the browser
+    Route::post("/Preferences/Theme",[UserPrefsController::class,"theme"]);
+
     // notifications
     Route::get("/Notification",[Notification::class,"getNotifications"])->middleware("notifications")->name("allNotifications");
     Route::get("/Notification/View/{notification_id}",[Notification::class,"showNotifications"])->middleware("notifications")->name("show_notifications");
@@ -72,6 +81,7 @@ Route::middleware("library:Acquisition")->group(function () {
     Route::post("/Acquisitions/Stock-take/Start",[StockTake::class,"start"])->middleware("audit:Started a stock-take");
     Route::get("/Acquisitions/Stock-take/{stocktake_id}",[StockTake::class,"show"])->middleware("notifications");
     Route::post("/Acquisitions/Stock-take/{stocktake_id}/Scan",[StockTake::class,"scan"]); // not audited: one entry per scanned book would flood the log
+    Route::get("/Acquisitions/Stock-take/{stocktake_id}/Later",[StockTake::class,"pause"]);
     Route::post("/Acquisitions/Stock-take/{stocktake_id}/Close",[StockTake::class,"close"])->middleware("audit:Closed a stock-take");
 });
 // barcode labels: printed from Acquisitions, and from any book page
@@ -101,7 +111,10 @@ Route::middleware("library:Circulation")->group(function () {
     Route::post("/Circulation/ExtendReturnDate",[Circulation::class,"extendReturnDate"])->middleware("audit:Extended a return date");
     Route::post("/Circulation/Confirm/check-in/{circulation_id}",[Circulation::class,"ConfirmCheckIn"])->middleware("audit:Checked in a book");
     Route::post("/Circulation/Cancel/check-in/{circulation_id}",[Circulation::class,"cancelCheckIn"])->middleware("audit:Cancelled a check-in");
-    Route::get("/Circulation/Stats",[Circulation::class,"circulationStats"])->middleware("notifications");
+    // statistics: insights page, Excel workbook, printable term report
+    Route::get("/Circulation/Stats",[CirculationStats::class,"index"])->middleware("notifications");
+    Route::get("/Circulation/Stats/Export",[CirculationStats::class,"export"]);
+    Route::get("/Circulation/Stats/Report",[CirculationStats::class,"report"]);
     Route::get("/Circulation/Stats/View/Student/{student_id}",[Circulation::class,"viewStudentStats"])->middleware("notifications");
     Route::get("/Circulation/Stats/View/Staff/{staff_id}",[Circulation::class,"viewStaffStats"])->middleware("notifications");
     Route::get("/Circulation/Book-Stats/View/{book_stats}",[Circulation::class,"viewBookStats"])->middleware("notifications");

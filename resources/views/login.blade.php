@@ -4,6 +4,7 @@
     <head>
         
         <meta charset="utf-8" />
+        @include('partials.theme_init')
         <title>Login | Ladybird Library System</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta content="Premium Multipurpose Admin & Dashboard Template" name="description" />
@@ -64,6 +65,10 @@
     </head>
 
     <body>
+        {{-- Light / Dark / System --}}
+        <div class="position-fixed top-0 end-0 p-3" style="z-index: 1030">
+            @include('partials.theme_switch')
+        </div>
         <div class="account-pages my-5 pt-sm-5">
             <div class="container">
                 <div class="row justify-content-center">

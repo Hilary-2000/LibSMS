@@ -56,19 +56,18 @@
                                 </li>
                             @endif
                             @if ($can("Circulation"))
+                                {{-- Circulation: everything about lending, returning and reserving books --}}
                                 <li @if ($active === "Circulation") class="mm-active" @endif>
-                                    <a href="/Circulation" class="waves-effect">
+                                    <a href="javascript: void(0);" class="waves-effect has-arrow" aria-expanded="{{ $active === 'Circulation' ? 'true' : 'false' }}">
                                         <i class="bx bx-rotate-left"></i>
                                         <span key="t-file-manager">Circulation</span>
                                     </a>
-                                </li>
-                            @endif
-                            @if ($can("Circulation"))
-                                <li>
-                                    <a href="/Circulation/Reservations" class="waves-effect">
-                                        <i class="bx bx-time-five"></i>
-                                        <span>Reservations</span>
-                                    </a>
+                                    <ul class="sub-menu {{ $active === 'Circulation' ? 'mm-collapse mm-show' : '' }}" aria-expanded="{{ $active === 'Circulation' ? 'true' : 'false' }}">
+                                        <li><a href="/Circulation/check-out"><i class="bx bx-log-out-circle"></i> Lend a book</a></li>
+                                        <li><a href="/Circulation"><i class="bx bx-history"></i> Borrowing history <small class="text-muted d-block ms-4">return a book</small></a></li>
+                                        <li><a href="/Circulation/Stats"><i class="bx bx-stats"></i> Statistics</a></li>
+                                        <li><a href="/Circulation/Reservations"><i class="bx bx-time-five"></i> Reservations</a></li>
+                                    </ul>
                                 </li>
                             @endif
                             @if ($can("Acquisition"))
