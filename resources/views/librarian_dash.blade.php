@@ -9,7 +9,9 @@
         <meta content="Ladybird Lbrary Management System" name="description"/>
         <meta content="Ladybird Softech Co." name="author"/>
         <!-- App favicon -->
-        <link rel="shortcut icon" href="/images/ladybird_dark.png">
+        <link rel="icon" type="image/png" href="{{ asset('images/ladybird-favicon.png') }}?v=4">
+        <link rel="shortcut icon" href="{{ asset('favicon.ico') }}?v=4">
+        <link rel="apple-touch-icon" href="{{ asset('images/ladybird-apple-touch.png') }}?v=4">
 
         <!-- Bootstrap Css -->
         <link href="assets/css/bootstrap.min.css" id="bootstrap-style" rel="stylesheet" type="text/css" />
@@ -41,177 +43,10 @@
         
         <!-- Begin page -->
         <div id="layout-wrapper">
-            <header id="page-topbar">
-                <div class="navbar-header">
-                    <div class="d-flex">
-                        <!-- LOGO -->
-                        <div class="navbar-brand-box">
-                            <a href="." class="logo logo-dark">
-                                <span class="logo-sm">
-                                    <img src="assets/images/logo.svg" alt="" height="22">
-                                </span>
-                                <span class="logo-lg">
-                                    <img src="assets/images/logo-dark.png" alt="" height="17">
-                                </span>
-                            </a>
-
-                            <a href="." class="logo logo-light">
-                                <span class="logo-sm">
-                                    <img src="images/ladybird_dark-removebg.png" alt="" height="40">
-                                </span>
-                                <span class="logo-lg">
-                                    <img src="images/ladybird_dark-removebg.png" alt="" height="100">
-                                </span>
-                            </a>
-                        </div>
-
-                        <button type="button" class="btn btn-sm px-3 font-size-16 header-item waves-effect" id="vertical-menu-btn">
-                            <i class="fa fa-fw fa-bars"></i>
-                        </button>
-                    </div>
-
-                    <div class="d-flex">
-
-                        <div class="dropdown d-inline-block d-lg-none ms-2">
-                            <button type="button" class="btn header-item noti-icon waves-effect" id="page-header-search-dropdown"
-                            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <i class="mdi mdi-magnify"></i>
-                            </button>
-                            <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end p-0"
-                                aria-labelledby="page-header-search-dropdown">
-        
-                                <form class="p-3">
-                                    <div class="form-group m-0">
-                                        <div class="input-group">
-                                            <input type="text" class="form-control" placeholder="Search ..." aria-label="Recipient's username">
-                                            <div class="input-group-append">
-                                                <button class="btn btn-primary" type="submit"><i class="mdi mdi-magnify"></i></button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-
-                        <div class="dropdown d-none d-lg-inline-block ms-1">
-                            <button type="button" class="btn header-item noti-icon waves-effect" data-bs-toggle="fullscreen">
-                                <i class="bx bx-fullscreen"></i>
-                            </button>
-                        </div>
-
-                        <div class="dropdown d-inline-block">
-                            <button type="button" class="btn header-item noti-icon waves-effect" id="page-header-notifications-dropdown"
-                            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <i class="bx bx-bell {{$notification_count > 0 ? 'bx-tada' : ''}}"></i>
-                                <span class="badge bg-danger rounded-pill">{{$notification_count > 99 ? "99+" : $notification_count}}</span>
-                            </button>
-
-                            {{-- notification details --}}
-                            <x-notification :notifications="$notifications"/>
-                        </div>
-
-                        <div class="dropdown d-inline-block">
-                            <button type="button" class="btn header-item waves-effect" id="page-header-user-dropdown"
-                            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <img class="rounded-circle header-profile-user" src="https://lsims.ladybirdsmis.com/sims/{{(session()->get("user_details")->profile_loc != null && strlen(trim(session()->get("user_details")->profile_loc)) > 0) ? session()->get("user_details")->profile_loc : "images/dp.png"}}"
-                                    alt="Header Avatar">
-                                <span class="d-none d-xl-inline-block ms-1" key="t-henry">{{session("gender") == "M" ? "Mr." : "Ms."}} {{explode(" ",ucwords(strtolower(session("fullname"))))[0]}}</span>
-                                <i class="mdi mdi-chevron-down d-none d-xl-inline-block"></i>
-                            </button>
-                            <div class="dropdown-menu dropdown-menu-end">
-                                <!-- item-->
-                                <div class="dropdown-divider"></div>
-                                <a class="dropdown-item text-danger" href="/Logout"><i class="bx bx-power-off font-size-16 align-middle me-1 text-danger"></i> <span key="t-logout">Logout</span></a>
-                            </div>
-                        </div>
-
-                        <div class="dropdown d-inline-block">
-                            <button type="button" class="btn header-item noti-icon right-bar-toggle waves-effect">
-                                <i class="bx bx-cog bx-spin"></i>
-                            </button>
-                        </div>
-
-                    </div>
-                </div>
-            </header>
+            @include('partials.topbar')
 
             <!-- ========== Left Sidebar Start ========== -->
-            <div class="vertical-menu">
-                <div data-simplebar class="h-100">
-                    <!--- Sidemenu -->
-                    <div id="sidebar-menu">
-                        @php
-                            $lib_priv = json_decode(session()->get("user_details")->library_previleges,true);
-                            function isPresent($array,$needle){
-                                if ($array == null) {
-                                    return false;
-                                }
-                                for ($index=0; $index < count($array); $index++) { 
-                                    if ($array[$index] == $needle) {
-                                        return true;
-                                    }
-                                }
-                                return false;
-                            }
-                        @endphp
-                        <!-- Left Menu Start -->
-                        <ul class="metismenu list-unstyled" id="side-menu">
-                            <li class="menu-title" key="t-menu">Menu</li>
-                            {{-- dashboard --}}
-                            <li class="">
-                                <a href="/Dashboard" class="waves-effect">
-                                    <i class="bx bx-home-circle"></i>
-                                    <span key="t-chat">Dashboard</span>
-                                </a>
-                            </li>
-                            @if (isPresent($lib_priv,"Acquisition") || count($lib_priv) == 0)
-                                <li>
-                                    <a href="/Acquisitions" class="waves-effect">
-                                        <i class="bx bx-add-to-queue"></i>
-                                        <span key="t-file-manager">Acquisitions</span>
-                                    </a>
-                                </li>
-                            @endif
-                            @if (isPresent($lib_priv,"Cataloging") || count($lib_priv) == 0)
-                                <li>
-                                    <a href="/Cataloging" class="waves-effect">
-                                        <i class="bx bx-file"></i>
-                                        <span key="t-file-manager">Cataloging</span>
-                                    </a>
-                                </li>
-                            @endif
-                            @if (isPresent($lib_priv,"Circulation") || count($lib_priv) == 0)
-                                <li>
-                                    <a href="/Circulation" class="waves-effect">
-                                        <i class="bx bx-rotate-left"></i>
-                                        <span key="t-file-manager">Circulation</span>
-                                    </a>
-                                </li>
-                            @endif
-                            @if (isPresent($lib_priv,"Report") || count($lib_priv) == 0)
-                                <li>
-                                    <a href="/Reports" class="waves-effect">
-                                        <i class="bx bxs-report"></i>
-                                        <span key="t-file-manager">Reports</span>
-                                    </a>
-                                </li>
-                            @endif
-                            @if (isPresent($lib_priv,"Settings") || count($lib_priv) == 0)
-                                <li class="">
-                                    <a href="javascript: void(0);" class="waves-effect has-arrow " aria-expanded="false">
-                                        <i class="bx bx-cog"></i>
-                                        <span key="t-jobs">Settings</span>
-                                    </a>
-                                    <ul class="sub-menu" aria-expanded="false" style="height: 0px;">
-                                        <li><a href="/Settings/User-mgmt" key="t-job-list"><i class="bx bxs-user"></i> User Management</a></li>
-                                        <li><a href="/Settings/Library-mgmt" key="t-job-list"><i class="bx bxs-book"></i> Library Management</a></li>
-                                    </ul>
-                                </li>
-                            @endif
-                    </div>
-                    <!-- Sidebar -->
-                </div>
-            </div>
+            @include('partials.sidebar')
             <!-- Left Sidebar End -->
 
             
@@ -223,6 +58,13 @@
 
                 <div class="page-content">
                     <div class="container-fluid">
+                        @if (session("error"))
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <i class="mdi mdi-alert-circle-outline me-2"></i>
+                                {{session("error")}}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        @endif
 
                         <!-- start page title -->
                         <div class="row">
@@ -522,6 +364,77 @@
                         </div>
                         <!-- end row -->
 
+                        {{-- Charts: last 12 months. Each has a "View as table" toggle (identity is never colour-only). --}}
+                        <div class="row">
+                            <div class="col-xl-8">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div>
+                                                <h4 class="card-title mb-1">Borrowing activity</h4>
+                                                <p class="text-muted small mb-0">Last 12 months &middot; {{ number_format($charts['total_12m']) }} check-outs &middot; <b>{{ number_format($charts['overdue_now']) }}</b> overdue right now</p>
+                                            </div>
+                                            <button class="btn btn-sm btn-light" type="button" data-bs-toggle="collapse" data-bs-target="#activity_table">View as table</button>
+                                        </div>
+                                        <div id="chart_activity" style="min-height: 320px"></div>
+                                        <div class="collapse" id="activity_table">
+                                            <div class="table-responsive"><table class="table table-sm mb-0">
+                                                <thead><tr><th>Month</th><th>Checked out</th><th>Returned</th><th>Late / overdue (by due month)</th></tr></thead>
+                                                <tbody>@foreach ($charts['months'] as $k => $month)<tr><td>{{ $month }}</td><td>{{ $charts['checked_out'][$k] }}</td><td>{{ $charts['returned'][$k] }}</td><td>{{ $charts['late'][$k] }}</td></tr>@endforeach</tbody>
+                                            </table></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-4">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <h4 class="card-title mb-1">Students vs staff</h4>
+                                            <button class="btn btn-sm btn-light" type="button" data-bs-toggle="collapse" data-bs-target="#types_table">View as table</button>
+                                        </div>
+                                        <p class="text-muted small">Check-outs, last 12 months</p>
+                                        <div id="chart_types" style="min-height: 280px"></div>
+                                        <div class="collapse" id="types_table">
+                                            <table class="table table-sm mb-0"><tbody>@foreach ($charts['borrower_types']['labels'] as $k => $label)<tr><td>{{ $label }}</td><td>{{ $charts['borrower_types']['values'][$k] }}</td></tr>@endforeach</tbody></table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xl-6">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <h4 class="card-title mb-1">Most borrowed books</h4>
+                                            <button class="btn btn-sm btn-light" type="button" data-bs-toggle="collapse" data-bs-target="#top_table">View as table</button>
+                                        </div>
+                                        <p class="text-muted small">Times borrowed, all time</p>
+                                        <div id="chart_top_books" style="min-height: 320px"></div>
+                                        <div class="collapse" id="top_table">
+                                            <table class="table table-sm mb-0"><tbody>@foreach ($charts['top_books']['labels'] as $k => $label)<tr><td>{{ $label }}</td><td>{{ $charts['top_books']['values'][$k] }}</td></tr>@endforeach</tbody></table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-6">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <h4 class="card-title mb-1">Borrowing by class</h4>
+                                            <button class="btn btn-sm btn-light" type="button" data-bs-toggle="collapse" data-bs-target="#class_table">View as table</button>
+                                        </div>
+                                        <p class="text-muted small">Student check-outs, last 12 months</p>
+                                        <div id="chart_classes" style="min-height: 320px"></div>
+                                        <div class="collapse" id="class_table">
+                                            <table class="table table-sm mb-0"><tbody>@foreach ($charts['classes']['labels'] as $k => $label)<tr><td>{{ $label }}</td><td>{{ $charts['classes']['values'][$k] }}</td></tr>@endforeach</tbody></table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="row">
                             <div class="col-lg-12">
                                 <div class="card">
@@ -690,83 +603,14 @@
                 </div> --}}
                 <!-- end modal -->
 
-                <footer class="footer">
-                    <div class="container-fluid">
-                        <div class="row">
-                            <div class="col-sm-6">
-                                <script>document.write(new Date().getFullYear())</script> © Ladybird Softech Co.
-                            </div>
-                            <div class="col-sm-6">
-                                <div class="text-sm-end d-none d-sm-block">
-                                    <b>Date Updated : </b>24rd Oct 2024 : 12:21AM
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </footer>
+                @include('partials.footer')
             </div>
             <!-- end main content-->
 
         </div>
         <!-- END layout-wrapper -->
 
-        <!-- Right Sidebar -->
-        <div class="right-bar">
-            <div data-simplebar class="h-100">
-                <div class="rightbar-title d-flex align-items-center px-3 py-4">
-            
-                    <h5 class="m-0 me-2">Settings</h5>
-
-                    <a href="javascript:void(0);" class="right-bar-toggle ms-auto">
-                        <i class="mdi mdi-close noti-icon"></i>
-                    </a>
-                </div>
-
-                <!-- Settings -->
-                <hr class="mt-0" />
-                <h6 class="text-center mb-0">Choose Layouts</h6>
-
-                <div class="p-4">
-                    <div class="mb-2">
-                        <img src="assets/images/layouts/layout-1.jpg" class="img-thumbnail" alt="layout images">
-                    </div>
-
-                    <div class="form-check form-switch mb-3">
-                        <input class="form-check-input theme-choice" type="checkbox" id="light-mode-switch" checked>
-                        <label class="form-check-label" for="light-mode-switch">Light Mode</label>
-                    </div>
-    
-                    <div class="mb-2">
-                        <img src="assets/images/layouts/layout-2.jpg" class="img-thumbnail" alt="layout images">
-                    </div>
-                    <div class="form-check form-switch mb-3">
-                        <input class="form-check-input theme-choice" type="checkbox" id="dark-mode-switch">
-                        <label class="form-check-label" for="dark-mode-switch">Dark Mode</label>
-                    </div>
-    
-                    {{-- <div class="mb-2">
-                        <img src="assets/images/layouts/layout-3.jpg" class="img-thumbnail" alt="layout images">
-                    </div>
-                    <div class="form-check form-switch mb-3">
-                        <input class="form-check-input theme-choice" type="checkbox" id="rtl-mode-switch">
-                        <label class="form-check-label" for="rtl-mode-switch">RTL Mode</label>
-                    </div>
-
-                    <div class="mb-2">
-                        <img src="assets/images/layouts/layout-4.jpg" class="img-thumbnail" alt="layout images">
-                    </div>
-                    <div class="form-check form-switch mb-5">
-                        <input class="form-check-input theme-choice" type="checkbox" id="dark-rtl-mode-switch">
-                        <label class="form-check-label" for="dark-rtl-mode-switch">Dark RTL Mode</label>
-                    </div> --}}
-
-            
-                </div>
-
-            </div> <!-- end slimscroll-menu-->
-        </div>
-        <!-- /Right-bar -->
-
+        @include('partials.rightbar')
         <!-- Right bar overlay-->
         <div class="rightbar-overlay"></div>
 
@@ -778,7 +622,70 @@
         <script src="assets/libs/node-waves/waves.min.js"></script>
 
         <!-- apexcharts -->
-        <script src="assets/libs/apexcharts/apexcharts.min.js"></script>
+        <script src="/assets/libs/apexcharts/apexcharts.min.js"></script>
+        <script>
+            // Dashboard charts. Colours: validated categorical palette (blue, orange, aqua) - see app/Services/DashboardCharts.php for the data.
+            (function () {
+                var C = @json($charts);
+                var SERIES = ["#2a78d6", "#eb6834", "#1baf7a"];
+                var INK = "#52514e", GRID = "#e9e9e7";
+                var base = {
+                    chart: { toolbar: { show: false }, fontFamily: "inherit", foreColor: INK, animations: { enabled: false } },
+                    grid: { borderColor: GRID, strokeDashArray: 3 },
+                    dataLabels: { enabled: false },
+                    legend: { position: "top", horizontalAlign: "left", markers: { radius: 12 } },
+                    noData: { text: "No borrowing recorded yet" }
+                };
+                function draw(el, opts) {
+                    var node = document.querySelector(el);
+                    if (node) new ApexCharts(node, Object.assign({}, base, opts)).render();
+                }
+                draw("#chart_activity", {
+                    chart: Object.assign({}, base.chart, { type: "line", height: 320 }),
+                    series: [
+                        { name: "Checked out", data: C.checked_out },
+                        { name: "Returned", data: C.returned },
+                        { name: "Late / overdue", data: C.late }
+                    ],
+                    colors: SERIES,
+                    stroke: { width: 2, curve: "straight" },
+                    markers: { size: 4, strokeWidth: 2, strokeColors: "#fcfcfb", hover: { size: 6 } },
+                    xaxis: { categories: C.months, axisBorder: { color: GRID }, axisTicks: { show: false } },
+                    // all-zero data makes ApexCharts print "Infinity" on the axis: give it a small fixed range
+                    yaxis: { min: 0, max: Math.max.apply(null, C.checked_out.concat(C.returned, C.late)) > 0 ? undefined : 4, tickAmount: 4, forceNiceScale: true, labels: { formatter: function (v) { return Math.round(v); } } },
+                    tooltip: { shared: true, intersect: false }
+                });
+                draw("#chart_types", {
+                    chart: Object.assign({}, base.chart, { type: "donut", height: 280 }),
+                    series: C.borrower_types.values,
+                    labels: C.borrower_types.labels,
+                    colors: SERIES.slice(0, 2),
+                    stroke: { width: 2, colors: ["#fcfcfb"] },
+                    legend: { position: "bottom" },
+                    dataLabels: { enabled: true, formatter: function (v) { return Math.round(v) + "%"; }, dropShadow: { enabled: false } },
+                    plotOptions: { pie: { donut: { size: "62%", labels: { show: true, total: { show: true, label: "Check-outs", color: INK } } } } }
+                });
+                draw("#chart_top_books", {
+                    chart: Object.assign({}, base.chart, { type: "bar", height: 320 }),
+                    series: [{ name: "Times borrowed", data: C.top_books.values }],
+                    colors: [SERIES[0]],
+                    plotOptions: { bar: { horizontal: true, borderRadius: 4, borderRadiusApplication: "end", barHeight: "60%" } },
+                    xaxis: { categories: C.top_books.labels, labels: { formatter: function (v) { return Math.round(v); } } },
+                    legend: { show: false },
+                    stroke: { width: 2, colors: ["#fcfcfb"] }
+                });
+                draw("#chart_classes", {
+                    chart: Object.assign({}, base.chart, { type: "bar", height: 320 }),
+                    series: [{ name: "Check-outs", data: C.classes.values }],
+                    colors: [SERIES[0]],
+                    plotOptions: { bar: { borderRadius: 4, borderRadiusApplication: "end", columnWidth: "55%" } },
+                    xaxis: { categories: C.classes.labels, axisBorder: { color: GRID }, axisTicks: { show: false } },
+                    yaxis: { min: 0, max: Math.max.apply(null, C.classes.values.concat([0])) > 0 ? undefined : 4, tickAmount: 4, labels: { formatter: function (v) { return Math.round(v); } } },
+                    legend: { show: false },
+                    stroke: { width: 2, colors: ["#fcfcfb"] }
+                });
+            })();
+        </script>
 
         <!-- dashboard init -->
         <script src="assets/js/pages/dashboard.init.js"></script>

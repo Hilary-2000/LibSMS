@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\Reservations;
+use App\Support\RawPaginator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use stdClass;
@@ -109,7 +111,7 @@ class Circulation extends Controller
             if ($select[$index]->return_status == 1) {
                 $data_in = new stdClass();
                 $data_in->status = 'Check-In';
-                $data_in->story = "<i><b>'".$select[$index]->book_title."'</b></i> was returned on <i><b>".date("D, dS M Y",strtotime($select[$index]->return_date))."</b></i> and the expected return date was <i><b>".date("D, dS M Y",strtotime($select[$index]->expected_return_date))."</b></i>. It was checked in by <i><b>". ucwords(strtolower($select[$index]->checked_in_by_user))." </i></b>";
+                $data_in->story = "<i><b>'".e($select[$index]->book_title)."'</b></i> was returned on <i><b>".date("D, dS M Y",strtotime($select[$index]->return_date))."</b></i> and the expected return date was <i><b>".date("D, dS M Y",strtotime($select[$index]->expected_return_date))."</b></i>. It was checked in by <i><b>". e(ucwords(strtolower($select[$index]->checked_in_by_user)))." </i></b>";
 
                 // save the data
                 array_push($circulation_data,$data_in);
@@ -119,7 +121,7 @@ class Circulation extends Controller
             // check out
             $data_in = new stdClass();
             $data_in->status = 'Check-Out';
-            $data_in->story = "<i><b>'".$select[$index]->book_title."'</b></i> was borrowed on <i><b>".date("D, dS M Y",strtotime($select[$index]->date_checked_out))."</b></i>, and it was expected to be returned on <i><b>".date("D, dS M Y",strtotime($select[$index]->expected_return_date))."</b></i>. It was checked out by <i><b>". ucwords(strtolower($select[$index]->checked_out_by_user))."</b></i>";
+            $data_in->story = "<i><b>'".e($select[$index]->book_title)."'</b></i> was borrowed on <i><b>".date("D, dS M Y",strtotime($select[$index]->date_checked_out))."</b></i>, and it was expected to be returned on <i><b>".date("D, dS M Y",strtotime($select[$index]->expected_return_date))."</b></i>. It was checked out by <i><b>". e(ucwords(strtolower($select[$index]->checked_out_by_user)))."</b></i>";
 
             // save the data
             array_push($circulation_data,$data_in);
@@ -258,7 +260,7 @@ class Circulation extends Controller
             if ($select[$index]->return_status == 1) {
                 $data_in = new stdClass();
                 $data_in->status = 'Check-In';
-                $data_in->story = "<i><b>'".$select[$index]->book_title."'</b></i> was returned on <i><b>".date("D, dS M Y",strtotime($select[$index]->return_date))."</b></i> and the expected return date was <i><b>".date("D, dS M Y",strtotime($select[$index]->expected_return_date))."</b></i>. It was checked in by <i><b>". ucwords(strtolower($select[$index]->checked_in_by_user))." </i></b>";
+                $data_in->story = "<i><b>'".e($select[$index]->book_title)."'</b></i> was returned on <i><b>".date("D, dS M Y",strtotime($select[$index]->return_date))."</b></i> and the expected return date was <i><b>".date("D, dS M Y",strtotime($select[$index]->expected_return_date))."</b></i>. It was checked in by <i><b>". e(ucwords(strtolower($select[$index]->checked_in_by_user)))." </i></b>";
 
                 // save the data
                 array_push($circulation_data,$data_in);
@@ -268,7 +270,7 @@ class Circulation extends Controller
             // check out
             $data_in = new stdClass();
             $data_in->status = 'Check-Out';
-            $data_in->story = "<i><b>'".$select[$index]->book_title."'</b></i> was borrowed on <i><b>".date("D, dS M Y",strtotime($select[$index]->date_checked_out))."</b></i>, and it was expected to be returned on <i><b>".date("D, dS M Y",strtotime($select[$index]->expected_return_date))."</b></i>. It was checked out by <i><b>". ucwords(strtolower($select[$index]->checked_out_by_user))."</b></i>";
+            $data_in->story = "<i><b>'".e($select[$index]->book_title)."'</b></i> was borrowed on <i><b>".date("D, dS M Y",strtotime($select[$index]->date_checked_out))."</b></i>, and it was expected to be returned on <i><b>".date("D, dS M Y",strtotime($select[$index]->expected_return_date))."</b></i>. It was checked out by <i><b>". e(ucwords(strtolower($select[$index]->checked_out_by_user)))."</b></i>";
 
             // save the data
             array_push($circulation_data,$data_in);
@@ -553,7 +555,9 @@ class Circulation extends Controller
         DB::setDefaultConnection("mysql2");
 
         // get checked out
-        $checked_out = DB::select("SELECT * FROM `book_circulation` WHERE `return_status` = '0' LIMIT 300");
+        // paginated on the server (previously capped at 300 records, with no way to see the rest)
+        [$checked_out, $pager_out] = RawPaginator::paginate("SELECT * FROM `book_circulation` WHERE `return_status` = '0' ORDER BY `circulation_id` DESC", [], "out_page");
+        $pager_out->fragment("checked_out");
 
         // get who borrowed the book
         for ($index=0; $index < count($checked_out); $index++) { 
@@ -588,7 +592,8 @@ class Circulation extends Controller
         // connect to mysql 2
         DB::setDefaultConnection("mysql2");
         // get checked in with a limit of 300 records first
-        $checked_in = DB::select("SELECT * FROM `book_circulation` WHERE `return_status` = '1' ORDER BY `return_date` DESC LIMIT 300");
+        [$checked_in, $pager_in] = RawPaginator::paginate("SELECT * FROM `book_circulation` WHERE `return_status` = '1' ORDER BY `return_date` DESC", [], "in_page");
+        $pager_in->fragment("checked_in");
 
         // get who borrowed the book
         for ($index=0; $index < count($checked_in); $index++) { 
@@ -648,7 +653,7 @@ class Circulation extends Controller
         // return value
         $notifications = $request->input("notifications") != null ? $request->input('notifications') : [];
         $notification_count = $request->input("notification_count");
-        return view("Circulation",["notification_count" => $notification_count,"notifications" => $notifications ,"checked_out" => $checked_out,"checked_in" => $checked_in]);
+        return view("Circulation",["notification_count" => $notification_count,"notifications" => $notifications ,"checked_out" => $checked_out,"checked_in" => $checked_in,"pager_out" => $pager_out,"pager_in" => $pager_in]);
     }
 
     // this link check outs
@@ -666,14 +671,13 @@ class Circulation extends Controller
         // connect to mysql 2
         DB::setDefaultConnection("mysql2");
 
-        // get the books
-        $search_title = null;
-        if (count($request->input()) > 0) {
-            $keyword = $request->input("keyword_search");
-            $search_title = $keyword;
-            $books = DB::select("SELECT * FROM `library_details` WHERE `lost_status` = '0' AND `availability_status` = '1' AND (`book_title` LIKE \"%".$keyword."%\" OR `book_author` LIKE \"%".$keyword."%\" OR `book_publishers` LIKE \"%".$keyword."%\" OR `isbn_13` LIKE \"%".$keyword."%\" OR `isbn_10` LIKE \"%".$keyword."%\" OR `shelf_no_location` LIKE \"%".$keyword."%\" OR `call_no` LIKE \"%".$keyword."%\" OR `shelf_no_location` LIKE \"%".$keyword."%\" OR `keywords` LIKE \"%".$keyword."%\") ORDER BY `book_id` DESC LIMIT 100;");
+        // get the available books - paginated on the server (all are reachable, not only the newest 100)
+        $keyword = trim((string) $request->input("keyword_search", ""));
+        $search_title = $keyword !== "" ? $keyword : null;
+        if ($keyword !== "") {
+            [$books, $pager] = RawPaginator::paginate("SELECT * FROM `library_details` WHERE `lost_status` = '0' AND `availability_status` = '1' AND (`book_title` LIKE ? OR `book_author` LIKE ? OR `book_publishers` LIKE ? OR `isbn_13` LIKE ? OR `isbn_10` LIKE ? OR `shelf_no_location` LIKE ? OR `call_no` LIKE ? OR `keywords` LIKE ?) ORDER BY `book_id` DESC", array_fill(0, 8, "%".$keyword."%"));
         }else {
-            $books = DB::select("SELECT * FROM `library_details` WHERE `lost_status` = '0' AND `availability_status` = '1' ORDER BY `book_id` DESC LIMIT 100");
+            [$books, $pager] = RawPaginator::paginate("SELECT * FROM `library_details` WHERE `lost_status` = '0' AND `availability_status` = '1' ORDER BY `book_id` DESC");
         }
         for ($index=0; $index < count($books); $index++) { 
             // get record where the book was borrowed
@@ -687,7 +691,7 @@ class Circulation extends Controller
         // return value
         $notifications = $request->input("notifications") != null ? $request->input('notifications') : [];
         $notification_count = $request->input("notification_count");
-        return view("check_out",["notification_count" => $notification_count,"notifications" => $notifications, "search_title" => $search_title ,"book_list" => $books]);
+        return view("check_out",["notification_count" => $notification_count,"notifications" => $notifications, "search_title" => $search_title ,"book_list" => $books, "pager" => $pager]);
     }
 
     function checkOut($book_id, Request $request){
@@ -752,7 +756,12 @@ class Circulation extends Controller
         // return view
         $notifications = $request->input("notifications") != null ? $request->input('notifications') : [];
         $notification_count = $request->input("notification_count");
-        return view("check_out_specific_book",["notification_count" => $notification_count,"notifications" => $notifications,"libraries" => $libraries, "book_details" => $book_details[0],"student_detail" => $student_detail,"staff_details" => $staff_details]);
+        $reservation_hold = Reservations::holdOn($book_details[0]->book_id);
+        if ($reservation_hold) {
+            $reservation_hold->borrower_name = \App\Services\Borrowers::name($reservation_hold->borrower_type, $reservation_hold->borrower_id);
+        }
+        DB::setDefaultConnection("mysql2");
+        return view("check_out_specific_book",["notification_count" => $notification_count,"notifications" => $notifications,"libraries" => $libraries, "book_details" => $book_details[0],"student_detail" => $student_detail,"staff_details" => $staff_details, "reservation_hold" => $reservation_hold]);
     }
 
     function confirmCheckOut(Request $request){
@@ -800,6 +809,13 @@ class Circulation extends Controller
             return redirect("/Circulation");
         }
 
+        // a copy kept aside for a reservation can only be lent to that borrower
+        $reserved_block = Reservations::blockReason($book_details[0], (string) $book_borrower, (string) ($book_borrower == "staff" ? $staff_borrower : $student_borrower));
+        if ($reserved_block !== null) {
+            session()->flash("error", $reserved_block);
+            return redirect("/Circulation/check-out/".$book_ids);
+        }
+
         // add a checkout record
         $book_isbn = $book_details[0]->isbn_13;
         $book_call_number = $book_details[0]->call_no;
@@ -813,6 +829,8 @@ class Circulation extends Controller
 
         // update data
         $update = DB::update("UPDATE `library_details` SET `availability_status` = '0' WHERE `book_id` = ?",[$book_ids]);
+        Reservations::onCheckedOut($book_details[0], (string) $book_borrower, (string) $user_checked_out);
+        DB::setDefaultConnection("mysql2");
 
         // return to the circulation list
         session()->flash("success","\"".$book_details[0]->book_title."\" with Call Number \"".$book_call_number."\" has been successfully been checked out!");
@@ -988,6 +1006,14 @@ class Circulation extends Controller
         // delete the due records on the notification table
         // remove by notification type
         $delete = DB::delete("DELETE FROM `library_notifications` WHERE `book_id` = ? AND `notification_type` = '1'",[$circulation_record[0]->book_id]);
+
+        // someone reserved this title? keep the copy aside for them
+        $returned_book = DB::selectOne("SELECT * FROM `library_details` WHERE `book_id` = ?", [$circulation_record[0]->book_id]);
+        $ready = $returned_book ? Reservations::onReturned($returned_book) : null;
+        if ($ready) {
+            session()->flash("success", "Book has been checked-in successfully! It is reserved for ".$ready->borrower_name." (".$ready->borrower_type.") - keep it aside until they collect it.");
+        }
+        DB::setDefaultConnection("mysql2");
 
         // circulations
         if (session('student_id')) {

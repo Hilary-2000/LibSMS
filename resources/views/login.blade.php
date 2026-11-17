@@ -9,7 +9,9 @@
         <meta content="Premium Multipurpose Admin & Dashboard Template" name="description" />
         <meta content="Themesbrand" name="author" />
         <!-- App favicon -->
-        <link rel="shortcut icon" href="images/ladybird_dark.png">
+        <link rel="icon" type="image/png" href="{{ asset('images/ladybird-favicon.png') }}?v=4">
+        <link rel="shortcut icon" href="{{ asset('favicon.ico') }}?v=4">
+        <link rel="apple-touch-icon" href="{{ asset('images/ladybird-apple-touch.png') }}?v=4">
 
         <!-- Bootstrap Css -->
         <link href="assets/css/bootstrap.min.css" id="bootstrap-style" rel="stylesheet" type="text/css" />
@@ -85,14 +87,14 @@
                                     <a href="https://ladybirdsmis.com/" class="auth-logo-light">
                                         <div class="avatar-md profile-user-wid mb-4">
                                             <span class="avatar-title rounded-circle bg-light">
-                                                <img src="images/ladybird_dark.png" alt="" class="rounded-circle" height="75">
+                                                <img src="{{ asset('images/brand/ladybird-mark-on-light.png') }}" alt="Ladybird" height="52">
                                             </span>
                                         </div>
                                     </a>
                                     <a href="https://ladybirdsmis.com/" class="auth-logo-dark">
                                         <div class="avatar-md profile-user-wid mb-4">
                                             <span class="avatar-title rounded-circle bg-light">
-                                                <img src="images/ladybird_dark.png" alt="" class="rounded-circle" height="75">
+                                                <img src="{{ asset('images/brand/ladybird-mark-on-light.png') }}" alt="Ladybird" height="52">
                                             </span>
                                         </div>
                                     </a>

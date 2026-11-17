@@ -65,7 +65,7 @@ window.onload = function () {
                     cObj("fullname_check_out").innerText = check_in_value.fullname_check_out;
                     cObj("comments").innerText = check_in_value.comments == null ? "No comments!" : check_in_value.comments;
                     cObj("book_thumbnails").src = check_in_value.book_details != null ? check_in_value.book_details.thumbnail_location : "/images/book_cover.jpg";
-                    cObj("confirm_cancel_check_in").href = "/Circulation/Cancel/check-in/"+check_in_value.circulation_id;
+                    cObj("confirm_cancel_check_in_form").action = "/Circulation/Cancel/check-in/"+check_in_value.circulation_id;
                     cObj("tool_tip_borrower").innerText = check_in_value.user_borrowing;
                 }else{
                     console.error("Does not work");

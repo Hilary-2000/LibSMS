@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Support\RawPaginator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use stdClass;
@@ -24,8 +25,8 @@ class Notification extends Controller
         DB::setDefaultConnection("mysql2");
 
         // get the notifications
-        $like_statement = '*"user_id":"'.session('user_id').'","read":"1","delete":"1"*';
-        $all_notifications = DB::select("SELECT * FROM `library_notifications` WHERE `notification_action` NOT LIKE ? ORDER BY `date_created` DESC LIMIT 300",[$like_statement]);
+        $like_statement = '%"user_id":"'.session('user_id').'","read":"1","delete":"1"%';
+        [$all_notifications, $pager] = RawPaginator::paginate("SELECT * FROM `library_notifications` WHERE `notification_action` NOT LIKE ? ORDER BY `date_created` DESC", [$like_statement]);
         
         
         // loop through the notifications and add a read value
@@ -48,7 +49,7 @@ class Notification extends Controller
 
 
         // display all the notifications in a table
-        return view("notification.index",["notification_count" => $notification_count, "all_notifications" => $all_notifications, "notifications" => $notifications, "search_title" => ""]);
+        return view("notification.index",["notification_count" => $notification_count, "all_notifications" => $all_notifications, "notifications" => $notifications, "search_title" => "","pager" => $pager]);
     }
 
     function isJson($string) {

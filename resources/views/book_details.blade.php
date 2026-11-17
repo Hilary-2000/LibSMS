@@ -10,7 +10,9 @@
         <meta content="Ladybird Softech Co." name="author" />
         
         <!-- App favicon -->
-        <link rel="shortcut icon" href="/images/ladybird_dark.png">
+        <link rel="icon" type="image/png" href="{{ asset('images/ladybird-favicon.png') }}?v=4">
+        <link rel="shortcut icon" href="{{ asset('favicon.ico') }}?v=4">
+        <link rel="apple-touch-icon" href="{{ asset('images/ladybird-apple-touch.png') }}?v=4">
 
         <link href="/assets/libs/bootstrap-datepicker/css/bootstrap-datepicker.min.css" rel="stylesheet" type="text/css">
 
@@ -53,177 +55,10 @@
         
         <!-- Begin page -->
         <div id="layout-wrapper">
-            <header id="page-topbar">
-                <div class="navbar-header">
-                    <div class="d-flex">
-                        <!-- LOGO -->
-                        <div class="navbar-brand-box">
-                            <a href="." class="logo logo-dark">
-                                <span class="logo-sm">
-                                    <img src="/assets/images/logo.svg" alt="" height="22">
-                                </span>
-                                <span class="logo-lg">
-                                    <img src="/assets/images/logo-dark.png" alt="" height="17">
-                                </span>
-                            </a>
-
-                            <a href="." class="logo logo-light">
-                                <span class="logo-sm">
-                                    <img src="/images/ladybird_dark-removebg.png" alt="" height="40">
-                                </span>
-                                <span class="logo-lg">
-                                    <img src="/images/ladybird_dark-removebg.png" alt="" height="100">
-                                </span>
-                            </a>
-                        </div>
-
-                        <button type="button" class="btn btn-sm px-3 font-size-16 header-item waves-effect" id="vertical-menu-btn">
-                            <i class="fa fa-fw fa-bars"></i>
-                        </button>
-                    </div>
-
-                    <div class="d-flex">
-
-                        <div class="dropdown d-inline-block d-lg-none ms-2">
-                            <button type="button" class="btn header-item noti-icon waves-effect" id="page-header-search-dropdown"
-                            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <i class="mdi mdi-magnify"></i>
-                            </button>
-                            <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end p-0"
-                                aria-labelledby="page-header-search-dropdown">
-        
-                                <form class="p-3">
-                                    <div class="form-group m-0">
-                                        <div class="input-group">
-                                            <input type="text" class="form-control" placeholder="Search ..." aria-label="Recipient's username">
-                                            <div class="input-group-append">
-                                                <button class="btn btn-primary" type="submit"><i class="mdi mdi-magnify"></i></button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-
-                        <div class="dropdown d-none d-lg-inline-block ms-1">
-                            <button type="button" class="btn header-item noti-icon waves-effect" data-bs-toggle="fullscreen">
-                                <i class="bx bx-fullscreen"></i>
-                            </button>
-                        </div>
-
-                        <div class="dropdown d-inline-block">
-                            <button type="button" class="btn header-item noti-icon waves-effect" id="page-header-notifications-dropdown"
-                            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <i class="bx bx-bell {{$notification_count > 0 ? 'bx-tada' : ''}}"></i>
-                                <span class="badge bg-danger rounded-pill">{{$notification_count > 99 ? "99+" : $notification_count}}</span>
-                            </button>
-
-                            {{-- notification details --}}
-                            <x-notification :notifications="$notifications"/>
-                        </div>
-
-                        <div class="dropdown d-inline-block">
-                            <button type="button" class="btn header-item waves-effect" id="page-header-user-dropdown"
-                            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <img class="rounded-circle header-profile-user" src="https://lsims.ladybirdsmis.com/sims/{{(session()->get("user_details")->profile_loc != null && strlen(trim(session()->get("user_details")->profile_loc)) > 0) ? session()->get("user_details")->profile_loc : "images/dp.png"}}"
-                                    alt="Header Avatar">
-                                <span class="d-none d-xl-inline-block ms-1" key="t-henry">{{session("gender") == "M" ? "Mr." : "Ms."}} {{explode(" ",ucwords(strtolower(session("fullname"))))[0]}}</span>
-                                <i class="mdi mdi-chevron-down d-none d-xl-inline-block"></i>
-                            </button>
-                            <div class="dropdown-menu dropdown-menu-end">
-                                <!-- item-->
-                                <div class="dropdown-divider"></div>
-                                <a class="dropdown-item text-danger" href="/Logout"><i class="bx bx-power-off font-size-16 align-middle me-1 text-danger"></i> <span key="t-logout">Logout</span></a>
-                            </div>
-                        </div>
-
-                        <div class="dropdown d-inline-block">
-                            <button type="button" class="btn header-item noti-icon right-bar-toggle waves-effect">
-                                <i class="bx bx-cog bx-spin"></i>
-                            </button>
-                        </div>
-
-                    </div>
-                </div>
-            </header>
+            @include('partials.topbar')
 
             <!-- ========== Left Sidebar Start ========== -->
-            <div class="vertical-menu">
-                <div data-simplebar class="h-100">
-                    <!--- Sidemenu -->
-                    <div id="sidebar-menu">
-                        @php
-                            $lib_priv = json_decode(session()->get("user_details")->library_previleges,true);
-                            function isPresent($array,$needle){
-                                if ($array == null) {
-                                    return false;
-                                }
-                                for ($index=0; $index < count($array); $index++) { 
-                                    if ($array[$index] == $needle) {
-                                        return true;
-                                    }
-                                }
-                                return false;
-                            }
-                        @endphp
-                        <!-- Left Menu Start -->
-                        <ul class="metismenu list-unstyled" id="side-menu">
-                            <li class="menu-title" key="t-menu">Menu</li>
-                            {{-- dashboard --}}
-                            <li class="">
-                                <a href="/Dashboard" class="waves-effect">
-                                    <i class="bx bx-home-circle"></i>
-                                    <span key="t-chat">Dashboard</span>
-                                </a>
-                            </li>
-                            @if (isPresent($lib_priv,"Acquisition") || count($lib_priv) == 0)
-                                <li class="mm-active">
-                                    <a href="/Acquisitions" class="waves-effect">
-                                        <i class="bx bx-add-to-queue"></i>
-                                        <span key="t-file-manager">Acquisitions</span>
-                                    </a>
-                                </li>
-                            @endif
-                            @if (isPresent($lib_priv,"Cataloging") || count($lib_priv) == 0)
-                                <li>
-                                    <a href="/Cataloging" class="waves-effect">
-                                        <i class="bx bx-file"></i>
-                                        <span key="t-file-manager">Cataloging</span>
-                                    </a>
-                                </li>
-                            @endif
-                            @if (isPresent($lib_priv,"Circulation") || count($lib_priv) == 0)
-                                <li>
-                                    <a href="/Circulation" class="waves-effect">
-                                        <i class="bx bx-rotate-left"></i>
-                                        <span key="t-file-manager">Circulation</span>
-                                    </a>
-                                </li>
-                            @endif
-                            @if (isPresent($lib_priv,"Report") || count($lib_priv) == 0)
-                                <li>
-                                    <a href="/Reports" class="waves-effect">
-                                        <i class="bx bxs-report"></i>
-                                        <span key="t-file-manager">Reports</span>
-                                    </a>
-                                </li>
-                            @endif
-                            @if (isPresent($lib_priv,"Settings") || count($lib_priv) == 0)
-                                <li class="">
-                                    <a href="javascript: void(0);" class="waves-effect has-arrow " aria-expanded="false">
-                                        <i class="bx bx-cog"></i>
-                                        <span key="t-jobs">Settings</span>
-                                    </a>
-                                    <ul class="sub-menu" aria-expanded="false" style="height: 0px;">
-                                        <li><a href="/Settings/User-mgmt" key="t-job-list"><i class="bx bxs-user"></i> User Management</a></li>
-                                        <li><a href="/Settings/Library-mgmt" key="t-job-list"><i class="bx bxs-book"></i> Library Management</a></li>
-                                    </ul>
-                                </li>
-                            @endif
-                    </div>
-                    <!-- Sidebar -->
-                </div>
-            </div>
+            @include('partials.sidebar', ['active' => 'Acquisitions'])
             <!-- Left Sidebar End -->
 
             
@@ -291,6 +126,66 @@
                                         <button class="btn btn-outline-danger btn-sm" id="delete_trash" data-bs-toggle="modal" data-bs-target="#staticBackdrop"><i class="bx bx-trash"></i> Delete</button>
                                         <button class="btn btn-outline-warning btn-sm {{$book_details->lost_status == "1" ? 'd-none' : ''}}" id="mark_lost" data-bs-toggle="modal" data-bs-target="#mark_as_lost_window"><i class="bx bx-no-entry"></i> Mark as Lost</button>
                                         <button class="btn btn-outline-success btn-sm {{$book_details->lost_status == "0" ? 'd-none' : ''}}" id="mark_found" data-bs-toggle="modal" data-bs-target="#mark_as_found_window"><i class="bx bx-no-entry"></i> Mark as Found</button>
+                                        <a href="/Acquisitions/Labels?ids={{$book_details->book_id}}" target="_blank" class="btn btn-outline-primary btn-sm"><i class="bx bx-barcode"></i> Print label</a>
+                                        @if ($book_details->availability_status == 0 && $book_details->lost_status == 0)
+                                            <button class="btn btn-outline-info btn-sm" data-bs-toggle="modal" data-bs-target="#reserve_window"><i class="bx bx-time-five"></i> Reserve</button>
+                                        @endif
+                                        <div class="my-2 small text-muted">
+                                            Label code: <b class="text-body">{{ $book_code }}</b>
+                                            @if ($waiting_count > 0) &middot; <a href="/Circulation/Reservations">{{ $waiting_count }} waiting for this title</a>@endif
+                                        </div>
+                                        @if ($reservation_hold)
+                                            <div class="alert alert-info py-2 my-2">This copy is being kept aside for <b>{{ $reservation_hold->borrower_name }}</b> ({{ $reservation_hold->borrower_type }}), who reserved it.</div>
+                                        @endif
+                                        {{-- reserve: every copy of this title is out, put the borrower on the waiting list --}}
+                                        <div class="modal fade" id="reserve_window" tabindex="-1" aria-labelledby="reserve_window_label" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered">
+                                                <form class="modal-content" method="POST" action="/Circulation/Reservations/New">
+                                                    @csrf
+                                                    <input type="hidden" name="book_id" value="{{$book_details->book_id}}">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="reserve_window_label">Reserve "{{ $book_details->book_title }}"</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <p class="small text-muted">The next copy that is checked in will be kept aside for this person.</p>
+                                                        <label class="form-label" for="reserve_borrower_type">Reserve for</label>
+                                                        <select class="form-control mb-3" name="borrower_type" id="reserve_borrower_type" onchange="document.getElementById('reserve_student_box').classList.toggle('d-none', this.value!=='student');document.getElementById('reserve_staff_box').classList.toggle('d-none', this.value!=='staff');">
+                                                            <option value="student" selected>Student</option>
+                                                            <option value="staff">Staff</option>
+                                                        </select>
+                                                        <div id="reserve_student_box" class="mb-3">
+                                                            <label class="form-label" for="reserve_student">Student</label>
+                                                            <select class="form-control" name="student_borrower" id="reserve_student">
+                                                                <option>Select an option</option>
+                                                                @foreach ($reserve_students as $group)
+                                                                    <optgroup label="{{ $group->class_name }}">
+                                                                        @foreach ($group->student_data as $student)
+                                                                            <option value="{{ $student->adm_no }}">{{ ucwords(strtolower($student->first_name." ".$student->second_name)) }} ({{ $student->adm_no }})</option>
+                                                                        @endforeach
+                                                                    </optgroup>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+                                                        <div id="reserve_staff_box" class="mb-3 d-none">
+                                                            <label class="form-label" for="reserve_staff">Staff</label>
+                                                            <select class="form-control" name="staff_borrower" id="reserve_staff">
+                                                                <option>Select an option</option>
+                                                                @foreach ($reserve_staff as $staff)
+                                                                    <option value="{{ $staff->user_id }}">{{ ucwords(strtolower($staff->fullname)) }}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+                                                        <label class="form-label" for="reserve_comments">Comments (optional)</label>
+                                                        <input class="form-control" name="comments" id="reserve_comments" maxlength="500">
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
+                                                        <button type="submit" class="btn btn-primary"><i class="bx bx-time-five"></i> Reserve</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
                                         <div class="border border-primary rounded bg-light text-black my-2 p-2 {{$book_details->lost_status == "0" ? 'd-none' : ''}}">
                                             <p><b>Note:</b></p>
                                             This book was lost on : "{{date("D dS M Y", strtotime($book_details->date_lost))}}" by "{{ucwords(strtolower($book_details->lost_by))}}" and was reported on "{{date("D dS M Y", strtotime($book_details->date_recorded))}}" by "{{ucwords(strtolower($book_details->reported_by))}}"
@@ -309,7 +204,7 @@
                                                     </div>
                                                     <div class="modal-footer">
                                                         <button type="button" class="btn btn-light" data-bs-dismiss="modal">No</button>
-                                                        <a href="/Acquisitions/Delete-book/{{$book_details->book_id}}" class="btn btn-outline-danger"> Yes Delete</a>
+                                                        <form method="POST" action="/Acquisitions/Delete-book/{{$book_details->book_id}}" class="d-inline">@csrf<button type="submit" class="btn btn-outline-danger"> Yes Delete</button></form>
                                                     </div>
                                                 </div>
                                             </div>
@@ -328,7 +223,7 @@
                                                     </div>
                                                     <div class="modal-footer">
                                                         <button type="button" class="btn btn-light" data-bs-dismiss="modal">No</button>
-                                                        <a href="/Acquisitions/found-book/{{$book_details->book_id}}" class="btn btn-outline-danger"> Yes Confirm</a>
+                                                        <form method="POST" action="/Acquisitions/found-book/{{$book_details->book_id}}" class="d-inline">@csrf<button type="submit" class="btn btn-outline-danger"> Yes Confirm</button></form>
                                                     </div>
                                                 </div>
                                             </div>
@@ -462,7 +357,7 @@
                                                                 @else
                                                                     Available at:
                                                                     @if(isset($book_details->shelf_no_location) && strlen($book_details->shelf_no_location) > 0)
-                                                                        <b>{!! $book_details->shelf_no_location !!} - 
+                                                                        <b>{{ $book_details->shelf_no_location }} - 
                                                                             @for ($i = 0; $i < count($libraries); $i++)
                                                                                 @if($book_details->library_location == $libraries[$i]->id)
                                                                                     {{$libraries[$i]->Name}}
@@ -784,7 +679,7 @@
                                                         <p>
                                                             Available at:
                                                             @if(isset($book_details->shelf_no_location) && strlen($book_details->shelf_no_location) > 0)
-                                                                <b>{!! $book_details->shelf_no_location !!}</b> 
+                                                                <b>{{ $book_details->shelf_no_location }}</b> 
                                                                 <br>Library Located : 
                                                                 <b>
                                                                     @for ($i = 0; $i < count($libraries); $i++)
@@ -854,64 +749,14 @@
                 </div><!-- End Page-content -->
                 <!-- End Page-content -->
 
-                <footer class="footer">
-                    <div class="container-fluid">
-                        <div class="row">
-                            <div class="col-sm-6">
-                                <script>document.write(new Date().getFullYear())</script> © Ladybird Softech Co.
-                            </div>
-                            <div class="col-sm-6">
-                                <div class="text-sm-end d-none d-sm-block">
-                                    <b>Date Updated : </b>24rd Oct 2024 : 12:21AM
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </footer>
+                @include('partials.footer')
             </div>
             <!-- end main content-->
 
         </div>
         <!-- END layout-wrapper -->
 
-        <!-- Right Sidebar -->
-        <div class="right-bar">
-            <div data-simplebar class="h-100">
-                <div class="rightbar-title d-flex align-items-center px-3 py-4">
-            
-                    <h5 class="m-0 me-2">Settings</h5>
-
-                    <a href="javascript:void(0);" class="right-bar-toggle ms-auto">
-                        <i class="mdi mdi-close noti-icon"></i>
-                    </a>
-                </div>
-
-                <!-- Settings -->
-                <hr class="mt-0" />
-                <h6 class="text-center mb-0">Choose Layouts</h6>
-
-                <div class="p-4">
-                    <div class="mb-2">
-                        <img src="/assets/images/layouts/layout-1.jpg" class="img-thumbnail" alt="layout images">
-                    </div>
-
-                    <div class="form-check form-switch mb-3">
-                        <input class="form-check-input theme-choice" type="checkbox" id="light-mode-switch" checked>
-                        <label class="form-check-label" for="light-mode-switch">Light Mode</label>
-                    </div>
-    
-                    <div class="mb-2">
-                        <img src="/assets/images/layouts/layout-2.jpg" class="img-thumbnail" alt="layout images">
-                    </div>
-                    <div class="form-check form-switch mb-3">
-                        <input class="form-check-input theme-choice" type="checkbox" id="dark-mode-switch">
-                        <label class="form-check-label" for="dark-mode-switch">Dark Mode</label>
-                    </div>
-                </div>
-            </div> <!-- end slimscroll-menu-->
-        </div>
-        <!-- /Right-bar -->
-
+        @include('partials.rightbar')
         <!-- Right bar overlay-->
         <div class="rightbar-overlay"></div>
         

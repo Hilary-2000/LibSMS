@@ -10,7 +10,9 @@
         <meta content="Ladybird Softech Co." name="author" />
         
         <!-- App favicon -->
-        <link rel="shortcut icon" href="/images/ladybird_dark.png">
+        <link rel="icon" type="image/png" href="{{ asset('images/ladybird-favicon.png') }}?v=4">
+        <link rel="shortcut icon" href="{{ asset('favicon.ico') }}?v=4">
+        <link rel="apple-touch-icon" href="{{ asset('images/ladybird-apple-touch.png') }}?v=4">
 
         <!-- Bootstrap Css -->
         <link href="/assets/css/bootstrap.min.css" id="bootstrap-style" rel="stylesheet" type="text/css" />
@@ -34,8 +36,8 @@
                     <div class="col-lg-12">
                         <div class="text-center">
                             <a href="/" class="d-block auth-logo">
-                                <img src="/images/ladybird_dark.png" alt="" height="100" class="auth-logo-dark mx-auto">
-                                <img src="/images/ladybird_dark.png" alt="" height="100" class="auth-logo-light mx-auto">
+                                <img src="{{ asset('images/brand/ladybird-mark-on-light.png') }}" alt="Ladybird" height="96" class="auth-logo-dark mx-auto">
+                                <img src="{{ asset('images/brand/ladybird-mark-on-dark.png') }}" alt="Ladybird" height="96" class="auth-logo-light mx-auto">
                             </a>
                             <div class="row justify-content-center mt-2">
                                 <div class="col-sm-4">

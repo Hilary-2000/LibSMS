@@ -100,13 +100,13 @@ class Settings extends Controller
 
         for ($index=0; $index < count($libraries); $index++) { 
             $id = $libraries[$index]->id;
-            $data = DB::select("SELECT * FROM `library_details` WHERE `library_location` = '".$id."'");
+            $data = DB::select("SELECT * FROM `library_details` WHERE `library_location` = ?", [$id]);
             $count = count($data);
             // total books
             $libraries[$index]->total = $count;
             
             // checked out
-            $checked_out = DB::select("SELECT * FROM `library_details` WHERE `availability_status` = '0' AND `library_location` = '".$id."'");
+            $checked_out = DB::select("SELECT * FROM `library_details` WHERE `availability_status` = '0' AND `library_location` = ?", [$id]);
             $libraries[$index]->checked_out = count($checked_out);
         }
 

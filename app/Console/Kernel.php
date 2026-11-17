@@ -12,7 +12,8 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        // $schedule->command('inspire')->hourly();
+        // overdue-book notifications for every school (needs the schedule:run cron entry)
+        $schedule->command('library:notify-overdue')->everyFifteenMinutes()->withoutOverlapping();
     }
 
     /**

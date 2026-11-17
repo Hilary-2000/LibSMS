@@ -50,12 +50,12 @@ class Reports extends Controller
                     $book_data_inside = [];
                     array_push($book_data_inside,($index+1));
                     $availability = $book_details[$index]->availability_status == 1 ? "<span data-bs-toggle='tooltip' data-bs-placement='top' class='badge bg-success' data-bs-original-title='Available'>in</span>" : "<span data-bs-toggle='tooltip' data-bs-placement='top' class='badge bg-danger' data-bs-original-title='Borrowed'>Out</span>";
-                    array_push($book_data_inside,$book_details[$index]->book_title." ".$availability);
-                    array_push($book_data_inside,$book_details[$index]->book_author);
-                    array_push($book_data_inside,$book_details[$index]->isbn_10);
-                    array_push($book_data_inside,$book_details[$index]->isbn_13);
+                    array_push($book_data_inside,e($book_details[$index]->book_title)." ".$availability);
+                    array_push($book_data_inside,e($book_details[$index]->book_author));
+                    array_push($book_data_inside,e($book_details[$index]->isbn_10));
+                    array_push($book_data_inside,e($book_details[$index]->isbn_13));
                     array_push($book_data_inside,date("D dS M Y",strtotime($book_details[$index]->date_recorded)));
-                    array_push($book_data_inside,$book_details[$index]->call_no);
+                    array_push($book_data_inside,e($book_details[$index]->call_no));
                     $link_details = new stdClass();
                     $link_details->show = "<i class=\"mdi mdi-eye\"></i> View";
                     $link_details->href = "/Acquisitions/Book-details/".$book_details[$index]->book_id;
@@ -77,7 +77,7 @@ class Reports extends Controller
                 if($date_type_selection == "specific_date"){
                     $search_heading .= "on ".($select_date_1 != null ? date("D dS M Y",strtotime($select_date_1)) : date("D dS M Y"));
                     $specific_date = $select_date_1 != null ? date("Ymd",strtotime($select_date_1)) : date("Ymd");
-                    $book_details = DB::select("SELECT * FROM `library_details` WHERE `date_recorded` LIKE '".$specific_date."%'  ORDER BY `book_id` DESC");
+                    $book_details = DB::select("SELECT * FROM `library_details` WHERE `date_recorded` LIKE ?  ORDER BY `book_id` DESC", [$specific_date."%"]);
                 }elseif($date_type_selection == "between_periods"){
                     $search_heading .= "between ".($select_date_from != null ? date("D dS M Y",strtotime($select_date_from)) : date("D dS M Y",strtotime("-1 week")))." and ".($select_date_to != null ? date("D dS M Y",strtotime($select_date_to)) : date("D dS M Y"));
                     $date_1 = $select_date_from != null ? date("YmdHis",strtotime($select_date_from)) : date("YmdHis",strtotime("-1 week"));
@@ -86,7 +86,7 @@ class Reports extends Controller
                 }else{
                     $search_heading .= "on ".($select_date_1 != null ? date("D dS M Y",strtotime($select_date_1)) : date("D dS M Y"));
                     $specific_date = $select_date_1 != null ? date("Ymd",strtotime($select_date_1)) : date("Ymd");
-                    $book_details = DB::select("SELECT * FROM `library_details` WHERE `date_recorded` LIKE '".$specific_date."%'  ORDER BY `book_id` DESC");
+                    $book_details = DB::select("SELECT * FROM `library_details` WHERE `date_recorded` LIKE ?  ORDER BY `book_id` DESC", [$specific_date."%"]);
                 }
 
                 // get all book details
@@ -94,12 +94,12 @@ class Reports extends Controller
                     $book_data_inside = [];
                     array_push($book_data_inside,($index+1));
                     $availability = $book_details[$index]->availability_status == 1 ? "<span data-bs-toggle='tooltip' data-bs-placement='top' class='badge bg-success' data-bs-original-title='Available'>in</span>" : "<span data-bs-toggle='tooltip' data-bs-placement='top' class='badge bg-danger' data-bs-original-title='Borrowed'>Out</span>";
-                    array_push($book_data_inside,$book_details[$index]->book_title." ".$availability);
-                    array_push($book_data_inside,$book_details[$index]->book_author);
-                    array_push($book_data_inside,$book_details[$index]->isbn_10);
-                    array_push($book_data_inside,$book_details[$index]->isbn_13);
+                    array_push($book_data_inside,e($book_details[$index]->book_title)." ".$availability);
+                    array_push($book_data_inside,e($book_details[$index]->book_author));
+                    array_push($book_data_inside,e($book_details[$index]->isbn_10));
+                    array_push($book_data_inside,e($book_details[$index]->isbn_13));
                     array_push($book_data_inside,date("D dS M Y",strtotime($book_details[$index]->date_recorded)));
-                    array_push($book_data_inside,$book_details[$index]->call_no);
+                    array_push($book_data_inside,e($book_details[$index]->call_no));
                     $link_details = new stdClass();
                     $link_details->show = "<i class=\"mdi mdi-eye\"></i>";
                     $link_details->href = "/Acquisitions/Book-details/".$book_details[$index]->book_id;
@@ -120,7 +120,7 @@ class Reports extends Controller
                 if($date_type_selection == "specific_date"){
                     $search_heading .= "on ".($select_date_1 != null ? date("D dS M Y",strtotime($select_date_1)) : date("D dS M Y"));
                     $specific_date = $select_date_1 != null ? date("Ymd",strtotime($select_date_1)) : date("Ymd");
-                    $book_details = DB::select("SELECT * FROM `book_circulation` WHERE `return_status` = '0' AND `date_checked_out` LIKE '".$specific_date."%'  ORDER BY `date_checked_out` DESC");
+                    $book_details = DB::select("SELECT * FROM `book_circulation` WHERE `return_status` = '0' AND `date_checked_out` LIKE ?  ORDER BY `date_checked_out` DESC", [$specific_date."%"]);
                 }elseif($date_type_selection == "between_periods"){
                     $search_heading .= "between ".($select_date_from != null ? date("D dS M Y",strtotime($select_date_from)) : date("D dS M Y",strtotime("-1 week")))." and ".($select_date_to != null ? date("D dS M Y",strtotime($select_date_to)) : date("D dS M Y"));
                     $date_1 = $select_date_from != null ? date("YmdHis",strtotime($select_date_from)) : date("YmdHis",strtotime("-1 week"));
@@ -129,7 +129,7 @@ class Reports extends Controller
                 }else{
                     $search_heading .= "on ".($select_date_1 != null ? date("D dS M Y",strtotime($select_date_1)) : date("D dS M Y"));
                     $specific_date = $select_date_1 != null ? date("Ymd",strtotime($select_date_1)) : date("Ymd");
-                    $book_details = DB::select("SELECT * FROM `book_circulation` WHERE `return_status` = '0' AND `date_checked_out` LIKE '".$specific_date."%'  ORDER BY `date_checked_out` DESC");
+                    $book_details = DB::select("SELECT * FROM `book_circulation` WHERE `return_status` = '0' AND `date_checked_out` LIKE ?  ORDER BY `date_checked_out` DESC", [$specific_date."%"]);
                 }
 
                 // GET ALL BOOKS
@@ -150,19 +150,19 @@ class Reports extends Controller
                     $BookBorrower = "N/A";
                     if ($book_details[$index]->user_borrowing == "staff") {
                         $staff_name = $this->getStaff($ALL_STAFF,$book_details[$index]->user_checked_out);
-                        $BookBorrower = ($staff_name != null ? $staff_name->fullname : "N/A")." <span data-bs-toggle='tooltip' data-bs-placement='top' class='badge badge-pill badge-soft-success' data-bs-original-title='Staff'>Staff</span>";
+                        $BookBorrower = e($staff_name != null ? $staff_name->fullname : "N/A")." <span data-bs-toggle='tooltip' data-bs-placement='top' class='badge badge-pill badge-soft-success' data-bs-original-title='Staff'>Staff</span>";
                     }else {
                         $student_name = $this->getStudent($ALL_STUDENTS,$book_details[$index]->user_checked_out);
-                        $BookBorrower = ($student_name != null ? ucwords(strtolower($student_name->first_name." ".$student_name->second_name)) : "N/A")." <span data-bs-toggle='tooltip' data-bs-placement='top' class='badge badge-pill badge-soft-success' data-bs-original-title='Student'>Student</span>";
+                        $BookBorrower = e($student_name != null ? ucwords(strtolower($student_name->first_name." ".$student_name->second_name)) : "N/A")." <span data-bs-toggle='tooltip' data-bs-placement='top' class='badge badge-pill badge-soft-success' data-bs-original-title='Student'>Student</span>";
                     }
 
                     $book_data_inside = [];
                     array_push($book_data_inside,($index+1));
                     $availability = $BD != null ? ($BD->availability_status == 1 ? "<span data-bs-toggle='tooltip' data-bs-placement='top' class='badge bg-success' data-bs-original-title='Available'>in</span>" : "<span data-bs-toggle='tooltip' data-bs-placement='top' class='badge bg-danger' data-bs-original-title='Borrowed'>Out</span>") : "";
-                    array_push($book_data_inside,($BD != null ? $BD->book_title." ".$availability : "N/A"));
+                    array_push($book_data_inside,($BD != null ? e($BD->book_title)." ".$availability : "N/A"));
                     array_push($book_data_inside,$BookBorrower);
-                    array_push($book_data_inside,$book_details[$index]->book_call_number);
-                    array_push($book_data_inside,$book_details[$index]->book_isbn);
+                    array_push($book_data_inside,e($book_details[$index]->book_call_number));
+                    array_push($book_data_inside,e($book_details[$index]->book_isbn));
                     array_push($book_data_inside,date("D dS M Y",strtotime($book_details[$index]->date_checked_out)));
                     array_push($book_data_inside,date("D dS M Y",strtotime($book_details[$index]->expected_return_date)));
                     $link_details = new stdClass();
@@ -190,7 +190,7 @@ class Reports extends Controller
                 if($date_type_selection == "specific_date"){
                     $search_heading .= "on ".($select_date_1 != null ? date("D dS M Y",strtotime($select_date_1)) : date("D dS M Y"));
                     $specific_date = $select_date_1 != null ? date("Ymd",strtotime($select_date_1)) : date("Ymd");
-                    $book_details = DB::select("SELECT * FROM `book_circulation` WHERE `return_status` = '1' AND `return_date` LIKE '".$specific_date."%'  ORDER BY `return_date` DESC");
+                    $book_details = DB::select("SELECT * FROM `book_circulation` WHERE `return_status` = '1' AND `return_date` LIKE ?  ORDER BY `return_date` DESC", [$specific_date."%"]);
                 }elseif($date_type_selection == "between_periods"){
                     $search_heading .= "between ".($select_date_from != null ? date("D dS M Y",strtotime($select_date_from)) : date("D dS M Y",strtotime("-1 week")))." and ".($select_date_to != null ? date("D dS M Y",strtotime($select_date_to)) : date("D dS M Y"));
                     $date_1 = $select_date_from != null ? date("YmdHis",strtotime($select_date_from)) : date("YmdHis",strtotime("-1 week"));
@@ -199,7 +199,7 @@ class Reports extends Controller
                 }else{
                     $search_heading .= "on ".($select_date_1 != null ? date("D dS M Y",strtotime($select_date_1)) : date("D dS M Y"));
                     $specific_date = $select_date_1 != null ? date("Ymd",strtotime($select_date_1)) : date("Ymd");
-                    $book_details = DB::select("SELECT * FROM `book_circulation` WHERE `return_status` = '1' AND `return_date` LIKE '".$specific_date."%'  ORDER BY `return_date` DESC");
+                    $book_details = DB::select("SELECT * FROM `book_circulation` WHERE `return_status` = '1' AND `return_date` LIKE ?  ORDER BY `return_date` DESC", [$specific_date."%"]);
                 }
 
                 // GET ALL BOOKS
@@ -229,19 +229,19 @@ class Reports extends Controller
                     $BookBorrower = "N/A";
                     if ($book_details[$index]->user_borrowing == "staff") {
                         $staff_name = $this->getStaff($ALL_STAFF,$book_details[$index]->user_checked_out);
-                        $BookBorrower = ($staff_name != null ? $staff_name->fullname : "N/A")." <span data-bs-toggle='tooltip' data-bs-placement='top' class='badge badge-pill badge-soft-success' data-bs-original-title='Staff'>Staff</span>";
+                        $BookBorrower = e($staff_name != null ? $staff_name->fullname : "N/A")." <span data-bs-toggle='tooltip' data-bs-placement='top' class='badge badge-pill badge-soft-success' data-bs-original-title='Staff'>Staff</span>";
                     }else {
                         $student_name = $this->getStudent($ALL_STUDENTS,$book_details[$index]->user_checked_out);
-                        $BookBorrower = ($student_name != null ? ucwords(strtolower($student_name->first_name." ".$student_name->second_name)) : "N/A")." <span data-bs-toggle='tooltip' data-bs-placement='top' class='badge badge-pill badge-soft-success' data-bs-original-title='Student'>Student</span>";
+                        $BookBorrower = e($student_name != null ? ucwords(strtolower($student_name->first_name." ".$student_name->second_name)) : "N/A")." <span data-bs-toggle='tooltip' data-bs-placement='top' class='badge badge-pill badge-soft-success' data-bs-original-title='Student'>Student</span>";
                     }
 
                     $book_data_inside = [];
                     array_push($book_data_inside,($index+1));
                     $availability = $BD != null ? ($BD->availability_status == 1 ? "<span data-bs-toggle='tooltip' data-bs-placement='top' class='badge bg-success' data-bs-original-title='Available'>in</span>" : "<span data-bs-toggle='tooltip' data-bs-placement='top' class='badge bg-danger' data-bs-original-title='Borrowed'>Out</span>") : "";
-                    array_push($book_data_inside,($BD != null ? $BD->book_title." ".$availability : "N/A"));
+                    array_push($book_data_inside,($BD != null ? e($BD->book_title)." ".$availability : "N/A"));
                     array_push($book_data_inside,$BookBorrower);
-                    array_push($book_data_inside,($BD != null ? $BD->isbn_10 : "N/A"));
-                    array_push($book_data_inside,($BD != null ? $BD->isbn_13 : "N/A"));
+                    array_push($book_data_inside,($BD != null ? e($BD->isbn_10) : "N/A"));
+                    array_push($book_data_inside,($BD != null ? e($BD->isbn_13) : "N/A"));
                     array_push($book_data_inside,date("D dS M Y",strtotime($book_details[$index]->date_checked_out)));
                     array_push($book_data_inside,($book_details[$index]->return_date != "NULL" && $book_details[$index]->return_date != null) ? date("D dS M Y",strtotime($book_details[$index]->return_date)) : "N/A");
                     $link_details = new stdClass();
@@ -264,7 +264,7 @@ class Reports extends Controller
                 if($date_type_selection == "specific_date"){
                     $search_heading .= "on ".($select_date_1 != null ? date("D dS M Y",strtotime($select_date_1)) : date("D dS M Y"));
                     $specific_date = ($select_date_1 != null ? date("Ymd",strtotime($select_date_1)) : date("Ymd"));
-                    $book_details = DB::select("SELECT * FROM `book_circulation` WHERE `expected_return_date` LIKE '".$specific_date."%' AND return_status = '0' ORDER BY `circulation_id` DESC");
+                    $book_details = DB::select("SELECT * FROM `book_circulation` WHERE `expected_return_date` LIKE ? AND return_status = '0' ORDER BY `circulation_id` DESC", [$specific_date."%"]);
                 }elseif($date_type_selection == "between_periods"){
                     $search_heading .= "between ".($select_date_from != null ? date("D dS M Y",strtotime($select_date_from)) : date("D dS M Y",strtotime("-1 week")))." and ".($select_date_to != null ? date("D dS M Y",strtotime($select_date_to)) : date("D dS M Y"));
                     $date_1 = $select_date_from != null ? date("YmdHis",strtotime($select_date_from)) : date("YmdHis",strtotime("-1 week"));
@@ -273,7 +273,7 @@ class Reports extends Controller
                 }else{
                     $search_heading .= "on ".($select_date_1 != null ? date("D dS M Y",strtotime($select_date_1)) : date("D dS M Y"));
                     $specific_date = $select_date_1 != null ? date("Ymd",strtotime($select_date_1)) : date("Ymd");
-                    $book_details = DB::select("SELECT * FROM `book_circulation` WHERE `expected_return_date` LIKE '".$specific_date."%' AND return_status = '0' ORDER BY `circulation_id` DESC");
+                    $book_details = DB::select("SELECT * FROM `book_circulation` WHERE `expected_return_date` LIKE ? AND return_status = '0' ORDER BY `circulation_id` DESC", [$specific_date."%"]);
                 }
 
                 // GET ALL BOOKS
@@ -303,19 +303,19 @@ class Reports extends Controller
                     $BookBorrower = "N/A";
                     if ($book_details[$index]->user_borrowing == "staff") {
                         $staff_name = $this->getStaff($ALL_STAFF,$book_details[$index]->user_checked_out);
-                        $BookBorrower = ($staff_name != null ? $staff_name->fullname : "N/A")." <span data-bs-toggle='tooltip' data-bs-placement='top' class='badge badge-pill badge-soft-success' data-bs-original-title='Staff'>Staff</span>";
+                        $BookBorrower = e($staff_name != null ? $staff_name->fullname : "N/A")." <span data-bs-toggle='tooltip' data-bs-placement='top' class='badge badge-pill badge-soft-success' data-bs-original-title='Staff'>Staff</span>";
                     }else {
                         $student_name = $this->getStudent($ALL_STUDENTS,$book_details[$index]->user_checked_out);
-                        $BookBorrower = ($student_name != null ? ucwords(strtolower($student_name->first_name." ".$student_name->second_name)) : "N/A")." <span data-bs-toggle='tooltip' data-bs-placement='top' class='badge badge-pill badge-soft-success' data-bs-original-title='Student'>Student</span>";
+                        $BookBorrower = e($student_name != null ? ucwords(strtolower($student_name->first_name." ".$student_name->second_name)) : "N/A")." <span data-bs-toggle='tooltip' data-bs-placement='top' class='badge badge-pill badge-soft-success' data-bs-original-title='Student'>Student</span>";
                     }
 
                     $book_data_inside = [];
                     $availability = $BD != null ? ($BD->availability_status == 1 ? "<span data-bs-toggle='tooltip' data-bs-placement='top' class='badge bg-success' data-bs-original-title='Available'>in</span>" : "<span data-bs-toggle='tooltip' data-bs-placement='top' class='badge bg-danger' data-bs-original-title='Borrowed'>Out</span>") : "";
                     array_push($book_data_inside,($index+1));
-                    array_push($book_data_inside,($BD != null ? $BD->book_title." ".$availability : "N/A"));
+                    array_push($book_data_inside,($BD != null ? e($BD->book_title)." ".$availability : "N/A"));
                     array_push($book_data_inside,$BookBorrower);
-                    array_push($book_data_inside,($BD != null ? $BD->isbn_10 : "N/A"));
-                    array_push($book_data_inside,($BD != null ? $BD->isbn_13 : "N/A"));
+                    array_push($book_data_inside,($BD != null ? e($BD->isbn_10) : "N/A"));
+                    array_push($book_data_inside,($BD != null ? e($BD->isbn_13) : "N/A"));
                     array_push($book_data_inside,date("D dS M Y",strtotime($book_details[$index]->date_checked_out)));
                     array_push($book_data_inside,date("D dS M Y",strtotime($book_details[$index]->expected_return_date)));
                     $link_details = new stdClass();
@@ -356,19 +356,19 @@ class Reports extends Controller
                     $BookBorrower = "N/A";
                     if ($book_details[$index]->user_borrowing == "staff") {
                         $staff_name = $this->getStaff($ALL_STAFF,$book_details[$index]->user_checked_out);
-                        $BookBorrower = ($staff_name != null ? $staff_name->fullname : "N/A")." - Staff";
+                        $BookBorrower = e($staff_name != null ? $staff_name->fullname : "N/A")." - Staff";
                     }else {
                         $student_name = $this->getStudent($ALL_STUDENTS,$book_details[$index]->user_checked_out);
-                        $BookBorrower = ($student_name != null ? ucwords(strtolower($student_name->first_name." ".$student_name->second_name)) : "N/A")." - Student";
+                        $BookBorrower = e($student_name != null ? ucwords(strtolower($student_name->first_name." ".$student_name->second_name)) : "N/A")." - Student";
                     }
 
                     $book_data_inside = [];
                     $availability = $BD != null ? ($BD->availability_status == 1 ? "<span data-bs-toggle='tooltip' data-bs-placement='top' class='badge bg-success' data-bs-original-title='Available'>in</span>" : "<span data-bs-toggle='tooltip' data-bs-placement='top' class='badge bg-danger' data-bs-original-title='Borrowed'>Out</span>") : "";
                     array_push($book_data_inside,($index+1));
-                    array_push($book_data_inside,($BD != null ? $BD->book_title." ".$availability : "N/A"));
+                    array_push($book_data_inside,($BD != null ? e($BD->book_title)." ".$availability : "N/A"));
                     array_push($book_data_inside,$BookBorrower);
-                    array_push($book_data_inside,($BD != null ? $BD->isbn_10 : "N/A"));
-                    array_push($book_data_inside,($BD != null ? $BD->isbn_13 : "N/A"));
+                    array_push($book_data_inside,($BD != null ? e($BD->isbn_10) : "N/A"));
+                    array_push($book_data_inside,($BD != null ? e($BD->isbn_13) : "N/A"));
                     array_push($book_data_inside,date("D dS M Y",strtotime($book_details[$index]->date_checked_out)));
                     array_push($book_data_inside,date("D dS M Y",strtotime($book_details[$index]->expected_return_date)));
                     

@@ -1,5 +1,5 @@
 @php
-    function getTimeAgo($date)
+    if (!function_exists('getTimeAgo')) { function getTimeAgo($date)
     {
         $currentTimestamp = time();
         $timestamp = strtotime($date);
@@ -23,7 +23,7 @@
             $years = floor($difference / 31536000);
             return $years . " years ago";
         }
-    }
+    } }
 @endphp
 <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end p-0" aria-labelledby="page-header-notifications-dropdown">
     <div class="p-3">

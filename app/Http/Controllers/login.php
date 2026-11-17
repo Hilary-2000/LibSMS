@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\AuditLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\DB;
@@ -9,129 +10,116 @@ use Illuminate\Support\Facades\DB;
 date_default_timezone_set('Africa/Nairobi');
 class login extends Controller
 {
+    // Name of the "remember me" cookie. It holds "<user_id>|<signature>" only - never the password.
+    const REMEMBER_COOKIE = "library_remember";
+    const REMEMBER_MINUTES = 7200; // 5 days, same lifetime as before
+    // Cookies used by the old remember-me, which stored the plain-text password. Always cleared.
+    const LEGACY_COOKIES = ["school_code", "username", "user_password", "remember_check"];
+
     //this controller is used to manage accounts access
     function loginLibrary(Request $request){
-        // return $request->input();
-        // $school_code = $request->input("school_code");
         $username = $request->input("username");
         $user_password = $request->input("user-password");
         $remember_check = $request->input("remember-check");
 
-        // set flash session to store the user credentials for the sake of those who forget
-        // session()->flash("school_code",$school_code);
+        // keep the username and checkbox to refill the form after an error (never the password)
         session()->flash("username",$username);
-        session()->flash("user_password",$user_password);
         session()->flash("remember_check", $remember_check);
 
         // confirm if the user is the right one.
-        $encrypt_password = $this->encryptCode($user_password);
+        // NOTE: passwords use the shared SIMS encoding (encryptCode); this is intentionally unchanged
+        // because the same credentials are used by the other Ladybird systems.
+        $encrypt_password = $this->encryptCode((string) $user_password);
         $user_data = DB::select("SELECT * FROM `user_tbl` WHERE `username` = ? AND `password` = ?",[$username,$encrypt_password]);
 
-        if (count($user_data) == 0) {
+        // compare case sensitively (MySQL string comparison may be case-insensitive)
+        if (count($user_data) == 0 || !hash_equals((string) $user_data[0]->password, $encrypt_password)) {
             session()->flash("error","Incorrect username or password try again!");
             return redirect("/");
         }
 
-        // set the school code
-        $school_code = $user_data[0]->school_code;
+        return $this->completeLogin($user_data[0], $remember_check == "on");
+    }
+
+    /**
+     * Shared by the login form and the remember-me cookie: checks the account may use the library,
+     * starts a fresh session and (optionally) issues the remember-me cookie.
+     */
+    private function completeLogin($user, bool $remember){
+        $fail = function (string $message) {
+            $this->forgetLoginCookies();
+            session()->flash("error", $message);
+            return redirect("/");
+        };
+
+        // deactivated or deleted staff must not get in
+        if ((isset($user->deleted) && (int) $user->deleted === 1) || (isset($user->activated) && (int) $user->activated === 0)) {
+            return $fail("Your account is not active. Contact your administrator.");
+        }
 
         // check if the school code is accepted to access the library
-        $accept_access = DB::select("SELECT * FROM `school_information` WHERE `school_code` = ?",[$school_code]);
-        if (count($accept_access) == 0) {
-            session()->flash("error","Cannot login, CONTACT US ASAP!");
-            return redirect("/");
+        $school_code = $user->school_code;
+        $school_details = DB::select("SELECT * FROM `school_information` WHERE `school_code` = ?",[$school_code]);
+        if (count($school_details) == 0) {
+            return $fail("Cannot login, CONTACT US ASAP!");
+        }
+        if ($school_details[0]->library_access == 0) {
+            return $fail("Your library account has not been activated! Contact us to activate your account!");
         }
 
-        if ($accept_access[0]->library_access == 0) {
-            session()->flash("error","Your library account has not been activated! Contact us to activate your account!");
-            return redirect("/");
+        /**
+         * 1 Headteacher
+         * 0 Administrator
+         * Librarian LIBRARIAN Librarian
+         */
+        $auth = $user->auth;
+        if ($auth != 0 && $auth != 1 && strtoupper($auth) !== "LIBRARIAN") {
+            return $fail("You have no rights to access this Library Account, contact your Administrator to be allowed back in.");
         }
 
-        // confirm if the user is the right one.
-        // $encrypt_password = $this->encryptCode($user_password);
-        // $user_data = DB::select("SELECT * FROM `user_tbl` WHERE `school_code` = ? AND `username` = ? AND `password` = ?",[$school_code,$username,$encrypt_password]);
-        // return $user_data;
+        // new session id on login (prevents session fixation)
+        session()->regenerate();
 
-        // if the data returns the user data then the password is correct
-        if (count($user_data) > 0) {
-            // check if the username password match case sensitively
-            if ($user_data[0]->password != $encrypt_password) {
-                session()->flash("error","Incorrect credentials, check your school code, username or password for errors.");
-                return redirect("/");
-            }
+        session()->put("fullname",$user->fullname);
+        session()->put("auth",$auth);
+        session()->put("user_id",$user->user_id);
+        session()->put("profile_loc",$user->profile_loc);
+        session()->put("gender",$user->gender);
 
-            // set the cookies to let this user online until later
-            if ($remember_check == "on") {
-                // create a cookie to store user data store it for 7 days
-                Cookie::queue(Cookie::make("school_code",$school_code,7200));
-                Cookie::queue(Cookie::make("username",$username,7200));
-                Cookie::queue(Cookie::make("user_password",$user_password,7200));
-                Cookie::queue(Cookie::make("remember_check",$remember_check,7200));
-            }
+        // before adding user details check if their dp is valid
+        $user->profile_loc = $this->isLinkValid("https://lsims.ladybirdsmis.com/sims/".$user->profile_loc) ? $user->profile_loc : "images/dp.png";
+        // never keep the (encoded) password in the session
+        unset($user->password);
+        session()->put("user_details",$user);
+        session()->put("school_details",$school_details[0]);
 
-            // check if they are either administrator librarian or headteacher
-            $fullname = $user_data[0]->fullname;
-            $auth = $user_data[0]->auth;
-            $user_id = $user_data[0]->user_id;
-            $profile_loc = $user_data[0]->profile_loc;
-            $gender = $user_data[0]->gender;
+        foreach (self::LEGACY_COOKIES as $legacy) {
+            Cookie::queue(Cookie::forget($legacy));
+        }
+        if ($remember) {
+            Cookie::queue(Cookie::make(self::REMEMBER_COOKIE, $this->rememberToken($user->user_id), self::REMEMBER_MINUTES, null, null, null, true));
+        }
+        AuditLog::record("Logged in", null, $remember ? ["method" => "remember-me or form, remember on"] : null);
 
-            // set the username fullname
-            session()->put("fullname",$fullname);
-            session()->put("auth",$auth);
-            session()->put("user_id",$user_id);
-            session()->put("profile_loc",$profile_loc);
-            session()->put("gender",$gender);
+        return redirect("/Dashboard");
+    }
 
-            // before adding user details check if their dp is valid
-            $user_data[0]->profile_loc = $this->isLinkValid("https://lsims.ladybirdsmis.com/sims/".$user_data[0]->profile_loc) ? $user_data[0]->profile_loc : "images/dp.png";
-            session()->put("user_details",$user_data[0]);
+    /**
+     * "<user_id>|<HMAC>" signed with APP_KEY over the user id, school and the CURRENT stored password value,
+     * so changing the password (in any Ladybird system) invalidates every remembered browser.
+     * Laravel additionally encrypts the whole cookie (EncryptCookies middleware).
+     */
+    private function rememberToken($user_id, $row = null){
+        $row = $row ?? DB::selectOne("SELECT `user_id`, `school_code`, `password` FROM `user_tbl` WHERE `user_id` = ?", [$user_id]);
+        if ($row === null) return "";
+        $signature = hash_hmac("sha256", $row->user_id."|".$row->school_code."|".$row->password, config("app.key"));
+        return $row->user_id."|".$signature;
+    }
 
-            // create the user librarian
-            /**
-             * 1 Headteacher
-             * 0 Administrator
-             * Librarian LIBRARIAN Librarian
-             */
-            // return $auth;
-            if ($auth != 0 && $auth != 1 && strtoupper($auth) !== "LIBRARIAN") {
-                // return an error to show they are not allowed in
-                session()->flash("error","You have no rights to access this Library Account, contact your Administrator to be allowed back in.");
-                
-                // destroy all the cookies
-                Cookie::queue(Cookie::forget("school_code"));
-                Cookie::queue(Cookie::forget("username"));
-                Cookie::queue(Cookie::forget("user_password"));
-
-                // return to homepage
-                return redirect("/");
-            }
-
-            // get the school details and store it in a session
-            $school_details = DB::select("SELECT * FROM `school_information` WHERE `school_code` = ?",[$school_code]);
-
-            // add the school information
-            if (count($school_details) > 0) {
-                session()->put("school_details",$school_details[0]);
-            }else {
-                session()->flash("error","An error occured, please contact your administrator.");
-
-                // destroy all the cookies
-                Cookie::queue(Cookie::forget("school_code"));
-                Cookie::queue(Cookie::forget("username"));
-                Cookie::queue(Cookie::forget("user_password"));
-                return redirect("/");
-            }
-
-            return redirect("/Dashboard");
-        }else{
-            session()->flash("error","Incorrect credentials, check your username or password for errors.");
-
-            // destroy all the cookies
-            // Cookie::queue(Cookie::forget("school_code"));
-            Cookie::queue(Cookie::forget("username"));
-            Cookie::queue(Cookie::forget("user_password"));
-            return redirect("/");
+    private function forgetLoginCookies(){
+        Cookie::queue(Cookie::forget(self::REMEMBER_COOKIE));
+        foreach (self::LEGACY_COOKIES as $legacy) {
+            Cookie::queue(Cookie::forget($legacy));
         }
     }
     function dashboard(Request $request){
@@ -154,30 +142,30 @@ class login extends Controller
 
         // books checked out today
         $today = date("Ymd");
-        $data = DB::select("SELECT COUNT(*) AS 'Total' FROM `book_circulation` WHERE `date_checked_out` LIKE '".$today."%'");
+        $data = DB::select("SELECT COUNT(*) AS 'Total' FROM `book_circulation` WHERE `date_checked_out` LIKE ?", [$today."%"]);
         $checked_out_today = count($data) == 0 ? 0 : number_format($data[0]->Total);
 
         // checked in today
-        $data = DB::select("SELECT COUNT(*) AS 'Total' FROM `book_circulation` WHERE `return_date` LIKE '".$today."%'");
+        $data = DB::select("SELECT COUNT(*) AS 'Total' FROM `book_circulation` WHERE `return_date` LIKE ?", [$today."%"]);
         $checked_in_today = count($data) == 0 ? 0 : number_format($data[0]->Total);
 
         // books checked out by user
         $user_id = session("user_id");
-        $data = DB::select("SELECT COUNT(*) AS 'Total' FROM `book_circulation` WHERE `checked_out_by` = '".$user_id."'");
+        $data = DB::select("SELECT COUNT(*) AS 'Total' FROM `book_circulation` WHERE `checked_out_by` = ?", [$user_id]);
         $check_out_user = count($data) == 0 ? 0 : number_format($data[0]->Total);
 
         // books checked in by user
-        $data = DB::select("SELECT COUNT(*) AS 'Total' FROM `book_circulation` WHERE `checked_in_by` = '".$user_id."'");
+        $data = DB::select("SELECT COUNT(*) AS 'Total' FROM `book_circulation` WHERE `checked_in_by` = ?", [$user_id]);
         $check_in_user = count($data) == 0 ? 0 : number_format($data[0]->Total);
 
         // books checked this month
         $this_month = date("Ym");
-        $data = DB::select("SELECT COUNT(*) AS 'Total' FROM `book_circulation` WHERE `date_checked_out` LIKE '".$this_month."%'");
+        $data = DB::select("SELECT COUNT(*) AS 'Total' FROM `book_circulation` WHERE `date_checked_out` LIKE ?", [$this_month."%"]);
         $borrowed_this_month = count($data) == 0 ? 0 : $data[0]->Total;
 
         // last month
         $last_month = date("Ym",strtotime("-1 Month"));
-        $data = DB::select("SELECT COUNT(*) AS 'Total' FROM `book_circulation` WHERE `date_checked_out` LIKE '".$last_month."%'");
+        $data = DB::select("SELECT COUNT(*) AS 'Total' FROM `book_circulation` WHERE `date_checked_out` LIKE ?", [$last_month."%"]);
         $borrowed_last_month = count($data) == 0 ? 0 : $data[0]->Total;
 
         // GET THE DATA FOR THE MOST BORROWED BOOK
@@ -194,127 +182,50 @@ class login extends Controller
         // get the latest books
         $book_data = DB::select("SELECT * FROM `library_details` ORDER BY `book_id` DESC LIMIT 15");
 
-        return view("librarian_dash",["notification_count" => $notification_count,"notifications" => $notifications, "book_data" => $book_data,"most_borrowed_books" => $most_borrowed_books, "borrowed_last_month" => $borrowed_last_month ,"borrowed_this_month" => $borrowed_this_month, "check_in_user" => $check_in_user ,"check_out_user" => $check_out_user,"book_count" => $book_count,"checked_out_today" => $checked_out_today,"checked_in_today" => $checked_in_today]);
+        return view("librarian_dash",["charts" => \App\Services\DashboardCharts::build(), "notification_count" => $notification_count,"notifications" => $notifications, "book_data" => $book_data,"most_borrowed_books" => $most_borrowed_books, "borrowed_last_month" => $borrowed_last_month ,"borrowed_this_month" => $borrowed_this_month, "check_in_user" => $check_in_user ,"check_out_user" => $check_out_user,"book_count" => $book_count,"checked_out_today" => $checked_out_today,"checked_in_today" => $checked_in_today]);
     }
-    function getSchools(){
-        // get if cookies are still available so that we bypass the login process
-        if (Cookie::has('school_code')) {
-            // bypass and login
-            $school_code = Cookie::get("school_code");
-            $username = Cookie::get("username");
-            $user_password = Cookie::get("user_password");
+    function getSchools(Request $request){
+        // remove the old remember-me cookies that stored the plain-text password. Done unconditionally:
+        // Laravel drops cookies it cannot decrypt before we see them, but the browser still holds them.
+        foreach (self::LEGACY_COOKIES as $legacy) {
+            Cookie::queue(Cookie::forget($legacy));
+        }
 
+        // already logged in -> straight to the dashboard
+        if (session("school_details") != null && session("user_id") != null) {
+            return redirect("/Dashboard");
+        }
 
-            // check if the school code is accepted to access the library
-            $accept_access = DB::select("SELECT * FROM `school_information` WHERE `school_code` = ?",[$school_code]);
-            if (count($accept_access) == 0) {
-                session()->flash("error","Cannot login, CONTACT US ASAP!");
-                return redirect("/");
+        // valid remember-me cookie -> log in without the form
+        $token = (string) $request->cookie(self::REMEMBER_COOKIE, "");
+        if ($token !== "") {
+            [$user_id] = explode("|", $token, 2) + [null];
+            $user = ctype_digit((string) $user_id) ? DB::selectOne("SELECT * FROM `user_tbl` WHERE `user_id` = ?", [$user_id]) : null;
+            if ($user !== null && hash_equals($this->rememberToken($user->user_id, $user), $token)) {
+                return $this->completeLogin($user, true);
             }
-    
-            if ($accept_access[0]->library_access == 0) {
-                session()->flash("error","Your library account has not been activated! Contact us to activate your account!");
-                return redirect("/");
-            }
-
-            // confirm if the user is the right one.
-            $encrypt_password = $this->encryptCode($user_password);
-            $user_data = DB::select("SELECT * FROM `user_tbl` WHERE `school_code` = ? AND `username` = ? AND `password` = ?",[$school_code,$username,$encrypt_password]);
-            
-            // if the data returns the user data then the password is correct
-            if (count($user_data) > 0) {
-                // check if the username password match case sensitively
-                if ($user_data[0]->password != $encrypt_password) {
-                    session()->flash("error","Incorrect credentials, check your school code, username or password for errors.");
-                    // destroy all the cookies
-                    Cookie::queue(Cookie::forget("school_code"));
-                    Cookie::queue(Cookie::forget("username"));
-                    Cookie::queue(Cookie::forget("user_password"));
-                    return redirect("/");
-                }
-
-                // check if they are either administrator librarian or headteacher
-                $fullname = $user_data[0]->fullname;
-                $auth = $user_data[0]->auth;
-                $user_id = $user_data[0]->user_id;
-                $profile_loc = $user_data[0]->profile_loc;
-                $gender = $user_data[0]->gender;
-
-                // set the username fullname
-                session()->put("fullname",$fullname);
-                session()->put("auth",$auth);
-                session()->put("user_id",$user_id);
-                session()->put("profile_loc",$profile_loc);
-                session()->put("gender",$gender);
-
-                // before adding user details check if their dp is valid
-                $user_data[0]->profile_loc = $this->isLinkValid("https://lsims.ladybirdsmis.com/sims/".$user_data[0]->profile_loc) ? $user_data[0]->profile_loc : "images/dp.png";
-                session()->put("user_details",$user_data[0]);
-
-                // create the user librarian
-                /**
-                 * 1 Headteacher
-                 * 0 Administrator
-                 * Librarian LIBRARIAN Librarian
-                 */
-                // return $auth;
-                if ($auth != 0 && $auth != 1 && strtoupper($auth) !== "LIBRARIAN") {
-                    // return an error to show they are not allowed in
-                    session()->flash("error","You have no rights to access this Library Account, contact your Administrator to be allowed back in.");
-                    
-                    // destroy all the cookies
-                    Cookie::queue(Cookie::forget("school_code"));
-                    Cookie::queue(Cookie::forget("username"));
-                    Cookie::queue(Cookie::forget("user_password"));
-
-                    // return to homepage
-                    return redirect("/");
-                }
-
-                // get the school details and store it in a session
-                $school_details = DB::select("SELECT * FROM `school_information` WHERE `school_code` = ?",[$school_code]);
-
-                // add the school information
-                if (count($school_details) > 0) {
-                    session()->put("school_details",$school_details[0]);
-                }else {
-                    session()->flash("error","An error occured, please contact your administrator.");
-    
-                    // destroy all the cookies
-                    Cookie::queue(Cookie::forget("school_code"));
-                    Cookie::queue(Cookie::forget("username"));
-                    Cookie::queue(Cookie::forget("user_password"));
-                    return redirect("/");
-                }
-
-                return redirect("/Dashboard");
-            }else{
-                session()->flash("error","Incorrect credentials, check your school code, username or password for errors.");
-
-                // destroy all the cookies
-                Cookie::queue(Cookie::forget("school_code"));
-                Cookie::queue(Cookie::forget("username"));
-                Cookie::queue(Cookie::forget("user_password"));
-                return redirect("/");
-            }
+            // tampered, expired or password changed
+            Cookie::queue(Cookie::forget(self::REMEMBER_COOKIE));
         }
 
         // PROCEED WITH DISPLAYING THE LOGIN PANE
         // connect to the database and get the schools present and activated
         $schools_list = DB::select("SELECT * FROM `school_information`");
-        
+
         // return value
-        for ($index=0; $index < count($schools_list); $index++) { 
+        for ($index=0; $index < count($schools_list); $index++) {
             $schools_list[$index]->school_name = ucwords(strtolower($schools_list[$index]->school_name));
         }
         return view("login",["school_list"=>$schools_list]);
     }
-    
+
     function Logout(){
-        // destroy all the cookies
-        Cookie::queue(Cookie::forget("school_code"));
-        Cookie::queue(Cookie::forget("username"));
-        Cookie::queue(Cookie::forget("user_password"));
+        AuditLog::record("Logged out");
+        // end the session (previously only the cookies were cleared and the user stayed logged in)
+        $this->forgetLoginCookies();
+        session()->flush();
+        session()->invalidate();
+        session()->regenerateToken();
         return redirect("/");
     }
     function encryptCode($dataToEncrypt)

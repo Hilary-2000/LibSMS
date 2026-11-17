@@ -4,6 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\LibraryDetail;
 use DateTime;
+use App\Services\BookCode;
+use App\Services\Borrowers;
+use App\Services\Reservations;
+use App\Support\RawPaginator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use stdClass;
@@ -62,19 +66,14 @@ class Acquisitions extends Controller
         DB::setDefaultConnection("mysql2");
         // return $this->getNotification();
         
-        // get the list of books recorded
-        $search_title = null;
-        if (count($request->input()) > 0) {
-            // keyword
-            $keyword = $request->input("keyword_search");
-            $search_title = $keyword;
-            $select = DB::select("SELECT * FROM `library_details` WHERE `book_title` LIKE \"%".$keyword."%\" OR `book_author` LIKE \"%".$keyword."%\" OR `book_publishers` LIKE \"%".$keyword."%\" OR `isbn_13` LIKE \"%".$keyword."%\" OR `isbn_10` LIKE \"%".$keyword."%\" OR `shelf_no_location` LIKE \"%".$keyword."%\" OR `call_no` LIKE \"%".$keyword."%\" OR `keywords` LIKE \"%".$keyword."%\" ORDER BY `book_id` DESC LIMIT 100");
+        // get the list of books recorded (paginated on the server; all books are reachable, not just the newest 100)
+        $keyword = trim((string) $request->input("keyword_search", ""));
+        $search_title = $keyword !== "" ? $keyword : null;
+        if ($keyword !== "") {
+            $like = "%".$keyword."%";
+            [$select, $pager] = RawPaginator::paginate("SELECT * FROM `library_details` WHERE `book_title` LIKE ? OR `book_author` LIKE ? OR `book_publishers` LIKE ? OR `isbn_13` LIKE ? OR `isbn_10` LIKE ? OR `shelf_no_location` LIKE ? OR `call_no` LIKE ? OR `keywords` LIKE ? ORDER BY `book_id` DESC", array_fill(0, 8, $like));
         }else {
-            $select = DB::select("SELECT * FROM `library_details` ORDER BY `book_id` DESC LIMIT 100");
-
-            // use paginate
-            // $library_details = LibraryDetail::paginate(20);
-            // $select = $library_details;
+            [$select, $pager] = RawPaginator::paginate("SELECT * FROM `library_details` ORDER BY `book_id` DESC");
         }
 
         $larger_length = 0;
@@ -105,7 +104,7 @@ class Acquisitions extends Controller
         $libraries = count($my_libraries) > 0 ? json_decode($my_libraries[0]->valued) : [];
 
         // return $select;
-        return view("acqusitions",["notification_count" => $notification_count, "notifications" => $notifications,"search_title" => $search_title,"libraries" => $libraries,"book_list" => $select,"subject_name" => $subject_name, "larger_length" => $larger_length]);
+        return view("acqusitions",["notification_count" => $notification_count, "notifications" => $notifications,"search_title" => $search_title,"libraries" => $libraries,"book_list" => $select,"pager" => $pager,"subject_name" => $subject_name, "larger_length" => $larger_length]);
     }
 
     function addBook(Request $request){
@@ -425,16 +424,16 @@ class Acquisitions extends Controller
 
                 if ($book_circulation_list[$index]->return_date != "NULL" && $book_circulation_list[$index]->return_date != NULL) {
                     // check in circulation
-                    $circulation_desc = "Returned on <b>".date("D dS M Y @ H:i:s A", strtotime($book_circulation_list[$index]->return_date))."</b> by <b>".$book_borrower." (".$book_circulation_list[$index]->user_borrowing.")</b> was expected to return on <b>".date("D dS M Y", strtotime($book_circulation_list[$index]->expected_return_date))."</b>";
+                    $circulation_desc = "Returned on <b>".date("D dS M Y @ H:i:s A", strtotime($book_circulation_list[$index]->return_date))."</b> by <b>".e($book_borrower)." (".e($book_circulation_list[$index]->user_borrowing).")</b> was expected to return on <b>".date("D dS M Y", strtotime($book_circulation_list[$index]->expected_return_date))."</b>";
                     // EXP RD
                     $exp_RD = date("Ymd", strtotime($book_circulation_list[$index]->expected_return_date));
                     $RD = date("Ymd", strtotime($book_circulation_list[$index]->return_date));
                     if ($exp_RD == $RD) {
-                        $circulation_desc.=" but returned on the same day. Checked in by <b>".(count($check_in_name) > 0 ? ucwords(strtolower($check_in_name[0]->fullname)) : "N/A")."</b>";
+                        $circulation_desc.=" but returned on the same day. Checked in by <b>".(count($check_in_name) > 0 ? e(ucwords(strtolower($check_in_name[0]->fullname))) : "N/A")."</b>";
                     }elseif ($exp_RD > $RD) {
-                        $circulation_desc.=" but returned <b>".$this->getDateDifference($RD,$exp_RD)." day(s)</b> earlier. Checked in by <b>".(count($check_in_name) > 0 ? ucwords(strtolower($check_in_name[0]->fullname)) : "N/A")."</b>";
+                        $circulation_desc.=" but returned <b>".$this->getDateDifference($RD,$exp_RD)." day(s)</b> earlier. Checked in by <b>".(count($check_in_name) > 0 ? e(ucwords(strtolower($check_in_name[0]->fullname))) : "N/A")."</b>";
                     }else{
-                        $circulation_desc.=" but returned <b>".$this->getDateDifference($RD,$exp_RD)." day(s)</b> later. Checked in by <b>".(count($check_in_name) > 0 ? ucwords(strtolower($check_in_name[0]->fullname)) : "N/A")."</b>";
+                        $circulation_desc.=" but returned <b>".$this->getDateDifference($RD,$exp_RD)." day(s)</b> later. Checked in by <b>".(count($check_in_name) > 0 ? e(ucwords(strtolower($check_in_name[0]->fullname))) : "N/A")."</b>";
                     }
 
                     $data = new stdClass();
@@ -446,7 +445,7 @@ class Acquisitions extends Controller
                 }
                 
                 // circulation description
-                $circulation_desc = "Borrowed on <b>".date("D dS M Y @ H:i:s A", strtotime($book_circulation_list[$index]->date_checked_out))."</b> by <b>".$book_borrower." (".$book_circulation_list[$index]->user_borrowing.")</b> expected to return on <b>".date("D dS M Y", strtotime($book_circulation_list[$index]->expected_return_date))."</b>. Checked out by <b>".(count($check_out_name) > 0 ? ucwords(strtolower($check_out_name[0]->fullname)) : "N/A")."</b>";
+                $circulation_desc = "Borrowed on <b>".date("D dS M Y @ H:i:s A", strtotime($book_circulation_list[$index]->date_checked_out))."</b> by <b>".e($book_borrower)." (".e($book_circulation_list[$index]->user_borrowing).")</b> expected to return on <b>".date("D dS M Y", strtotime($book_circulation_list[$index]->expected_return_date))."</b>. Checked out by <b>".(count($check_out_name) > 0 ? e(ucwords(strtolower($check_out_name[0]->fullname))) : "N/A")."</b>";
 
                 $data = new stdClass();
                 $data->date = $book_circulation_list[$index]->date_checked_out;
@@ -487,7 +486,19 @@ class Acquisitions extends Controller
             // check if my libraries has anything
             $libraries = count($my_libraries) > 0 ? json_decode($my_libraries[0]->valued) : [];
             
-            return view("book_details",["notification_count" => $notification_count, "student_detail" => $student_detail, "notifications" => $notifications,"libraries" => $libraries, "book_circulation_details" => $book_circulation_details,"book_details" => $book_details[0], "subject_name" => $subject_name]);
+            // label code + reservations for this title
+            $reservation_hold = Reservations::holdOn($book_details[0]->book_id);
+            if ($reservation_hold) {
+                $reservation_hold->borrower_name = Borrowers::name($reservation_hold->borrower_type, $reservation_hold->borrower_id);
+            }
+            DB::setDefaultConnection("mysql2");
+            return view("book_details",["notification_count" => $notification_count, "student_detail" => $student_detail, "notifications" => $notifications,"libraries" => $libraries, "book_circulation_details" => $book_circulation_details,"book_details" => $book_details[0], "subject_name" => $subject_name,
+                "book_code" => BookCode::encode($book_details[0]->book_id),
+                "reservation_hold" => $reservation_hold,
+                "waiting_count" => Reservations::waitingCount($book_details[0]),
+                "reserve_students" => Borrowers::studentsByClass(),
+                "reserve_staff" => Borrowers::staff(),
+            ]);
         }else {
             session()->flash("error","Book details not found, try another books!");
             return redirect("/Acquisitions");
@@ -695,7 +706,7 @@ class Acquisitions extends Controller
         DB::setDefaultConnection("mysql2");
 
         // get the table details with the keyword
-        $book_details = DB::select("SELECT * FROM `library_details` WHERE `book_title` LIKE '%".$keyword."%' OR `book_author` LIKE '%".$keyword."%' OR `book_publishers` LIKE '%".$keyword."%' OR `isbn_13` LIKE '%".$keyword."%' OR `isbn_10` LIKE '%".$keyword."%' OR `shelf_no_location` LIKE '%".$keyword."%' OR `call_no` LIKE '%".$keyword."%' OR `shelf_no_location` LIKE '%".$keyword."%' OR `keywords` LIKE '%".$keyword."%'");
+        $book_details = DB::select("SELECT * FROM `library_details` WHERE `book_title` LIKE ? OR `book_author` LIKE ? OR `book_publishers` LIKE ? OR `isbn_13` LIKE ? OR `isbn_10` LIKE ? OR `shelf_no_location` LIKE ? OR `call_no` LIKE ? OR `shelf_no_location` LIKE ? OR `keywords` LIKE ?", ["%".$keyword."%", "%".$keyword."%", "%".$keyword."%", "%".$keyword."%", "%".$keyword."%", "%".$keyword."%", "%".$keyword."%", "%".$keyword."%", "%".$keyword."%"]);
 
         // no book details
         return $book_details;

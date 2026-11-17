@@ -10,7 +10,9 @@
         <meta content="Ladybird Softech Co." name="author" />
         
         <!-- App favicon -->
-        <link rel="shortcut icon" href="/images/ladybird_dark.png">
+        <link rel="icon" type="image/png" href="{{ asset('images/ladybird-favicon.png') }}?v=4">
+        <link rel="shortcut icon" href="{{ asset('favicon.ico') }}?v=4">
+        <link rel="apple-touch-icon" href="{{ asset('images/ladybird-apple-touch.png') }}?v=4">
 
         <link href="assets/libs/bootstrap-datepicker/css/bootstrap-datepicker.min.css" rel="stylesheet" type="text/css">
 
@@ -93,195 +95,10 @@
         
         <!-- Begin page -->
         <div id="layout-wrapper">
-            <header id="page-topbar">
-                <div class="navbar-header">
-                    <div class="d-flex">
-                        <!-- LOGO -->
-                        <div class="navbar-brand-box">
-                            <a href="." class="logo logo-dark">
-                                <span class="logo-sm">
-                                    <img src="/images/ladybird_dark-removebg.png" alt="" height="40">
-                                </span>
-                                <span class="logo-lg">
-                                    <img src="/images/ladybird_dark-removebg.png" alt="" height="100">
-                                </span>
-                            </a>
-
-                            <a href="." class="logo logo-light">
-                                <span class="logo-sm">
-                                    <img src="/images/ladybird_dark-removebg.png" alt="" height="40">
-                                </span>
-                                <span class="logo-lg">
-                                    <img src="/images/ladybird_dark-removebg.png" alt="" height="100">
-                                </span>
-                            </a>
-                        </div>
-
-                        <button type="button" class="btn btn-sm px-3 font-size-16 header-item waves-effect" id="vertical-menu-btn">
-                            <i class="fa fa-fw fa-bars"></i>
-                        </button>
-                    </div>
-
-                    <div class="d-flex">
-
-                        <div class="dropdown d-inline-block d-lg-none ms-2">
-                            <button type="button" class="btn header-item noti-icon waves-effect" id="page-header-search-dropdown"
-                            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <i class="mdi mdi-magnify"></i>
-                            </button>
-                            <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end p-0"
-                                aria-labelledby="page-header-search-dropdown">
-        
-                                <form class="p-3">
-                                    <div class="form-group m-0">
-                                        <div class="input-group">
-                                            <input type="text" class="form-control" placeholder="Search ..." aria-label="Recipient's username">
-                                            <div class="input-group-append">
-                                                <button class="btn btn-primary" type="submit"><i class="mdi mdi-magnify"></i></button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-
-                        <div class="dropdown d-none d-lg-inline-block ms-1">
-                            <button type="button" class="btn header-item noti-icon waves-effect" data-bs-toggle="fullscreen">
-                                <i class="bx bx-fullscreen"></i>
-                            </button>
-                        </div>
-
-                        <div class="dropdown d-inline-block">
-                            <button type="button" class="btn header-item noti-icon waves-effect" id="page-header-notifications-dropdown"
-                            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <i class="bx bx-bell {{$notification_count > 0 ? 'bx-tada' : ''}}"></i>
-                                <span class="badge bg-danger rounded-pill">{{$notification_count > 99 ? "99+" : $notification_count}}</span>
-                            </button>
-
-                            {{-- notification details --}}
-                            <x-notification :notifications="$notifications"/>
-                        </div>
-
-                        <div class="dropdown d-inline-block">
-                            <button type="button" class="btn header-item waves-effect" id="page-header-user-dropdown"
-                            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <img class="rounded-circle header-profile-user" src="https://lsims.ladybirdsmis.com/sims/{{(session()->get("user_details")->profile_loc != null && strlen(trim(session()->get("user_details")->profile_loc)) > 0) ? session()->get("user_details")->profile_loc : "images/dp.png"}}"
-                                    alt="Header Avatar">
-                                <span class="d-none d-xl-inline-block ms-1" key="t-henry">{{session("gender") == "M" ? "Mr." : "Ms."}} {{explode(" ",ucwords(strtolower(session("fullname"))))[0]}}</span>
-                                <i class="mdi mdi-chevron-down d-none d-xl-inline-block"></i>
-                            </button>
-                            <div class="dropdown-menu dropdown-menu-end">
-                                <!-- item-->
-                                <div class="dropdown-divider"></div>
-                                <a class="dropdown-item text-danger" href="/Logout"><i class="bx bx-power-off font-size-16 align-middle me-1 text-danger"></i> <span key="t-logout">Logout</span></a>
-                            </div>
-                        </div>
-
-                        <div class="dropdown d-inline-block">
-                            <button type="button" class="btn header-item noti-icon right-bar-toggle waves-effect">
-                                <i class="bx bx-cog bx-spin"></i>
-                            </button>
-                        </div>
-
-                    </div>
-                </div>
-            </header>
+            @include('partials.topbar')
 
             <!-- ========== Left Sidebar Start ========== -->
-            <div class="vertical-menu">
-                <div data-simplebar class="h-100">
-                    <!--- Sidemenu -->
-                    <div id="sidebar-menu">
-                        @php
-                            $lib_priv = json_decode(session()->get("user_details")->library_previleges,true);
-                            function isPresent($array,$needle){
-                                if ($array == null) {
-                                    return false;
-                                }
-                                for ($index=0; $index < count($array); $index++) { 
-                                    if ($array[$index] == $needle) {
-                                        return true;
-                                    }
-                                }
-                                return false;
-                            }
-                        @endphp
-                        <!-- Left Menu Start -->
-                        <ul class="metismenu list-unstyled" id="side-menu">
-                            <li class="menu-title" key="t-menu">Menu</li>
-                            {{-- dashboard --}}
-                            <li class="">
-                                <a href="/Dashboard" class="waves-effect">
-                                    <i class="bx bx-home-circle"></i>
-                                    <span key="t-chat">Dashboard</span>
-                                </a>
-                            </li>
-                            @if (isPresent($lib_priv,"Acquisition") || count($lib_priv) == 0)
-                                <li>
-                                    <a href="/Acquisitions" class="waves-effect">
-                                        <i class="bx bx-add-to-queue"></i>
-                                        <span key="t-file-manager">Acquisitions</span>
-                                    </a>
-                                </li>
-                            @endif
-                            @if (isPresent($lib_priv,"Cataloging") || count($lib_priv) == 0)
-                                <li>
-                                    <a href="/Cataloging" class="waves-effect">
-                                        <i class="bx bx-file"></i>
-                                        <span key="t-file-manager">Cataloging</span>
-                                    </a>
-                                </li>
-                            @endif
-                            @if (isPresent($lib_priv,"Circulation") || count($lib_priv) == 0)
-                                <li>
-                                    <a href="/Circulation" class="waves-effect">
-                                        <i class="bx bx-rotate-left"></i>
-                                        <span key="t-file-manager">Circulation</span>
-                                    </a>
-                                </li>
-                            @endif
-                            @if (isPresent($lib_priv,"Report") || count($lib_priv) == 0)
-                                <li>
-                                    <a href="/Reports" class="waves-effect">
-                                        <i class="bx bxs-report"></i>
-                                        <span key="t-file-manager">Reports</span>
-                                    </a>
-                                </li>
-                            @endif
-                            @if (isPresent($lib_priv,"Settings") || count($lib_priv) == 0)
-                                <li class="">
-                                    <a href="javascript: void(0);" class="waves-effect has-arrow " aria-expanded="false">
-                                        <i class="bx bx-cog"></i>
-                                        <span key="t-jobs">Settings</span>
-                                    </a>
-                                    <ul class="sub-menu" aria-expanded="false" style="height: 0px;">
-                                        <li><a href="/Settings/User-mgmt" key="t-job-list"><i class="bx bxs-user"></i> User Management</a></li>
-                                        <li><a href="/Settings/Library-mgmt" key="t-job-list"><i class="bx bxs-book"></i> Library Management</a></li>
-                                    </ul>
-                                </li>
-                            @endif
-                            {{-- <div class="navbar-brand-box" style="bottom: 0;position: absolute;">
-                                <a href="https://ladybirdsmis.com" target="_blank" class="logo logo-dark">
-                                    <span class="logo-sm">
-                                        <img src="/assets/images/logo.svg" alt="" height="22">
-                                    </span>
-                                    <span class="logo-lg">
-                                        <img src="/assets/images/logo-dark.png" alt="" height="17">
-                                    </span>
-                                </a>
-                                <a href="https://ladybirdsmis.com" target="_blank" class="logo logo-light">
-                                    <span class="logo-sm">
-                                        <img src="/images/ladybird_dark-removebg.png" alt="" height="40">
-                                    </span>
-                                    <span class="logo-lg">
-                                        <img src="/images/ladybird_dark-removebg.png" alt="" height="100">
-                                    </span>
-                                </a>
-                            </div> --}}
-                    </div>
-                    <!-- Sidebar -->
-                </div>
-            </div>
+            @include('partials.sidebar')
             <!-- Left Sidebar End -->
 
             
@@ -634,7 +451,7 @@
                                             @endif
                                             </u></h6>
                                         @php
-                                            function elongateData($larger_length,$data){
+                                            if (!function_exists('elongateData')) { function elongateData($larger_length,$data){
                                                 // get the length of the string
                                                 $length = strlen($data);
 
@@ -646,13 +463,19 @@
                                                     $data.= ($index+1 == $larger_length ? "   " : "   ");
                                                 }
                                                 return $data;
-                                            }
+                                            } }
                                         @endphp
+                                        <div class="d-flex flex-wrap gap-2 my-2">
+                                            <button type="button" class="btn btn-sm btn-outline-primary" id="print_selected_labels"><i class="bx bx-barcode"></i> Print labels for selected</button>
+                                            <button type="button" class="btn btn-sm btn-outline-primary" id="print_page_labels"><i class="bx bx-barcode"></i> Print labels for this page</button>
+                                            <a href="/Acquisitions/Import" class="btn btn-sm btn-outline-success"><i class="bx bx-import"></i> Import books (CSV / Excel)</a>
+                                            <a href="/Acquisitions/Stock-take" class="btn btn-sm btn-outline-secondary"><i class="bx bx-list-check"></i> Stock-take</a>
+                                        </div>
                                         <div class="table-responsive">
-                                            <table id="datatable" class="table table-bordered dt-responsive  nowrap w-100">
+                                            <table id="datatable" data-server-paginated="1" class="table table-bordered dt-responsive  nowrap w-100">
                                                 <thead>
                                                 <tr>
-                                                    <th>No.</th>
+                                                    <th><input type="checkbox" class="form-check-input" id="pick_all_labels" title="Select all on this page" aria-label="Select all on this page"> No.</th>
                                                     <th>Title</th>
                                                     <th>Author</th>
                                                     <th>ISBN</th>
@@ -666,7 +489,7 @@
                                                 <tbody>
                                                     @for ($i = 0; $i < count($book_list); $i++)
                                                         <tr>
-                                                            <td>{{$i+1}}</td>
+                                                            <td><input type="checkbox" class="form-check-input label_pick" value="{{$book_list[$i]->book_id}}" aria-label="Select for labels"> {{ ($pager->firstItem() ?? 1) + $i }}</td>
                                                             <td>{{elongateData($larger_length,$book_list[$i]->book_title)}}
                                                                 @if ($book_list[$i]->availability_status == 1)
                                                                     @if ($book_list[$i]->lost_status == 0)
@@ -706,6 +529,7 @@
                                                     @endfor
                                                 </tbody>
                                             </table>
+                                            @include('partials.pagination', ['pager' => $pager])
                                         </div>
                                         <style>
                                             .w-5{
@@ -724,64 +548,14 @@
                 </div><!-- End Page-content -->
                 <!-- End Page-content -->
 
-                <footer class="footer">
-                    <div class="container-fluid">
-                        <div class="row">
-                            <div class="col-sm-6">
-                                <script>document.write(new Date().getFullYear())</script> © Ladybird Softech Co.
-                            </div>
-                            <div class="col-sm-6">
-                                <div class="text-sm-end d-none d-sm-block">
-                                    <b>Date Updated : </b>24rd Oct 2024 : 12:21AM
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </footer>
+                @include('partials.footer')
             </div>
             <!-- end main content-->
 
         </div>
         <!-- END layout-wrapper -->
 
-        <!-- Right Sidebar -->
-        <div class="right-bar">
-            <div data-simplebar class="h-100">
-                <div class="rightbar-title d-flex align-items-center px-3 py-4">
-            
-                    <h5 class="m-0 me-2">Settings</h5>
-
-                    <a href="javascript:void(0);" class="right-bar-toggle ms-auto">
-                        <i class="mdi mdi-close noti-icon"></i>
-                    </a>
-                </div>
-
-                <!-- Settings -->
-                <hr class="mt-0" />
-                <h6 class="text-center mb-0">Choose Layouts</h6>
-
-                <div class="p-4">
-                    <div class="mb-2">
-                        <img src="assets/images/layouts/layout-1.jpg" class="img-thumbnail" alt="layout images">
-                    </div>
-
-                    <div class="form-check form-switch mb-3">
-                        <input class="form-check-input theme-choice" type="checkbox" id="light-mode-switch" checked>
-                        <label class="form-check-label" for="light-mode-switch">Light Mode</label>
-                    </div>
-    
-                    <div class="mb-2">
-                        <img src="assets/images/layouts/layout-2.jpg" class="img-thumbnail" alt="layout images">
-                    </div>
-                    <div class="form-check form-switch mb-3">
-                        <input class="form-check-input theme-choice" type="checkbox" id="dark-mode-switch">
-                        <label class="form-check-label" for="dark-mode-switch">Dark Mode</label>
-                    </div>
-                </div>
-            </div> <!-- end slimscroll-menu-->
-        </div>
-        <!-- /Right-bar -->
-
+        @include('partials.rightbar')
         <!-- Right bar overlay-->
         <div class="rightbar-overlay"></div>
 
@@ -817,6 +591,25 @@
         {{-- Acqusition --}}
         <script src="/assets/js/acquisition.js"></script>
 
+        <script>
+            // barcode labels for the ticked books / the whole page
+            (function () {
+                function openLabels(ids) {
+                    if (!ids.length) { alert("Tick at least one book first."); return; }
+                    window.open("/Acquisitions/Labels?ids=" + ids.join(","), "_blank");
+                }
+                var all = document.getElementById("pick_all_labels");
+                if (all) all.addEventListener("change", function () {
+                    document.querySelectorAll(".label_pick").forEach(function (c) { c.checked = all.checked; });
+                });
+                document.getElementById("print_selected_labels").addEventListener("click", function () {
+                    openLabels(Array.from(document.querySelectorAll(".label_pick:checked")).map(function (c) { return c.value; }));
+                });
+                document.getElementById("print_page_labels").addEventListener("click", function () {
+                    openLabels(Array.from(document.querySelectorAll(".label_pick")).map(function (c) { return c.value; }));
+                });
+            })();
+        </script>
         <script src="/assets/js/app.js"></script>
     </body>
 </html>

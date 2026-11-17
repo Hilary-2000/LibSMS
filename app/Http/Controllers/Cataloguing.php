@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Support\RawPaginator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -20,15 +21,16 @@ class Cataloguing extends Controller
         // connect to mysql 2
         DB::setDefaultConnection("mysql2");
 
-        // get books
-        $search_results = null;
-        if (count($request->input()) > 0) {
-            $keyword = $request->input("keyword_search");
-            $search_results = $keyword;
-            $select = DB::select("SELECT `isbn_13`, COUNT(`isbn_13`) AS 'Total' FROM `library_details` WHERE `book_title` LIKE \"%".$keyword."%\" OR `book_author` LIKE \"%".$keyword."%\" OR `book_publishers` LIKE \"%".$keyword."%\" OR `isbn_13` LIKE \"%".$keyword."%\" OR `isbn_10` LIKE \"%".$keyword."%\" OR `shelf_no_location` LIKE \"%".$keyword."%\" OR `call_no` LIKE \"%".$keyword."%\" OR `shelf_no_location` LIKE \"%".$keyword."%\" OR `keywords` LIKE \"%".$keyword."%\" GROUP BY `isbn_13` LIMIT 100;");
-        }else {
-            $select = DB::select("SELECT `isbn_13`, COUNT(`isbn_13`) AS 'Total' FROM `library_details` GROUP BY `isbn_13` LIMIT 100;");
+        // get books, one row per title (ISBN) - paginated on the server
+        $keyword = trim((string) $request->input("keyword_search", ""));
+        $search_results = $keyword !== "" ? $keyword : null;
+        $where = "";
+        $bindings = [];
+        if ($keyword !== "") {
+            $where = "WHERE `book_title` LIKE ? OR `book_author` LIKE ? OR `book_publishers` LIKE ? OR `isbn_13` LIKE ? OR `isbn_10` LIKE ? OR `shelf_no_location` LIKE ? OR `call_no` LIKE ? OR `keywords` LIKE ?";
+            $bindings = array_fill(0, 8, "%".$keyword."%");
         }
+        [$select, $pager] = RawPaginator::paginate("SELECT `isbn_13`, COUNT(`isbn_13`) AS 'Total' FROM `library_details` $where GROUP BY `isbn_13` ORDER BY MAX(`book_id`) DESC", $bindings);
         // get the different books you have
         for ($index=0; $index < count($select); $index++) {
             // get the number of records of each book group
@@ -45,7 +47,7 @@ class Cataloguing extends Controller
             $select[$index] = array_merge($details[0],$select[$index]);
         }
         // return $select;
-        return view("catalogue",["notification_count" => $notification_count,"notifications" => $notifications ,"search_results" => $search_results,"book_list" => $select]);
+        return view("catalogue",["notification_count" => $notification_count,"notifications" => $notifications ,"search_results" => $search_results,"book_list" => $select,"pager" => $pager]);
     }
     
     function keywordSearch($keyword){
@@ -62,7 +64,7 @@ class Cataloguing extends Controller
         DB::setDefaultConnection("mysql2");
 
         // get books
-        $select = DB::select("SELECT `isbn_13`, COUNT(`isbn_13`) AS 'Total' FROM `library_details` WHERE `book_title` LIKE '%".$keyword."%' OR `book_author` LIKE '%".$keyword."%' OR `book_publishers` LIKE '%".$keyword."%' OR `isbn_13` LIKE '%".$keyword."%' OR `isbn_10` LIKE '%".$keyword."%' OR `shelf_no_location` LIKE '%".$keyword."%' OR `call_no` LIKE '%".$keyword."%' OR `shelf_no_location` LIKE '%".$keyword."%' OR `keywords` LIKE '%".$keyword."%' GROUP BY `isbn_13` LIMIT 100;");
+        $select = DB::select("SELECT `isbn_13`, COUNT(`isbn_13`) AS 'Total' FROM `library_details` WHERE `book_title` LIKE ? OR `book_author` LIKE ? OR `book_publishers` LIKE ? OR `isbn_13` LIKE ? OR `isbn_10` LIKE ? OR `shelf_no_location` LIKE ? OR `call_no` LIKE ? OR `shelf_no_location` LIKE ? OR `keywords` LIKE ? GROUP BY `isbn_13` LIMIT 100;", ["%".$keyword."%", "%".$keyword."%", "%".$keyword."%", "%".$keyword."%", "%".$keyword."%", "%".$keyword."%", "%".$keyword."%", "%".$keyword."%", "%".$keyword."%"]);
         // get the different books you have
         for ($index=0; $index < count($select); $index++) {
             // get the number of records of each book group
