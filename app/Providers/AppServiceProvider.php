@@ -12,7 +12,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // isPresent(), getDateDifference(), elongateData(), getTimeAgo() for the views
+        require_once app_path("Support/view_helpers.php");
     }
 
     /**

@@ -371,4 +371,32 @@ class LibraryFeaturesTest extends TestCase
         // the rows-per-page box carries only the search, not the notifications
         $this->assertDoesNotMatchRegularExpression('/<input type="hidden" name="notification/', $html);
     }
+
+    public function test_borrower_pages_render_with_real_loan_history(): void
+    {
+        $this->login();
+        $student = $this->school()->table("student_data")->value("adm_no");
+        $day = fn ($d) => date("YmdHis", strtotime("$d days 10:00"));
+        $ids = [];
+        foreach ([["student", $student], ["staff", "990300"]] as [$type, $who]) {
+            foreach ([[-30, -23, -24], [-20, -13, -6], [-10, -3, null]] as [$out, $due, $back]) {   // on time, late, still overdue
+                $book = $this->book(["book_title" => "History Book $type $out"]);
+                $ids[] = [$book, (int) $this->school()->table("book_circulation")->insertGetId([
+                    "book_id" => (string) $book, "book_isbn" => "", "user_checked_out" => $who, "user_borrowing" => $type,
+                    "date_checked_out" => $day($out), "expected_return_date" => date("Ymd000000", strtotime("$due days")),
+                    "return_status" => $back === null ? 0 : 1, "return_date" => $back === null ? "NULL" : $day($back), "checked_out_by" => "990300",
+                ])];
+                if ($back === null) {
+                    $this->school()->table("library_details")->where("book_id", $book)->update(["availability_status" => 0]);
+                }
+            }
+        }
+        // every page that calls the view helpers (getDateDifference etc.) with real history
+        $this->go()->get("/Circulation/Stats/View/Student/".$student)->assertOk()->assertSee("History Book student -10");
+        $this->go()->get("/Circulation/Stats/View/Staff/990300")->assertOk()->assertSee("History Book staff -10");
+        [$book, $loan] = end($ids);
+        $this->go()->get("/Circulation/View/check-out/$book/$loan")->assertOk();
+        $this->go()->get("/Circulation")->assertOk();
+        $this->go()->get("/Notification")->assertOk();
+    }
 }
