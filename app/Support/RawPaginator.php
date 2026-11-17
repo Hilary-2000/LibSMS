@@ -41,8 +41,19 @@ class RawPaginator
             "path" => $request->url(),
             "pageName" => $pageName,
         ]);
-        $pager->appends($request->except($pageName));
+        $pager->appends(array_diff_key(self::urlQuery(), [$pageName => true]));
 
         return [$rows, $pager];
+    }
+
+    /**
+     * The parameters actually in the address bar (search, filters, per_page...).
+     * Not $request->input(): the "notifications" middleware merges the whole notification list into the
+     * request, and copying that into page links made URLs thousands of characters long.
+     */
+    public static function urlQuery(): array
+    {
+        parse_str((string) request()->server("QUERY_STRING", ""), $query);
+        return $query;
     }
 }

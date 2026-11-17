@@ -7,7 +7,7 @@
         <div class="text-muted small">
             Showing <b>{{ $pager->firstItem() }}</b>–<b>{{ $pager->lastItem() }}</b> of <b>{{ number_format($pager->total()) }}</b>
             <form method="GET" action="{{ $pager->path() }}" class="d-inline ms-2">
-                @foreach (request()->except([$pager->getPageName(), 'per_page']) as $k => $v)
+                @foreach (array_diff_key(\App\Support\RawPaginator::urlQuery(), [$pager->getPageName() => 1, 'per_page' => 1]) as $k => $v)
                     @if (!is_array($v))<input type="hidden" name="{{ $k }}" value="{{ $v }}">@endif
                 @endforeach
                 <select name="per_page" class="form-select form-select-sm d-inline-block w-auto" onchange="this.form.submit()" aria-label="Rows per page">

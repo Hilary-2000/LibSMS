@@ -278,7 +278,7 @@
         <script src="/assets/js/librarian_priveleges.js"></script>
 
         <!-- Datatable init js -->
-        <script src="/assets/js/pages/datatables.init.js"></script>
+        <script src="/assets/js/pages/datatables.init.js?v=2"></script>
         <!-- Alerts Live Demo js -->
         <script src="/assets/js/pages/alerts.init.js"></script>
 

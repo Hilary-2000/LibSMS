@@ -35,7 +35,7 @@
         <strong>{{ count($books) }} label(s)</strong>
         <button onclick="window.print()">Print</button>
         <form method="GET">
-            @foreach (request()->except('skip') as $k => $v)<input type="hidden" name="{{ $k }}" value="{{ $v }}">@endforeach
+            @foreach (array_diff_key(\App\Support\RawPaginator::urlQuery(), ['skip' => 1]) as $k => $v)@if (!is_array($v))<input type="hidden" name="{{ $k }}" value="{{ $v }}">@endif @endforeach
             <label>Skip first <input type="number" name="skip" min="0" max="23" value="{{ $skip }}"> labels (part-used sheet)</label>
             <button type="submit">Apply</button>
         </form>

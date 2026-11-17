@@ -573,7 +573,7 @@
         <script src="/assets/libs/parsleyjs/parsley.min.js"></script>
 
         <!-- Datatable init js -->
-        <script src="/assets/js/pages/datatables.init.js"></script>
+        <script src="/assets/js/pages/datatables.init.js?v=2"></script>
 
         {{-- Acqusition --}}
         <script src="/assets/js/book_details.js"></script>

@@ -403,10 +403,10 @@
         <script src="/assets/libs/parsleyjs/parsley.min.js"></script>
 
         <!-- Datatable init js -->
-        <script src="/assets/js/pages/datatables.init.js"></script>
+        <script src="/assets/js/pages/datatables.init.js?v=2"></script>
 
         <!-- Alerts Live Demo js -->
-        <script src="/assets/js/circulation.js"></script>
+        <script src="/assets/js/circulation.js?v=2"></script>
         <script>
             // page links of the "returned" list end in #checked_in: reopen that tab after paging
             if (window.location.hash === "#checked_in") {

@@ -343,4 +343,32 @@ class LibraryFeaturesTest extends TestCase
         $this->go()->get("/Logout");
         $this->go()->get("/")->assertOk()->assertSee("window.LIBRARY_THEME_SAVE = null", false);
     }
+
+    public function test_page_links_keep_the_search_but_never_the_notification_list(): void
+    {
+        $this->login();
+        for ($i = 0; $i < 12; $i++) {
+            $this->book(["book_title" => "Linkcheck Book $i"]);
+        }
+        // an overdue loan, so the notifications middleware has a list to merge into the request
+        $overdue = $this->book(["book_title" => "Linkcheck Overdue"]);
+        $this->school()->table("book_circulation")->insert([
+            "book_id" => (string) $overdue, "user_checked_out" => "1", "user_borrowing" => "student",
+            "date_checked_out" => date("YmdHis", strtotime("-9 days")), "expected_return_date" => date("YmdHis", strtotime("-2 days")), "return_status" => 0,
+        ]);
+        \Illuminate\Support\Facades\Cache::flush();
+
+        $html = $this->go()->get("/Acquisitions?per_page=10&keyword_search=Linkcheck")->assertOk()->getContent();
+        preg_match_all('/href="([^"]*(?:\?|&amp;|&)page=\d+[^"]*)"/', $html, $m);
+        $this->assertNotEmpty($m[1], "page links are shown");
+        foreach ($m[1] as $href) {
+            $href = html_entity_decode($href);
+            $this->assertStringContainsString("keyword_search=Linkcheck", $href);
+            $this->assertStringContainsString("per_page=10", $href);
+            $this->assertStringNotContainsString("notification", $href);
+            $this->assertLessThan(200, strlen($href), "page link stays short: $href");
+        }
+        // the rows-per-page box carries only the search, not the notifications
+        $this->assertDoesNotMatchRegularExpression('/<input type="hidden" name="notification/', $html);
+    }
 }

@@ -289,7 +289,7 @@
         <script src="/assets/libs/parsleyjs/parsley.min.js"></script>
 
         <!-- Datatable init js -->
-        <script src="assets/js/pages/datatables.init.js"></script>
+        <script src="/assets/js/pages/datatables.init.js?v=2"></script>
         {{-- Excel / PDF / print export for the report tables. All rows are exported, not just the visible page. --}}
         <script src="/assets/libs/jszip/jszip.min.js"></script>
         <script src="/assets/libs/pdfmake/build/pdfmake.min.js"></script>

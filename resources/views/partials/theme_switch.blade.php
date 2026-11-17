@@ -15,5 +15,5 @@
         .theme-toast.show { transform: translate(-50%, 0); opacity: 1; }
         .theme-toast i { font-size: 17px; color: var(--bs-primary); }
     </style>
-    <script src="/assets/js/theme.js" defer></script>
+    <script src="/assets/js/theme.js?v=2" defer></script>
 @endonce
