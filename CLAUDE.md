@@ -18,6 +18,11 @@ Instructions for Claude Code when working in this repository.
   project lives at `/var/www/html/LibSMS` (locally it is `/opt/lampp/htdocs/LibSMS`).
   Deployments, migrations and server changes there affect the other apps as well.
 
+- **UI template:** New pages follow the Skote admin template (v4.4.0), at
+  `/opt/lampp/htdocs/skote template.zip` (i.e. `../skote template.zip` from this project).
+  Reference HTML pages are in `Skote_Html_Laravel_v4.4.0/HTML/Admin/dist/` inside the zip; LibSMS
+  already serves Skote's CSS/JS/images from `public/assets/`.
+
 <!-- Add new "remember this" instructions from the user above this line. -->
 
 ## Project overview
