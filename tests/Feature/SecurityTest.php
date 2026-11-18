@@ -167,6 +167,57 @@ class SecurityTest extends TestCase
         $this->get("/Acquisitions")->assertRedirect("/Dashboard");
     }
 
+    public function test_stock_take_has_its_own_privilege(): void
+    {
+        // Acquisitions alone no longer opens Stock-take
+        $username = $this->makeUser(990020, ["library_previleges" => '["Acquisition"]']);
+        $this->loginAs($username);
+        $this->resetDb();
+        // neither the sidebar entry nor the button on the Acquisitions page is shown
+        // (the "What's new" window may still mention it; the server refuses the page anyway)
+        $this->get("/Acquisitions")->assertOk()
+            ->assertDontSee('<a href="/Acquisitions/Stock-take" class="waves-effect">', false)
+            ->assertDontSee('<a href="/Acquisitions/Stock-take" class="btn', false);
+        $this->resetDb();
+        $this->get("/Acquisitions/Stock-take")->assertRedirect("/Dashboard");
+
+        // Stock-take alone opens Stock-take but not Acquisitions
+        DB::connection("mysql")->table("user_tbl")->where("user_id", 990020)->update(["library_previleges" => '["Stock-take"]']);
+        $this->resetDb();
+        $this->get("/Acquisitions/Stock-take")->assertOk();
+        $this->resetDb();
+        $this->get("/Acquisitions")->assertRedirect("/Dashboard");
+    }
+
+    public function test_privilege_page_matches_the_menu_and_saves_only_known_privileges(): void
+    {
+        $this->makeUser(990021, ["library_previleges" => '["Acquisition"]']);
+        $admin = $this->makeUser(990022, ["library_previleges" => '["Settings"]']);
+        $this->loginAs($admin);
+        $this->resetDb();
+        $page = $this->get("/Settings/User-mgmt/990021")->assertOk();
+        foreach (\App\Http\Middleware\LibraryAccess::PRIVILEGES as $privilege => $info) {
+            $page->assertSee('value="'.$privilege.'"', false)->assertSee($info["label"]);
+        }
+        $page->assertSee("Lend a book, Borrowing history");
+
+        $this->resetDb();
+        $this->post("/settings/store_privileges", ["user_id" => 990021, "store_privileges" => '["Report","Stock-take","Hacker","Acquisition"]'])
+            ->assertRedirect("/Settings/User-mgmt/990021");
+        $this->assertSame('["Acquisition","Stock-take","Report"]', DB::connection("mysql")->table("user_tbl")->where("user_id", 990021)->value("library_previleges"));
+    }
+
+    public function test_upgrade_command_gives_acquisition_users_stock_take(): void
+    {
+        $this->makeUser(990023, ["library_previleges" => '["Acquisition","Report"]']);
+        $this->makeUser(990024, ["library_previleges" => '["Circulation"]']);
+        $this->artisan("library:add-stocktake-privilege")->assertSuccessful();
+        $this->artisan("library:add-stocktake-privilege")->assertSuccessful(); // second run changes nothing
+        $users = DB::connection("mysql")->table("user_tbl");
+        $this->assertSame('["Acquisition","Stock-take","Report"]', (clone $users)->where("user_id", 990023)->value("library_previleges"));
+        $this->assertSame('["Circulation"]', (clone $users)->where("user_id", 990024)->value("library_previleges"));
+    }
+
     public function test_state_changing_actions_are_post_only(): void
     {
         $username = $this->makeUser(990009);

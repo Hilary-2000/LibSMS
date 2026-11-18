@@ -16,11 +16,25 @@ use Symfony\Component\HttpFoundation\Response;
  *   ->middleware("library:Acquisition,Circulation") // needs ANY of the listed privileges
  *
  * Privileges live in `ladybird_smis`.`user_tbl`.`library_previleges` as a JSON list, e.g.
- * ["Acquisition","Cataloging","Circulation","Report","Settings"]. An empty list means
+ * ["Acquisition","Cataloging","Circulation","Stock-take","Report","Settings"]. An empty list means
  * full access - the same rule the sidebar already uses to decide which menus to show.
  */
 class LibraryAccess
 {
+    /**
+     * Every privilege, in sidebar order: stored value => [label shown to admins, menu pages it unlocks].
+     * The privilege page (change_lib_previleges) is built from this list, so keep it in step with
+     * partials/sidebar.blade.php and the "library:X" guards in routes/web.php.
+     */
+    public const PRIVILEGES = [
+        "Acquisition" => ["label" => "Acquisitions", "covers" => "Acquisitions: add, edit, import and label books"],
+        "Cataloging"  => ["label" => "Cataloging", "covers" => "Cataloging"],
+        "Circulation" => ["label" => "Circulation", "covers" => "Lend a book, Borrowing history (return a book), Statistics, Reservations"],
+        "Stock-take"  => ["label" => "Stock-take", "covers" => "Stock-take: scan the shelves and find missing or misplaced books"],
+        "Report"      => ["label" => "Reports", "covers" => "Reports"],
+        "Settings"    => ["label" => "Settings", "covers" => "User Management, Library Management, Audit Log"],
+    ];
+
     public function handle(Request $request, Closure $next, string ...$privileges): Response
     {
         if (session("school_details") == null || session("user_id") == null) {

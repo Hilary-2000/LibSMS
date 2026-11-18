@@ -72,7 +72,9 @@ class Settings extends Controller
         $school_code = session()->get("school_details")->school_code;
 
         $user_id = $request->input("user_id");
-        $store_privileges = $request->input("store_privileges");
+        // keep only known privileges, in menu order, so the stored list always matches the menu
+        $chosen = \App\Http\Middleware\LibraryAccess::parsePrivileges($request->input("store_privileges"));
+        $store_privileges = json_encode(array_values(array_intersect(array_keys(\App\Http\Middleware\LibraryAccess::PRIVILEGES), $chosen)));
 
         DB::connection("mysql")->update("UPDATE `user_tbl` SET `library_previleges` = ? WHERE `user_id` = ? AND `school_code` = ?",[$store_privileges,$user_id,$school_code]);
         session()->flash("success","Privileges have been updated successfully!");

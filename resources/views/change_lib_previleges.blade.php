@@ -167,55 +167,29 @@
                                             </div>
                                         </div>
                                         @php
-                                            $library_previleges = json_decode($user_data->library_previleges,true);
-                                            if (!function_exists('isPresent')) { function isPresent($array,$needle){
-                                                if ($array == null) {
-                                                    return false;
-                                                }
-                                                for ($index=0; $index < count($array); $index++) { 
-                                                    if ($array[$index] == $needle) {
-                                                        return true;
-                                                    }
-                                                }
-                                                return false;
-                                            } }
+                                            $library_previleges = \App\Http\Middleware\LibraryAccess::parsePrivileges($user_data->library_previleges);
                                         @endphp
                                         <div class="table-responsive">
-                                            <p class="card-title-desc">Check the options you want the user to access!</p>
+                                            <p class="card-title-desc">Check the menu sections this user can open. The Dashboard is always available. Leaving every box unchecked gives full access.</p>
                                             <table id="" class="table table-bordered dt-responsive  nowrap w-100">
                                                 <thead>
                                                 <tr>
                                                     <th>No.</th>
                                                     <th>Privileges</th>
-                                                    <th>Allowed <input class="form-check-input " id="input_fields" type="checkbox" value="Acquisition"></th>
+                                                    <th>Allowed <input class="form-check-input " id="input_fields" type="checkbox" aria-label="Allow all"></th>
                                                 </tr>
                                                 </thead>
                                                 <tbody>
+                                                    @foreach (\App\Http\Middleware\LibraryAccess::PRIVILEGES as $privilege => $info)
                                                     <tr>
-                                                        <td>1.</td>
-                                                        <td>Acquisitions</td>
-                                                        <td><input class="form-check-input input_fields" {{isPresent($library_previleges,"Acquisition") ? "checked" : ""}} type="checkbox" value="Acquisition"></td>
+                                                        <td>{{ $loop->iteration }}.</td>
+                                                        <td>
+                                                            {{ $info["label"] }}
+                                                            <small class="text-muted d-block text-wrap">{{ $info["covers"] }}</small>
+                                                        </td>
+                                                        <td><input class="form-check-input input_fields" {{ in_array($privilege, $library_previleges, true) ? "checked" : "" }} type="checkbox" value="{{ $privilege }}" aria-label="{{ $info["label"] }}"></td>
                                                     </tr>
-                                                    <tr>
-                                                        <td>2.</td>
-                                                        <td>Cataloging</td>
-                                                        <td><input class="form-check-input input_fields" {{isPresent($library_previleges,"Cataloging") ? "checked" : ""}} type="checkbox" value="Cataloging"></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>3.</td>
-                                                        <td>Circulation</td>
-                                                        <td><input class="form-check-input input_fields" {{isPresent($library_previleges,"Circulation") ? "checked" : ""}} type="checkbox" value="Circulation"></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>4.</td>
-                                                        <td>Report</td>
-                                                        <td><input class="form-check-input input_fields" {{isPresent($library_previleges,"Report") ? "checked" : ""}} type="checkbox" value="Report"></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>5.</td>
-                                                        <td>Settings</td>
-                                                        <td><input class="form-check-input input_fields" {{isPresent($library_previleges,"Settings") ? "checked" : ""}} type="checkbox" value="Settings"></td>
-                                                    </tr>
+                                                    @endforeach
                                                 </tbody>
                                             </table>
                                             <form action="/settings/store_privileges" method="POST">

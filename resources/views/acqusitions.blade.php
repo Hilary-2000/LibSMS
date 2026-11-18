@@ -466,7 +466,10 @@
                                             <button type="button" class="btn btn-sm btn-outline-primary" id="print_selected_labels"><i class="bx bx-barcode"></i> Print labels for selected</button>
                                             <button type="button" class="btn btn-sm btn-outline-primary" id="print_page_labels"><i class="bx bx-barcode"></i> Print labels for this page</button>
                                             <a href="/Acquisitions/Import" class="btn btn-sm btn-outline-success"><i class="bx bx-import"></i> Import books (CSV / Excel)</a>
+                                            @php $stock_priv = \App\Http\Middleware\LibraryAccess::parsePrivileges(optional(session()->get("user_details"))->library_previleges); @endphp
+                                            @if (count($stock_priv) == 0 || in_array("Stock-take", $stock_priv, true))
                                             <a href="/Acquisitions/Stock-take" class="btn btn-sm btn-outline-secondary"><i class="bx bx-list-check"></i> Stock-take</a>
+                                            @endif
                                         </div>
                                         <div class="table-responsive">
                                             <table id="datatable" data-server-paginated="1" class="table table-bordered dt-responsive  nowrap w-100">

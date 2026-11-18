@@ -70,7 +70,7 @@
                                     </ul>
                                 </li>
                             @endif
-                            @if ($can("Acquisition"))
+                            @if ($can("Stock-take"))
                                 <li>
                                     <a href="/Acquisitions/Stock-take" class="waves-effect">
                                         <i class="bx bx-list-check"></i>

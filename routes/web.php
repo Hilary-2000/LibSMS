@@ -75,8 +75,10 @@ Route::middleware("library:Acquisition")->group(function () {
     Route::get("/Acquisitions/Import/Template",[ImportBooks::class,"template"]);
     Route::post("/Acquisitions/Import/Preview",[ImportBooks::class,"preview"])->middleware("notifications");
     Route::post("/Acquisitions/Import/Confirm",[ImportBooks::class,"confirm"]); // audited inside (one entry per import)
-
-    // stock-take
+});
+// Stock-take (own privilege since 2026-11-18; run `php artisan library:add-stocktake-privilege` once
+// so users who already had Acquisitions keep access)
+Route::middleware("library:Stock-take")->group(function () {
     Route::get("/Acquisitions/Stock-take",[StockTake::class,"index"])->middleware("notifications");
     Route::post("/Acquisitions/Stock-take/Start",[StockTake::class,"start"])->middleware("audit:Started a stock-take");
     Route::get("/Acquisitions/Stock-take/{stocktake_id}",[StockTake::class,"show"])->middleware("notifications");
